@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AuthForm from "./components/auth-form";
 import Dashboard from "./dashboard";
+import {Document} from "./pages/document";
 
 export default function App() {
   return (
@@ -24,6 +25,12 @@ export default function App() {
             />
           }
         />
+          <Route
+              path="/documents"
+              element={
+                    <Document />
+              }
+          />
         <Route path="/" element={<Dashboard />} />
       </Routes>
     </Router>
