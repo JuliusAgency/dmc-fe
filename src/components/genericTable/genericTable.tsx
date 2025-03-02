@@ -82,19 +82,6 @@ export const GenericTable = ({
         rows={rows}
         hideFooterPagination={disableFooter}
         hideFooterSelectedRowCount={disableFooter}
-        slots={{
-          noRowsOverlay: () => (
-            <div
-              style={{
-                textAlign: "center",
-                alignContent: "center",
-                height: "100%",
-              }}
-            >
-              אין שורות
-            </div>
-          ),
-        }}
         columns={columns}
         paginationMode={"server"}
         rowCount={totalCount}
