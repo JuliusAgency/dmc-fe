@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AuthForm from "./components/AuthForm";
+import AuthForm from "./components/auth-form";
 import Dashboard from "./dashboard";
 
 export default function App() {
