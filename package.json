@@ -13,13 +13,20 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.6",
+    "@mui/lab": "^6.0.0-beta.29",
     "@mui/material": "^6.4.6",
+    "@mui/x-data-grid-pro": "^7.27.2",
+    "@mui/x-date-pickers-pro": "^7.27.1",
+    "@mui/x-license": "^7.26.0",
     "axios": "^1.8.1",
+    "dayjs": "^1.11.13",
     "formik": "^2.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-query": "^3.39.3",
     "react-router-dom": "^6.30.0",
-    "yup": "^1.6.1"
+    "yup": "^1.6.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
