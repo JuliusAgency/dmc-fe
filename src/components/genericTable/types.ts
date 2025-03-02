@@ -15,6 +15,4 @@ export interface GenericTableProps {
   pageSize?: number;
   initialPage?: number;
   disableFooter?: boolean;
-  isJobStatusCellStyling?: boolean
-  purchaseHistoryStyling?: boolean
 }

@@ -10,7 +10,6 @@ export const Document = () => {
 
     const documentsQuery = useGetAllDocuments({ pageSize: 10, page: 1 })
 
-console.log(documentsQuery.data)
 
     return (
         <Grid container display={'flex'} justifyContent={'center'}>

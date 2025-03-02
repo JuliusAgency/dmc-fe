@@ -51,34 +51,3 @@ export const darkThemePalette: Partial<Palette> = {
     disabled: "#a4a6b1",
   },
 };
-//
-// export const darkThemePalette: Partial<Palette> = {
-//   background: {
-//     default: "#080F19",
-//     paper: "#2A394A",
-//   },
-//   primary: {
-//     main: "#04222F",
-//     dark: "##009cda",
-//     light: "##dcf1fa",
-//     contrastText: "#E1EBFE",
-//   },
-//   secondary: {
-//     main: "#003855",
-//     contrastText: "#252F43",
-//     light: "##84d7ff",
-//     dark: "##E1EBFE",
-//   },
-//   //user as accent color
-//   warning: {
-//     main: "#670809",
-//     contrastText: "#342D3F",
-//     light: "#ff3116",
-//     dark: "#E1EBFE",
-//   },
-//   text: {
-//     primary: "#E1EBFE",
-//     secondary: "#485671",
-//     disabled: "#7d8bab",
-//   },
-// };

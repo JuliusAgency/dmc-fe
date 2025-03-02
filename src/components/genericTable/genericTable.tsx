@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { DataGridPro, GridCellParams } from "@mui/x-data-grid-pro";
+import { DataGridPro, } from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material";
 import { alpha } from "@mui/material/styles";
@@ -60,8 +60,6 @@ export const GenericTable = ({
   initialPage = 0,
   disableFooter = false,
   StyledComponent = StyledDataGrid,
-  isJobStatusCellStyling  = false,
-                               purchaseHistoryStyling=false
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -74,39 +72,6 @@ export const GenericTable = ({
     }),
     [initialPage, pageSize],
   );
-  const getGridCellClassName = (params: GridCellParams) => {
-    //if column is 'jtStatus' and value is 'rejected' or 'approved' then add class to cell
-    if (params.field === "jtStatus" && isJobStatusCellStyling) {
-      if (params.row?.jtStatus?.id === 1) {
-        return "approved";
-      } else if (params.row?.jtStatus?.id === 2) {
-        return "rejected";
-      } else if (params.row?.jtStatus?.id === 3) {
-        return "inHold";
-      } else if (params.row?.jtStatus?.id === 4) {
-        return "recruited";
-      } else if (params.row?.jtStatus?.id === 5) {
-        return "expired";
-      } else if (params.row?.jtStatus?.id === 6) {
-        return "accepted";
-      } else if (params.row?.jtStatus?.id === 7) {
-        return "recruitment_attempt";
-      } else if (params.row?.jtStatus?.id === 8) {
-        return "resume_sent"
-      } else if (params.row?.jtStatus?.id === 9) {
-        return "job_interview";
-      } else if (params.row?.jtStatus?.id === 10) {
-        return "candidate_accepted_to_job";
-      }
-    } else if(params.field === "isActive" && purchaseHistoryStyling){
-      if(params.row?.isActive) {
-        return 'active';
-      }
-      return 'inactive';
-    }
-
-    return "";
-  };
 
   return (
     <Box sx={sx} borderColor={"red"}>
@@ -138,7 +103,6 @@ export const GenericTable = ({
         disableRowSelectionOnClick
         disableVirtualization={true}
         hideFooterRowCount={loading}
-        getCellClassName={getGridCellClassName}
       />
     </Box>
   );
