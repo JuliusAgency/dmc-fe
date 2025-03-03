@@ -1,8 +1,11 @@
-// src/hooks/document/documentHooks.ts
+import { useMutation, UseMutationResult } from "react-query";
+import { AxiosError } from "axios";
+
 import { useQuery, UseQueryResult } from "react-query";
-import {getAllDocuments} from "../../api/documentAPI/document.ts";
+import {getAllDocuments, uploadDocument} from "../../api/documentAPI/document.ts";
 import {PaginationModel} from "../../consts/types.ts";
 import { GetAllDocumentsResponse} from "../../api/documentAPI/types.ts";
+import {DocumentEndpoints} from "../../api/documentAPI/consts.ts";
 
 export const useGetAllDocuments = (
     headers: PaginationModel,
@@ -15,4 +18,9 @@ export const useGetAllDocuments = (
             refetchOnWindowFocus: false,
         },
     );
+};
+
+export const useUploadDocument = (): UseMutationResult<DocumentType[], AxiosError, any> => {
+    return useMutation<DocumentType[], AxiosError, any>(uploadDocument, {
+    });
 };

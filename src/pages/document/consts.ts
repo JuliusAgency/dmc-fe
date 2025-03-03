@@ -1,5 +1,7 @@
 import {GridColDef} from "@mui/x-data-grid";
 
+const RELATIONS: string[] = [""]
+
 export const COLUMNS: GridColDef[] = [
     {
         field: "id",

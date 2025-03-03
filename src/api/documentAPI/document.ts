@@ -8,7 +8,7 @@ export const getAllDocuments = async (
     headers: PaginationModel,
     relations?: string[],
 ): Promise<GetAllDocumentsResponse> => {
-
+console.log(headers)
     const { data } = await API.get(DocumentEndpoints.getAllDocuments, {
         params: {
             filters: JSON.stringify({}),
@@ -22,3 +22,12 @@ export const getAllDocuments = async (
 
     return data;
 }
+
+export const uploadDocument= async (file: any) => {
+    const { data } = await API.post<DocumentType[]>(DocumentEndpoints.uploadDocument, file, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    return data;
+};
