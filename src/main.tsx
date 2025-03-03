@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.tsx'
 import { LicenseInfo } from "@mui/x-license";
 import { QueryClient, QueryClientProvider } from "react-query";
