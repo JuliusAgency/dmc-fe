@@ -5,7 +5,6 @@ export interface DocumentType {
     format: string
     projectCode: string
     updateDate: Date
-    createDate: Date
     revision: string
     isFinal: boolean
     revisionGroup: string

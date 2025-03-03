@@ -2,18 +2,19 @@ import { useMutation, UseMutationResult } from "react-query";
 import { AxiosError } from "axios";
 
 import { useQuery, UseQueryResult } from "react-query";
-import {getAllDocuments, getFile, uploadDocument} from "../../api/documentAPI/document.ts";
+import {createDocument, getAllDocuments, getFile, restoreRevision, uploadDocument} from "../../api/documentAPI/document.ts";
 import {PaginationModel} from "../../consts/types.ts";
 import { GetAllDocumentsResponse} from "../../api/documentAPI/types.ts";
 import {DocumentFilters} from "../../pages/document/types.ts";
 
 export const useGetAllDocuments = (
     headers: PaginationModel,
-    filters: DocumentFilters,
+    filters: Partial<DocumentFilters>,
     relations?: string[],
+    queryKey?: string
 ): UseQueryResult<GetAllDocumentsResponse, Error> => {
     return useQuery(
-        ["getAllDocuments", headers, relations],
+        [queryKey ?? "getAllDocuments", headers],
         () => getAllDocuments(headers, filters, relations),
         {
             refetchOnWindowFocus: false,
@@ -36,3 +37,9 @@ export const useGetFile = (fileName?: string): UseQueryResult<Blob, Error> => {
         },
     );
 };
+
+export const useCreateDocument = (): UseMutationResult<DocumentType, AxiosError, Partial<DocumentType>> =>
+    useMutation(createDocument);
+
+export const useRestoreRevision = (): UseMutationResult<DocumentType, AxiosError, string> =>
+    useMutation<DocumentType, AxiosError, string>(restoreRevision);

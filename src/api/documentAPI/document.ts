@@ -7,7 +7,7 @@ import { DocumentFilters } from "../../pages/document/types.ts";
 
 export const getAllDocuments = async (
     headers: PaginationModel,
-    filters: DocumentFilters,
+    filters: Partial<DocumentFilters>,
     relations?: string[]
 ): Promise<GetAllDocumentsResponse> => {
     let transformedFilters: Record<string, any> = {};
@@ -26,6 +26,21 @@ export const getAllDocuments = async (
                         transformedFilters = {
                             ...transformedFilters,
                             isFinal
+                        };
+                    }
+                },
+            },
+        ],
+        [
+            'revisionGroup',
+            {
+                description: 'קבוצת גרסא',
+                action: () => {
+                    const revisionGroup = filters['revisionGroup'];
+                    if (revisionGroup) {
+                        transformedFilters = {
+                            ...transformedFilters,
+                            revisionGroup
                         };
                     }
                 },
@@ -60,6 +75,15 @@ export const uploadDocument = async (file: File) => {
             "Content-Type": "multipart/form-data",
         },
     });
+    return data;
+};
+
+export const createDocument = (document: Partial<DocumentType>): Promise<DocumentType> => {
+    return API.post(DocumentEndpoints.createDocument, document);
+}
+
+export const restoreRevision = async (id: string): Promise<DocumentType> => {
+    const { data } = await API.post<DocumentType>(`${DocumentEndpoints.restoreRevision}${id}`);
     return data;
 };
 

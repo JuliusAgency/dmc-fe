@@ -3,20 +3,23 @@ import { COLUMNS } from "./consts.ts";
 import { useGetAllDocuments, useGetFile } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
 import { PaginationModel } from "../../consts/types.ts";
-import { Button, Grid } from "@mui/material";
+import {Box, Button, Grid} from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { GridColDef } from "@mui/x-data-grid";
+import {RevisionGroup} from "./components/revisionGroup";
+import EditIcon from '@mui/icons-material/Edit';
 
 export const Document = () => {
     const [pagination, setPagination] = useState<PaginationModel>({ pageSize: 10, page: 0 });
     const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState<boolean>(false);
     const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(null);
+    const [documentToEdit, setDocumentToEdit] = useState<DocumentType | undefined>(undefined)
 
     const documentsQuery = useGetAllDocuments(pagination, { isFinal: true });
     const fileQuery = useGetFile(fileNameToDownload ?? "");
 
-    const toggleAddDocumentModal = useCallback(() => {
+    const toggleDocumentModal = useCallback(() => {
         setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
     }, [isAddDocumentModalOpen]);
 
@@ -37,6 +40,11 @@ export const Document = () => {
         setFileNameToDownload(fileName);
     };
 
+    const handleEdit = (document: DocumentType) => {
+        setDocumentToEdit(document)
+        toggleDocumentModal()
+    }
+
     const ACTION_COLUMN: GridColDef = {
         field: "action",
         headerName: "פעולות",
@@ -46,9 +54,14 @@ export const Document = () => {
         cellClassName: "socialMedia",
         renderCell: ({ row }) => {
             return (
-                <Button variant="outlined" onClick={() => handleOpenFile(row.fileName)}>
-                    <DownloadForOfflineIcon />
-                </Button>
+                <Box display={'flex'} gap={1}>
+                    <Button variant="outlined" onClick={() => handleOpenFile(row.fileName)}>
+                        <DownloadForOfflineIcon />
+                    </Button>
+                    <Button variant="outlined" onClick={() => handleEdit(row)}>
+                        <EditIcon />
+                    </Button>
+                </Box>
             );
         },
     };
@@ -56,7 +69,7 @@ export const Document = () => {
     return (
         <Grid container display={'flex'} justifyContent={'center'} flexDirection={'column'} alignItems={'center'}>
             <Grid item xs={12} display={'flex'} justifyContent={'flex-end'} alignItems={'start'}>
-                <Button variant="outlined" onClick={toggleAddDocumentModal}>
+                <Button variant="outlined" onClick={toggleDocumentModal}>
                     הוספת מסמך
                 </Button>
             </Grid>
@@ -66,11 +79,15 @@ export const Document = () => {
                 columns={[...COLUMNS, ACTION_COLUMN]}
                 pageSize={pagination.pageSize}
                 handlePagination={setPagination}
-                sx={{ bgcolor: "background.default", height: "60vh", mb: 3 , width: '90vw'}}
+                sx={{ bgcolor: "background.default", height: "60vh", mb: 3 }}
                 totalCount={documentsQuery?.data?.total ?? 0}
                 rows={documentsQuery?.data?.data ?? []}
+                getDetailPanelHeight={() => 200}
+                getDetailPanelContent={(params) => {
+                    return <RevisionGroup revisionGroup={params.row.revisionGroup} refetchMainDocuments={documentsQuery.refetch}/>
+                }}
             />
-            <AddDocument open={isAddDocumentModalOpen} onClose={toggleAddDocumentModal} refetch={documentsQuery.refetch}/>
+            <AddDocument open={isAddDocumentModalOpen} onClose={toggleDocumentModal} refetch={documentsQuery.refetch} documentToEdit={documentToEdit}/>
         </Grid>
     );
 };
