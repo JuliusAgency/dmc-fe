@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getUser, logout } from "./api";
+import { getUser, logout } from "../../api";
 import { useNavigate } from "react-router-dom";
 import { Button, Container, Typography } from "@mui/material";
-import { setUser } from "./actions/userActions";
+import { setUser } from "../../actions/userActions";
 
 export default function Dashboard() {
   const dispatch = useDispatch();

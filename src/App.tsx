@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import AuthForm from "./components/auth-form";
-import Dashboard from "./dashboard";
+import Dashboard from "./pages/dashboard/dashboard.tsx";
 import { Document } from "./pages/document";
 import { WithTheme } from "../theme/Theme.tsx";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
