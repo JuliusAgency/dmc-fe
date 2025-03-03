@@ -5,6 +5,7 @@ import { styled } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { GenericTableProps } from "./types.ts";
 
+import { GridColDef, GridRowParams } from "@mui/x-data-grid";
 
 
 export const StyledDataGrid = styled(DataGridPro)(({ theme }) => ({
@@ -60,6 +61,8 @@ export const GenericTable = ({
                                  initialPage = 0,
                                  disableFooter = false,
                                  StyledComponent = StyledDataGrid,
+                                 getDetailPanelHeight,
+                                 getDetailPanelContent,
                              }: GenericTableProps) => {
     const initialState = useMemo(
         () => ({
@@ -88,6 +91,12 @@ export const GenericTable = ({
                 disableVirtualization
                 pagination
                 disableFooter={disableFooter}
+                getDetailPanelHeight={
+                    getDetailPanelHeight
+                        ? (params: GridRowParams) => getDetailPanelHeight(params)
+                        : undefined
+                }
+                getDetailPanelContent={getDetailPanelContent}
             />
         </Box>
     );

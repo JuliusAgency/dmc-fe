@@ -1,4 +1,4 @@
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRowParams } from "@mui/x-data-grid";
 import { GridPaginationModel } from "@mui/x-data-grid-pro";
 import { SxProps } from "@mui/material";
 import { Theme } from "@mui/material/styles";
@@ -15,4 +15,6 @@ export interface GenericTableProps {
   pageSize?: number;
   initialPage?: number;
   disableFooter?: boolean;
+  getDetailPanelHeight?: (params: GridRowParams) => number | 'auto'
+  getDetailPanelContent?: ({ row }: GridRowParams) => JSX.Element
 }
