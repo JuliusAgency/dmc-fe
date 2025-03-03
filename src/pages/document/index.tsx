@@ -70,7 +70,7 @@ export const Document = () => {
                 totalCount={documentsQuery?.data?.total ?? 0}
                 rows={documentsQuery?.data?.data ?? []}
             />
-            <AddDocument open={isAddDocumentModalOpen} onClose={toggleAddDocumentModal} />
+            <AddDocument open={isAddDocumentModalOpen} onClose={toggleAddDocumentModal} refetch={documentsQuery.refetch}/>
         </Grid>
     );
 };

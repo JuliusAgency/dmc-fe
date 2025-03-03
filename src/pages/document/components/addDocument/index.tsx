@@ -5,15 +5,12 @@ import GridInput from "../../../../components/gridItems/gridInput/GridInput.tsx"
 import { Props } from "./types.ts";
 import { GridCloseIcon } from "@mui/x-data-grid-pro";
 import { useUploadDocument } from "../../../../hooks/document/documentHooks.ts";
+import { useQueryClient } from '@tanstack/react-query'
 
-export const AddDocument = ({ open, onClose }: Props) => {
+export const AddDocument = ({ open, onClose, refetch }: Props) => {
     const { mutate: uploadDocument, isLoading: uploadingDocument } = useUploadDocument();
 
-    const [formData, setFormData] = useState<Partial<DocumentType>>({
-        name: "",
-        projectCode: "",
-        revisionGroup: "",
-    });
+    const [formData, setFormData] = useState<Partial<DocumentType>>({});
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +38,12 @@ export const AddDocument = ({ open, onClose }: Props) => {
         [],
     );
 
+    const onCloseHandler = () => {
+        handleRemoveCVFile()
+        setFormData({})
+        onClose()
+    }
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
@@ -50,7 +53,12 @@ export const AddDocument = ({ open, onClose }: Props) => {
         }
         fileFormData.append("entityData", JSON.stringify(formData));
 
-        await uploadDocument(fileFormData);
+        await uploadDocument(fileFormData, {
+            onSuccess: () => {
+                refetch()
+                onCloseHandler();
+            },
+        });
     };
 
     return (
