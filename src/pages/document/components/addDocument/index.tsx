@@ -11,11 +11,7 @@ export const AddDocument = ({ open, onClose }: Props) => {
 
     const [formData, setFormData] = useState<Partial<DocumentType>>({
         name: "",
-        fileName: "",
-        format: "",
         projectCode: "",
-        revision: "",
-        isFinal: false,
         revisionGroup: "",
     });
     const [file, setFile] = useState<File | null>(null);
@@ -77,32 +73,11 @@ export const AddDocument = ({ open, onClose }: Props) => {
                             onChange={(value) => handleInputChange("name", value)}
                         />
                         <GridInput
-                            label="שם קובץ"
-                            gridSize={12}
-                            gridSizeXL={12}
-                            type="text"
-                            onChange={(value) => handleInputChange("fileName", value)}
-                        />
-                        <GridInput
                             label="קוד פרויקט"
                             gridSize={12}
                             gridSizeXL={12}
                             type="text"
                             onChange={(value) => handleInputChange("projectCode", value)}
-                        />
-                        <GridInput
-                            label="גרסה"
-                            gridSize={12}
-                            gridSizeXL={12}
-                            type="text"
-                            onChange={(value) => handleInputChange("revision", value)}
-                        />
-                        <GridInput
-                            label="סופי"
-                            gridSize={12}
-                            gridSizeXL={12}
-                            type="text"
-                            onChange={(value) => handleInputChange("isFinal", value === "true")}
                         />
                         <GridInput
                             label="קבוצת גרסאות"

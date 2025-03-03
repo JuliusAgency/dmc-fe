@@ -50,47 +50,45 @@ export const StyledDataGrid = styled(DataGridPro)(({ theme }) => ({
 }));
 
 export const GenericTable = ({
-  columns,
-  rows,
-  loading,
-  handlePagination,
-  totalCount,
-  sx,
-  pageSize = 25,
-  initialPage = 0,
-  disableFooter = false,
-  StyledComponent = StyledDataGrid,
-}: GenericTableProps) => {
-  const initialState = useMemo(
-    () => ({
-      pagination: {
-        paginationModel: {
-          pageSize: pageSize,
-          page: initialPage,
-        },
-      },
-    }),
-    [initialPage, pageSize],
-  );
+                                 columns,
+                                 rows,
+                                 loading,
+                                 handlePagination,
+                                 totalCount,
+                                 sx,
+                                 pageSize = 25,
+                                 initialPage = 0,
+                                 disableFooter = false,
+                                 StyledComponent = StyledDataGrid,
+                             }: GenericTableProps) => {
+    const initialState = useMemo(
+        () => ({
+            pagination: {
+                paginationModel: {
+                    pageSize: pageSize,
+                    page: initialPage,
+                },
+            },
+        }),
+        [initialPage, pageSize]
+    );
 
-  return (
-    <Box sx={sx} borderColor={"red"}>
-      <StyledComponent
-        withBorder={false}
-        onPaginationModelChange={handlePagination}
-        loading={loading}
-        rows={rows}
-        hideFooterPagination={disableFooter}
-        hideFooterSelectedRowCount={disableFooter}
-        columns={columns}
-        paginationMode={"server"}
-        rowCount={totalCount}
-        pagination={!loading}
-        initialState={initialState}
-        disableRowSelectionOnClick
-        disableVirtualization={true}
-        hideFooterRowCount={loading}
-      />
-    </Box>
-  );
+    return (
+        <Box sx={sx}>
+            <StyledComponent
+                onPaginationModelChange={handlePagination}
+                loading={loading}
+                rows={rows}
+                columns={columns}
+                paginationMode="server"
+                rowCount={totalCount}
+                pageSizeOptions={[5, 10, 25]}
+                initialState={initialState}
+                disableRowSelectionOnClick
+                disableVirtualization
+                pagination
+                disableFooter={disableFooter}
+            />
+        </Box>
+    );
 };
