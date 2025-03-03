@@ -5,7 +5,6 @@ import GridInput from "../../../../components/gridItems/gridInput/GridInput.tsx"
 import { Props } from "./types.ts";
 import { GridCloseIcon } from "@mui/x-data-grid-pro";
 import { useUploadDocument } from "../../../../hooks/document/documentHooks.ts";
-import { useQueryClient } from '@tanstack/react-query'
 
 export const AddDocument = ({ open, onClose, refetch }: Props) => {
     const { mutate: uploadDocument, isLoading: uploadingDocument } = useUploadDocument();
