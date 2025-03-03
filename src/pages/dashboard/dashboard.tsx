@@ -1,42 +1,32 @@
-import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { getUser, logout } from "../../api";
-import { useNavigate } from "react-router-dom";
-import { Button, Container, Typography } from "@mui/material";
-import { setUser } from "../../actions/userActions";
+import { useState } from "react";
+import { Container, Typography, Tabs, Tab, Box } from "@mui/material";
+import ManageUsers from "./components/manageUsers";
+import ManageHomePage from "./components/manageHomePage";
+import ManageCategories from "./components/manageCategories";
 
-export default function Dashboard() {
-  const dispatch = useDispatch();
-  const user = useSelector((state: any) => state.user.user);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!user) {
-      getUser()
-        .then((response) => dispatch(setUser(response)))
-        .catch(() => navigate("/login"));
-    }
-
-    console.log(user);
-  }, [dispatch, navigate, user]);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
-  if (!user) {
-    return <div>טוען...</div>;
-  }
+export default function AdminDashboard() {
+  const [tabIndex, setTabIndex] = useState(0);
 
   return (
     <Container>
-      <Typography variant="h6">מייל: {user.email}</Typography>
-      <Typography variant="h6">תפקיד: {user.role}</Typography>
+      <Typography variant="h4" sx={{ mb: 3, textAlign: "center" }}>
+        דשבורד ניהול מערכת
+      </Typography>
+      <Tabs
+        value={tabIndex}
+        onChange={(e, newIndex) => setTabIndex(newIndex)}
+        centered
+      >
+        <Tab label="ניהול משתמשים" />
+        <Tab label="ניהול דף הבית" />
+        <Tab label="ניהול קטגוריות" />
+      </Tabs>
 
-      <Button variant="contained" color="error" onClick={handleLogout}>
-        התנתק
-      </Button>
+      <Box sx={{ mt: 3 }}>
+        {tabIndex === 0 && <ManageUsers />}
+        {tabIndex === 1 && <ManageHomePage />}
+        {tabIndex === 2 && <ManageCategories />}
+      </Box>
     </Container>
   );
 }

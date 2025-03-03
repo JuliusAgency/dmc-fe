@@ -3,8 +3,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { login } from "../api";
 import { AuthFormProps, AuthData } from "../types";
-import { signInWithCustomToken } from "firebase/auth";
-import { auth } from "../firebase";
 import { useDispatch } from "react-redux";
 import { setUser } from "../actions/userActions";
 
@@ -23,14 +21,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     onSubmit: async (values) => {
       try {
         const response = await login(values);
-        const firebaseToken = response.firebaseToken;
-
-        if (firebaseToken) {
-          await signInWithCustomToken(auth, firebaseToken);
-        }
-
         dispatch(setUser(response.user));
-
         onSuccess();
       } catch (error: any) {
         alert(error.response?.data?.message || "שגיאה");
@@ -77,10 +68,8 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             helperText={formik.touched.email && formik.errors.email}
             variant="outlined"
             fullWidth
-            size="medium"
             sx={{ mb: 2 }}
           />
-
           <TextField
             label="סיסמה"
             type="password"
@@ -89,7 +78,6 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             helperText={formik.touched.password && formik.errors.password}
             variant="outlined"
             fullWidth
-            size="medium"
             sx={{ mb: 3 }}
           />
 
@@ -97,13 +85,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             variant="contained"
             onClick={() => formik.handleSubmit()}
             fullWidth
-            size="large"
-            sx={{
-              bgcolor: "#1976d2",
-              "&:hover": {
-                bgcolor: "#1565c0",
-              },
-            }}
+            sx={{ bgcolor: "#1976d2", "&:hover": { bgcolor: "#1565c0" } }}
           >
             התחבר
           </Button>
