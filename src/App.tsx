@@ -6,6 +6,7 @@ import { WithTheme } from "../theme/Theme.tsx";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useNavigate } from "react-router-dom";
 
@@ -16,33 +17,44 @@ export default function App() {
     navigate("/");
   };
 
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retryDelay: 1500,
+      },
+    },
+  });
+
   return (
-    <WithTheme>
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        adapterLocale={"he"}
-        localeText={{
-          start: "התחלה",
-          end: "סיום",
-          nextMonth: "חודש הבא",
-          previousMonth: "חודש קודם",
-          clearButtonLabel: "נקה תאריכים",
-          dateRangePickerToolbarTitle: "בחר טווח תאריכים",
-        }}
-      >
-        <Routes>
-          <Route
-            path="/login"
-            element={<AuthForm type="login" onSuccess={handleSuccess} />}
-          />
-          <Route
-            path="/register"
-            element={<AuthForm type="register" onSuccess={handleSuccess} />}
-          />
-          <Route path="/documents" element={<Document />} />
-          <Route path="/" element={<Dashboard />} />
-        </Routes>
-      </LocalizationProvider>
-    </WithTheme>
+    <QueryClientProvider client={queryClient}>
+      <WithTheme>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={"he"}
+          localeText={{
+            start: "התחלה",
+            end: "סיום",
+            nextMonth: "חודש הבא",
+            previousMonth: "חודש קודם",
+            clearButtonLabel: "נקה תאריכים",
+            dateRangePickerToolbarTitle: "בחר טווח תאריכים",
+          }}
+        >
+          <Routes>
+            <Route
+              path="/login"
+              element={<AuthForm type="login" onSuccess={handleSuccess} />}
+            />
+            <Route
+              path="/register"
+              element={<AuthForm type="register" onSuccess={handleSuccess} />}
+            />
+            <Route path="/documents" element={<Document />} />
+            <Route path="/" element={<Dashboard />} />
+          </Routes>
+        </LocalizationProvider>
+      </WithTheme>
+    </QueryClientProvider>
   );
 }

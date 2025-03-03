@@ -4,8 +4,8 @@ export interface DocumentType {
     fileName: string
     format: string
     projectCode: string
-    updateDate: string
-    createDate: string
+    updateDate: Date
+    createDate: Date
     revision: string
     isFinal: boolean
     revisionGroup: string
