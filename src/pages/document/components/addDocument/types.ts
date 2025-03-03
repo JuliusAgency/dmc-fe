@@ -5,4 +5,5 @@ export interface Props {
     open: boolean;
     onClose: () => void;
     refetch: <TPageData>(options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined) => Promise<QueryObserverResult<GetAllDocumentsResponse, Error>>;
+    documentToEdit?: DocumentType
 }

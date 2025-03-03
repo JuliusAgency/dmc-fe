@@ -5,6 +5,8 @@ import { styled } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { GenericTableProps } from "./types.ts";
 
+import { GridColDef, GridRowParams } from "@mui/x-data-grid";
+
 const StyledDataGrid = styled(DataGridPro)(({ theme }) => ({
   borderRadius: "12px",
   border: `1px solid ${theme.palette.divider}`,
