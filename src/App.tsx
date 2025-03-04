@@ -76,11 +76,11 @@ export default function App() {
                 variant="permanent"
                 anchor="right"
                 sx={{
-                  width: open ? "240px" : "80px",
+                  width: open ? "100px" : "80px",
                   flexShrink: 0,
                   transition: "width 0.3s ease-in-out",
                   "& .MuiDrawer-paper": {
-                    width: open ? "240px" : "80px",
+                    width: open ? "130px" : "80px",
                     backgroundColor: "#ffffff",
                     borderRight: "1px solid #ddd",
                     overflowX: "hidden",
@@ -180,7 +180,11 @@ export default function App() {
                 <Route
                   path="/dashboard"
                   element={
-                    user ? <AdminDashboard /> : <Navigate to="/login" replace />
+                    user && user.role === "SYSTEM_ADMIN" ? (
+                      <AdminDashboard />
+                    ) : (
+                      <Navigate to="/login" replace />
+                    )
                   }
                 />
                 <Route

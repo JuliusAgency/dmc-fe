@@ -91,26 +91,26 @@ export default function ManageUsers() {
         </Button>
       </Box>
 
-      <Table>
+      <Table style={{ width: "70%" }}>
         <TableHead>
           <TableRow>
             <TableCell align="right">{EMAIL_LABEL}</TableCell>
             <TableCell align="right">{ROLE_LABEL}</TableCell>
-            <TableCell align="right">{RESET_PASSWORD_BUTTON}</TableCell>
+            <TableCell align="right"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map((user: any) => (
             <TableRow key={user.id}>
-              <TableCell align="right">{user.email}</TableCell>
-              <TableCell align="right">
-                <FormControl fullWidth>
-                  <InputLabel sx={{ textAlign: "right" }}>
-                    {ROLE_LABEL}
-                  </InputLabel>
+              <TableCell align="right" width="20%">
+                {user.email}
+              </TableCell>
+              <TableCell align="right" width="30%">
+                <FormControl>
                   <Select
                     value={user.role}
                     onChange={(e) => updateUserRole(user.id, e.target.value)}
+                    style={{ width: "100%" }}
                   >
                     {ROLE_OPTIONS.map((role: any) => (
                       <MenuItem key={role.value} value={role.value}>
@@ -120,7 +120,7 @@ export default function ManageUsers() {
                   </Select>
                 </FormControl>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" width="20%">
                 <Button onClick={() => resetPassword(user.id)} color="warning">
                   {RESET_PASSWORD_BUTTON}
                 </Button>

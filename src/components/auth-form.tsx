@@ -25,7 +25,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         const response = await login(values);
         dispatch(setUser(response.user));
         onSuccess();
-        navigate("/dashboard");
+        navigate("/home");
       } catch (error: any) {
         console.log(error);
         alert(error.response?.data?.message || "שגיאה");
