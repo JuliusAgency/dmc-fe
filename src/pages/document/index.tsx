@@ -16,7 +16,7 @@ export const Document = () => {
     const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(null);
     const [documentToEdit, setDocumentToEdit] = useState<DocumentType | undefined>(undefined)
 
-    const documentsQuery = useGetAllDocuments(pagination, { isFinal: true }, ["tags", "tags.tag", "category"]);
+    const documentsQuery = useGetAllDocuments(pagination, { isFinal: true }, ["tags", "tags.tag", "category", "secretLevel"]);
     const fileQuery = useGetFile(fileNameToDownload ?? "");
 
     const toggleDocumentModal = useCallback(() => {

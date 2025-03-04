@@ -1,7 +1,7 @@
 import {GridColDef} from "@mui/x-data-grid";
-import {formatDate} from "../../utils/formatDate";
+import {formatDate} from "../../../../utils/formatDate.ts";
 import {Chip, Stack} from "@mui/material";
-import {DocumentTag} from "../../api/documentAPI/types.ts";
+import {DocumentTag} from "../../../../api/documentAPI/types.ts";
 
 
 export const COLUMNS: GridColDef[] = [
@@ -30,13 +30,6 @@ export const COLUMNS: GridColDef[] = [
     {
         field: "revision",
         headerName: "גרסה",
-        headerAlign: "center",
-        align: "center",
-        width: 150,
-    },
-    {
-        field: "revisionGroup",
-        headerName: "קבוצת גרסאות",
         headerAlign: "center",
         align: "center",
         width: 150,
@@ -79,5 +72,4 @@ export const COLUMNS: GridColDef[] = [
         align: "center",
         width: 150,
     },
-
 ];

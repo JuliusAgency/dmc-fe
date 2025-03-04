@@ -59,12 +59,39 @@ export default function App() {
   const handleSuccess = () => navigate("/home");
   const handleNavigation = (path: string) => navigate(path);
   const toggleDrawer = () => setOpen(!open);
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {SnackbarProvider} from "notistack";
+import WithCache from "./hooks/cache/withCache.tsx";
+
+
+export default function App() {
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                refetchOnWindowFocus: false,
+                retryDelay: 1500,
+            },
+        },
+    })
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <WithTheme>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Box
+      <WithCache>
+          <QueryClientProvider client={queryClient}>
+              <WithTheme>
+                  <SnackbarProvider maxSnack={3}>
+                      <LocalizationProvider
+                          dateAdapter={AdapterDayjs}
+                          adapterLocale={"he"}
+                          localeText={{
+                              start: "התחלה",
+                              end: "סיום",
+                              nextMonth: "חודש הבא",
+                              previousMonth: "חודש קודם",
+                              clearButtonLabel: "נקה תאריכים",
+                              dateRangePickerToolbarTitle: "בחר טווח תאריכים",
+                          }}
+                      >
+                         <Box
             sx={{
               display: "flex",
               flexDirection: "row-reverse",
@@ -198,8 +225,10 @@ export default function App() {
               </Routes>
             </Box>
           </Box>
-        </LocalizationProvider>
-      </WithTheme>
-    </QueryClientProvider>
+                      </LocalizationProvider>
+                  </SnackbarProvider>
+              </WithTheme>
+          </QueryClientProvider>
+      </WithCache>
   );
 }

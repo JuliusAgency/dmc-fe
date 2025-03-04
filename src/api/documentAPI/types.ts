@@ -14,7 +14,7 @@ export interface DocumentType {
     revisionGroup: string
     category: Category
     secretLevel: SecretLevel
-    tags: Tag[]
+    tags: DocumentTag[] | Tag[]
 }
 
 export interface DocumentTag {
