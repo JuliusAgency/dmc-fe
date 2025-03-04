@@ -144,8 +144,9 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             disabled={Boolean(documentToEdit)}
                         />
                         <GridMultipleAutocomplete
+                            multiple={false}
                             onChange={(value) => handleInputChange("secretLevel", value)}
-                            value={formData.secretLevel}
+                            value={formData.secretLevel ?? []}
                             gridSize={12}
                             size={"medium"}
                             selectorData={{
@@ -157,7 +158,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                         <GridMultipleAutocomplete
                             multiple={false}
                             onChange={(value) => handleInputChange("category", value)}
-                            value={formData.category}
+                            value={formData.category ?? []}
                             gridSize={12}
                             size={"medium"}
                             selectorData={{
@@ -168,7 +169,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                         />
                         <GridMultipleAutocomplete
                             onChange={(value) => handleInputChange("tags", value)}
-                            value={formData.category}
+                            value={formData.tags ?? []}
                             gridSize={12}
                             size={"medium"}
                             selectorData={{
