@@ -125,27 +125,34 @@ export default function App() {
                           },
                         }}
                       >
-                        <ListItemIcon
+                        <Box
                           sx={{
-                            color: "#37474f",
-                            fontSize: "24px",
-                            minWidth: 0,
-                            marginRight: open ? "16px" : "0px", // יותר רווח בין האייקון לטקסט
+                            display: "flex",
+                            alignItems: "center",
+                            gap: open ? 2 : 0, // יותר רווח בין האייקון לטקסט
                           }}
                         >
-                          {item.icon}
-                        </ListItemIcon>
-                        {open && (
-                          <Typography
-                            variant="body1"
+                          <ListItemIcon
                             sx={{
-                              fontWeight: "bold",
                               color: "#37474f",
+                              fontSize: "24px",
+                              minWidth: 0,
                             }}
                           >
-                            {item.text}
-                          </Typography>
-                        )}
+                            {item.icon}
+                          </ListItemIcon>
+                          {open && (
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                fontWeight: "bold",
+                                color: "#37474f",
+                              }}
+                            >
+                              {item.text}
+                            </Typography>
+                          )}
+                        </Box>
                       </ListItemButton>
                     </ListItem>
                   ))}
