@@ -5,16 +5,26 @@ import GridInput from "../../../../components/gridItems/gridInput/GridInput.tsx"
 import { Props } from "./types.ts";
 import { GridCloseIcon } from "@mui/x-data-grid-pro";
 import { useCreateDocument, useUploadDocument } from "../../../../hooks/document/documentHooks.ts";
+import {useGetAllCategories} from "../../../../hooks/category/categoryHooks.ts";
+import {
+    GridMultipleAutocomplete, Option
+} from "../../../../components/gridItems/gridMultipleAutocomplete/GridMultipleAutocomplete.tsx";
+import {useGetAllTags} from "../../../../hooks/tag/tagHooks.ts";
+import {useGetAllSecretLevels} from "../../../../hooks/secretLevel/tagHooks.ts";
+import GridButton from "../../../../components/gridItems/gridButton/GridButton.tsx";
 
 export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) => {
     const { mutate: uploadDocument, isLoading: uploadingDocument } = useUploadDocument();
     const createDocument = useCreateDocument();
+    const {data: categories} = useGetAllCategories()
+    const {data: tags} = useGetAllTags()
+    const {data: secretLevel} = useGetAllSecretLevels()
 
     const [formData, setFormData] = useState<Partial<DocumentType>>({});
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleInputChange = (field: keyof DocumentType, value: string | boolean | Date) => {
+    const handleInputChange = (field: keyof DocumentType, value: string | boolean | Date | Option | Option[]) => {
         setFormData((prevData) => ({
             ...prevData,
             [field]: value,
@@ -94,16 +104,16 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
     }, [documentToEdit]);
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={onCloseHandler}>
             <DialogContent>
-                <form onSubmit={handleSubmit} style={{ height: "100%" }}>
+                <form onSubmit={handleSubmit} style={{ height: "100%", padding: 10 }}>
                     <Grid
                         container
                         display={"flex"}
                         justifyContent={"space-between"}
                         flexDirection={"column"}
                         height={"100%"}
-                        spacing={1}
+                        spacing={2}
                     >
                         <GridInput
                             required
@@ -132,6 +142,40 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             onChange={(value) => handleInputChange("revisionGroup", value)}
                             defaultValue={formData.revisionGroup ?? ''}
                             disabled={Boolean(documentToEdit)}
+                        />
+                        <GridMultipleAutocomplete
+                            onChange={(value) => handleInputChange("secretLevel", value)}
+                            value={formData.secretLevel}
+                            gridSize={12}
+                            size={"medium"}
+                            selectorData={{
+                                label: "רמת סיווג",
+                                accessorId: 'tags',
+                                options: secretLevel || [],
+                            }}
+                        />
+                        <GridMultipleAutocomplete
+                            multiple={false}
+                            onChange={(value) => handleInputChange("category", value)}
+                            value={formData.category}
+                            gridSize={12}
+                            size={"medium"}
+                            selectorData={{
+                                label: "קטגוריה",
+                                accessorId: 'categories',
+                                options: categories || [],
+                            }}
+                        />
+                        <GridMultipleAutocomplete
+                            onChange={(value) => handleInputChange("tags", value)}
+                            value={formData.category}
+                            gridSize={12}
+                            size={"medium"}
+                            selectorData={{
+                                label: "תגיות",
+                                accessorId: 'tags',
+                                options: tags || [],
+                            }}
                         />
                     </Grid>
                     <Grid>
@@ -171,9 +215,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             )}
                         </Grid>
                     </Grid>
-                    <Button type="submit" variant="contained" color="primary" fullWidth={true} disabled={uploadingDocument}>
-                        שמור
-                    </Button>
+                    <GridButton buttonText={"שמור"} type="submit" variant="contained" fullWidth={true} gridSize={12} disabled={uploadingDocument}/>
                 </form>
             </DialogContent>
         </Dialog>
