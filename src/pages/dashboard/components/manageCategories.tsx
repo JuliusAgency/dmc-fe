@@ -10,7 +10,7 @@ import {
   TableBody,
   Container,
 } from "@mui/material";
-import { getCategories, createCategory } from "../../../api";
+import { getCategories, createCategory } from "../../../api/adminAPI/admin";
 
 export default function ManageCategories() {
   const [categories, setCategories] = useState([]);

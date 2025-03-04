@@ -1,8 +1,8 @@
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { login } from "../api";
-import { AuthFormProps, AuthData } from "../types";
+import { login } from "../api/authAPI/auth";
+import { AuthFormProps, AuthData } from "../api/authAPI/types";
 import { useDispatch } from "react-redux";
 import { setUser } from "../actions/userActions";
 

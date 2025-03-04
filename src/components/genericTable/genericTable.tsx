@@ -1,50 +1,8 @@
 import { useMemo } from "react";
 import { DataGridPro } from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
-import { styled } from "@mui/material";
-import { alpha } from "@mui/material/styles";
 import { GenericTableProps } from "./types.ts";
-
-import { GridColDef, GridRowParams } from "@mui/x-data-grid";
-
-const StyledDataGrid = styled(DataGridPro)(({ theme }) => ({
-  borderRadius: "12px",
-  border: `1px solid ${theme.palette.divider}`,
-  boxShadow: theme.shadows[2],
-  "& .MuiDataGrid-columnHeaders": {
-    borderTopLeftRadius: "12px",
-    borderTopRightRadius: "12px",
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    fontWeight: 600,
-  },
-  "& .MuiDataGrid-cell": {
-    color: theme.palette.text.primary,
-    borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-    transition: "background-color 0.2s ease-in-out",
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.primary.light, 0.15),
-    },
-  },
-  "& .MuiDataGrid-row.Mui-selected .MuiDataGrid-cell": {
-    backgroundColor: alpha(theme.palette.secondary.light, 0.2),
-  },
-  "& .MuiDataGrid-footerContainer": {
-    borderBottomLeftRadius: "12px",
-    borderBottomRightRadius: "12px",
-    backgroundColor: theme.palette.background.paper,
-    borderTop: `1px solid ${theme.palette.divider}`,
-  },
-  "& .MuiDataGrid-row": {
-    "&:nth-of-type(odd)": {
-      backgroundColor: alpha(theme.palette.primary.light, 0.05),
-    },
-    transition: "background-color 0.2s ease-in-out",
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.primary.light, 0.1),
-    },
-  },
-}));
+import { GridRowParams } from "@mui/x-data-grid";
 
 export const GenericTable = ({
   columns,
@@ -56,7 +14,8 @@ export const GenericTable = ({
   pageSize = 25,
   initialPage = 0,
   disableFooter = false,
-  StyledComponent = StyledDataGrid,
+  getDetailPanelHeight,
+  getDetailPanelContent,
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -71,8 +30,8 @@ export const GenericTable = ({
   );
 
   return (
-    <Box sx={sx}>
-      <StyledComponent
+    <Box sx={{ width: "90%", height: "70vh", ...sx }}>
+      <DataGridPro
         onPaginationModelChange={handlePagination}
         loading={loading}
         rows={rows}
@@ -82,9 +41,15 @@ export const GenericTable = ({
         pageSizeOptions={[5, 10, 25]}
         initialState={initialState}
         disableRowSelectionOnClick
-        disableVirtualization
         pagination
-        disableFooter={disableFooter}
+        hideFooterPagination={disableFooter}
+        getDetailPanelHeight={
+          getDetailPanelHeight
+            ? (params: GridRowParams) => getDetailPanelHeight(params)
+            : undefined
+        }
+        getDetailPanelContent={getDetailPanelContent}
+        getRowId={(row) => row.id || Math.random()}
       />
     </Box>
   );
