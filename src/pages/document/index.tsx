@@ -1,5 +1,5 @@
 import { GenericTable } from "../../components/genericTable/genericTable";
-import { COLUMNS } from "./consts.ts";
+import { COLUMNS } from "./consts.tsx";
 import { useGetAllDocuments, useGetFile } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
 import { PaginationModel } from "../../consts/types.ts";
@@ -16,7 +16,7 @@ export const Document = () => {
     const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(null);
     const [documentToEdit, setDocumentToEdit] = useState<DocumentType | undefined>(undefined)
 
-    const documentsQuery = useGetAllDocuments(pagination, { isFinal: true });
+    const documentsQuery = useGetAllDocuments(pagination, { isFinal: true }, ["tags", "tags.tag", "category"]);
     const fileQuery = useGetFile(fileNameToDownload ?? "");
 
     const toggleDocumentModal = useCallback(() => {

@@ -1,3 +1,7 @@
+import {Category} from "../categoryAPI/types.ts";
+import { Tag } from "../tagsAPI/types.ts";
+import {SecretLevel} from "../secretLevelAPI/types.ts";
+
 export interface DocumentType {
     id: number
     name: string
@@ -8,6 +12,15 @@ export interface DocumentType {
     revision: string
     isFinal: boolean
     revisionGroup: string
+    category: Category
+    secretLevel: SecretLevel
+    tags: Tag[]
+}
+
+export interface DocumentTag {
+    tagId: number
+    documentId: number
+    tag: Tag
 }
 
 export type GetAllDocumentsResponse = { data: DocumentType[], total: number };
