@@ -59,7 +59,7 @@ export default function ManageHomePage() {
     }
     try {
       const formData = new FormData();
-      formData.append("name", "תמונה ראשונה"); // שם קבוע לתמונה
+      formData.append("name", "תמונה ראשונה");
       formData.append("image", selectedFile);
 
       await addHomeImage(formData);
@@ -101,7 +101,6 @@ export default function ManageHomePage() {
         ניהול דף הבית
       </Typography>
 
-      {/* === ניהול תמונת דף הבית === */}
       <Typography variant="h6" sx={{ mb: 1 }}>
         תמונת דף הבית
       </Typography>
@@ -127,8 +126,6 @@ export default function ManageHomePage() {
       <Button variant="contained" onClick={handleUploadImage} sx={{ mb: 2 }}>
         העלה תמונה ראשונה
       </Button>
-
-      {/* === ניהול הודעות רצות === */}
       <Typography variant="h6" sx={{ mb: 1 }}>
         הודעות רצות
       </Typography>

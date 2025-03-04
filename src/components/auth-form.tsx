@@ -5,9 +5,11 @@ import { login } from "../api/authAPI/auth";
 import { AuthFormProps, AuthData } from "../api/authAPI/types";
 import { useDispatch } from "react-redux";
 import { setUser } from "../actions/userActions";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthForm({ onSuccess }: AuthFormProps) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const formik = useFormik<AuthData>({
     initialValues: {
@@ -19,11 +21,15 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       password: Yup.string().min(6, "לפחות 6 תווים").required("סיסמה חובה"),
     }),
     onSubmit: async (values) => {
+      console.log("📌 התחלת התחברות עם הערכים:", values);
       try {
         const response = await login(values);
+        console.log("📌 Server Response:", response);
         dispatch(setUser(response.user));
         onSuccess();
+        navigate("/home");
       } catch (error: any) {
+        console.log(error);
         alert(error.response?.data?.message || "שגיאה");
       }
     },
