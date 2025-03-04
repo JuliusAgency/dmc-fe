@@ -2,7 +2,7 @@ import { Box, Dialog, DialogContent, Grid, Button, Typography, IconButton } from
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DocumentType } from "../../../../api/documentAPI/types.ts";
 import GridInput from "../../../../components/gridItems/gridInput/GridInput.tsx";
-import { Props } from "./types.ts";
+import {DocumentFormData, Props} from "./types.ts";
 import { GridCloseIcon } from "@mui/x-data-grid-pro";
 import { useCreateDocument, useUploadDocument } from "../../../../hooks/document/documentHooks.ts";
 import {useGetAllCategories} from "../../../../hooks/category/categoryHooks.ts";
@@ -12,6 +12,7 @@ import {
 import {useGetAllTags} from "../../../../hooks/tag/tagHooks.ts";
 import {useGetAllSecretLevels} from "../../../../hooks/secretLevel/tagHooks.ts";
 import GridButton from "../../../../components/gridItems/gridButton/GridButton.tsx";
+import {snackBarError, snackBarSuccess} from "../../../../components/toast/Toast.tsx";
 
 export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) => {
     const { mutate: uploadDocument, isLoading: uploadingDocument } = useUploadDocument();
@@ -20,7 +21,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
     const {data: tags} = useGetAllTags()
     const {data: secretLevel} = useGetAllSecretLevels()
 
-    const [formData, setFormData] = useState<Partial<DocumentType>>({});
+    const [formData, setFormData] = useState<Partial<DocumentFormData>>({});
     const [file, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,14 +71,28 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const { id, updateDate, ...data } = formData;
+        const newData: Partial<DocumentType> = {
+            name: formData.name,
+            projectCode: formData.projectCode,
+            revisionGroup: formData.revisionGroup,
+            secretLevel: formData.secretLevel,
+            category: formData.category,
+            tags: formData.tags,
+            format: formData.format,
+            revision: formData.revision,
+            fileName: formData.fileName
+        }
 
         if (documentToEdit && !file) {
-            await createDocument.mutateAsync({ ...data, isFinal: true } as DocumentType, {
+            await createDocument.mutateAsync({ ...newData, isFinal: true } as DocumentType, {
                 onSuccess: () => {
+                    snackBarSuccess("גרסת המסך נוצרה בהצלחה");
                     refetch();
                     onCloseHandler();
                 },
+                onError: () => {
+                    snackBarError("שגיאה ביצירת גרסת המסך");
+                }
             });
 
             return;
@@ -87,26 +102,32 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
         if (file) {
             fileFormData.append("file", file);
         }
-        fileFormData.append("entityData", JSON.stringify(data));
+        fileFormData.append("entityData", JSON.stringify(newData));
 
         uploadDocument(fileFormData, {
             onSuccess: async () => {
+                snackBarSuccess("גרסת המסך נוצרה בהצלחה");
                 await refetch();
                 onCloseHandler();
             },
+            onError: () => {
+                snackBarError("שגיאה ביצירת גרסת המסך");
+            }
         });
     };
 
     useEffect(() => {
         if (documentToEdit) {
-            setFormData(documentToEdit);
+            const tags = documentToEdit.tags?.map((item) => ({id: item.tag.id, name: item.tag.name}));
+            console.log(tags)
+            setFormData({...documentToEdit, tags: tags});
         }
     }, [documentToEdit]);
 
     return (
         <Dialog open={open} onClose={onCloseHandler}>
             <DialogContent>
-                <form onSubmit={handleSubmit} style={{ height: "100%", padding: 10 }}>
+                <form onSubmit={handleSubmit} style={{ height: "100%", padding: 10, width: '15vw' }}>
                     <Grid
                         container
                         display={"flex"}
@@ -116,6 +137,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                         spacing={2}
                     >
                         <GridInput
+                            fullWidth
                             required
                             label="שם"
                             gridSize={12}
@@ -125,6 +147,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             defaultValue={formData.name ?? ''}
                         />
                         <GridInput
+                            fullWidth
                             required
                             label="קוד פרויקט"
                             gridSize={12}
@@ -134,6 +157,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             defaultValue={formData.projectCode ?? ''}
                         />
                         <GridInput
+                            fullWidth
                             required={Boolean(documentToEdit)}
                             label="קבוצת גרסאות"
                             gridSize={12}
@@ -151,7 +175,7 @@ export const AddDocument = ({ open, onClose, refetch, documentToEdit }: Props) =
                             size={"medium"}
                             selectorData={{
                                 label: "רמת סיווג",
-                                accessorId: 'tags',
+                                accessorId: 'secretLevel',
                                 options: secretLevel || [],
                             }}
                         />

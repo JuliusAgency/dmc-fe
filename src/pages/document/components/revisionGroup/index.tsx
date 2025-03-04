@@ -4,7 +4,7 @@ import { GenericTable } from "../../../../components/genericTable/genericTable.t
 import { useGetAllDocuments, useRestoreRevision } from "../../../../hooks/document/documentHooks.ts";
 import { useCallback, useState } from "react";
 import { PaginationModel } from "../../../../consts/types.ts";
-import { COLUMNS } from "./consts.ts";
+import { COLUMNS } from "./consts.tsx";
 import { GridColDef } from "@mui/x-data-grid";
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,7 +15,7 @@ export const RevisionGroup = ({ revisionGroup, refetchMainDocuments }: Props) =>
     const documentsQuery = useGetAllDocuments(pagination, {
         isFinal: false,
         revisionGroup
-    }, [], "GetRevisionGroupDocuments");
+    }, ["tags", "tags.tag", "category", "secretLevel"], "GetRevisionGroupDocuments");
 
     const restoreRevision = useRestoreRevision();
 

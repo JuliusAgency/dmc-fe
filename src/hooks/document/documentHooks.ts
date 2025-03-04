@@ -6,6 +6,7 @@ import {createDocument, getAllDocuments, getFile, restoreRevision, uploadDocumen
 import {PaginationModel} from "../../consts/types.ts";
 import { GetAllDocumentsResponse} from "../../api/documentAPI/types.ts";
 import {DocumentFilters} from "../../pages/document/types.ts";
+import {snackBarError} from "../../components/toast/Toast.tsx";
 
 export const useGetAllDocuments = (
     headers: PaginationModel,
@@ -18,6 +19,9 @@ export const useGetAllDocuments = (
         () => getAllDocuments(headers, filters, relations),
         {
             refetchOnWindowFocus: false,
+            onError: () => {
+                snackBarError("שגיאה בטעינת המסמכים");
+            }
         },
     );
 };
