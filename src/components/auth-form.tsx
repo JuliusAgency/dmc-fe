@@ -23,7 +23,6 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     onSubmit: async (values) => {
       try {
         const response = await login(values);
-        console.log("📌 Server Response:", response);
         dispatch(setUser(response.user));
         onSuccess();
         navigate("/dashboard");
