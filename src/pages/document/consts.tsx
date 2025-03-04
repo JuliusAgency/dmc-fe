@@ -35,14 +35,6 @@ export const COLUMNS: GridColDef[] = [
         width: 150,
     },
     {
-        field: "isFinal",
-        headerName: "סופי",
-        headerAlign: "center",
-        align: "center",
-        type: "boolean",
-        width: 150,
-    },
-    {
         field: "revisionGroup",
         headerName: "קבוצת גרסאות",
         headerAlign: "center",
