@@ -7,8 +7,6 @@ import ManageHomePage from "./components/manageHomePage";
 import ManageCategories from "./components/manageCategories";
 
 export const TAB_COMPONENTS = [ManageUsers, ManageHomePage, ManageCategories];
-
-// ניהול משתמשים
 export const USERS_TITLE = "ניהול משתמשים";
 export const CREATE_USER_BUTTON = "צור משתמש";
 export const EMAIL_LABEL = "אימייל";

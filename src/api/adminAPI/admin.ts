@@ -55,10 +55,28 @@ export const updateUserPermissions = async (
 };
 
 export const getCategories = async () => {
-  const response = await API.get(AdminEndpoints.getCategories);
-  return response.data;
+  const { data } = await API.get("/category/getAll");
+  return data;
 };
 
-export const createCategory = async (categoryName: string) => {
-  return API.post(AdminEndpoints.createCategory, { name: categoryName });
+export const createCategory = async (description: string) => {
+  return API.post("/category", { description });
 };
+
+export const getTags = async () => {
+  const { data } = await API.get("/tag/getAll");
+  console.log("Tags response:", data);
+  return data;
+};
+
+export const createTag = async (description: string) => {
+  return API.post("/tag", { description });
+};
+
+export async function deleteCategory(id: number) {
+  await API.delete(`/category/${id}`);
+}
+
+export async function deleteTag(id: number) {
+  await API.delete(`/tag/${id}`);
+}

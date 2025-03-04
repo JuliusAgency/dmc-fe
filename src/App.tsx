@@ -71,7 +71,6 @@ export default function App() {
               height: "100vh",
             }}
           >
-            {/* הצגת הסיידבר רק אם המשתמש מחובר */}
             {user && !isAuthPage && (
               <Drawer
                 variant="permanent"
@@ -82,7 +81,7 @@ export default function App() {
                   transition: "width 0.3s ease-in-out",
                   "& .MuiDrawer-paper": {
                     width: open ? "240px" : "80px",
-                    backgroundColor: "#ffffff", // רקע לבן נקי
+                    backgroundColor: "#ffffff",
                     borderRight: "1px solid #ddd",
                     overflowX: "hidden",
                     direction: "rtl",
@@ -129,7 +128,7 @@ export default function App() {
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            gap: open ? 2 : 0, // יותר רווח בין האייקון לטקסט
+                            gap: open ? 2 : 0,
                           }}
                         >
                           <ListItemIcon
