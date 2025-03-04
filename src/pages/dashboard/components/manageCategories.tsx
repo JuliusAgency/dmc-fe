@@ -79,15 +79,26 @@ export default function ManageCategories() {
   };
 
   return (
-    <Container sx={{ direction: "rtl", textAlign: "right" }}>
-      <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
+    <Container sx={{ direction: "rtl", textAlign: "left" }}>
+      <Typography
+        variant="h6"
+        sx={{ mb: 2, textAlign: "left", fontSize: "1rem" }}
+      >
         ניהול קטגוריות ותגיות
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} justifyContent="flex-end">
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3, direction: "rtl" }}>
-            <Typography variant="h6" sx={{ mb: 2, textAlign: "right" }}>
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              boxShadow: 1,
+              backgroundColor: "#f9f9f9",
+              textAlign: "left",
+            }}
+          >
+            <Typography variant="body1" sx={{ mb: 2, fontSize: "0.9rem" }}>
               קטגוריות
             </Typography>
             <TextField
@@ -95,35 +106,35 @@ export default function ManageCategories() {
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               fullWidth
-              sx={{ mb: 2, textAlign: "right", direction: "rtl" }}
-              InputProps={{ sx: { textAlign: "right" } }}
+              sx={{ mb: 2, fontSize: "0.9rem" }}
             />
             <Button
               variant="contained"
               onClick={handleCreateCategory}
               fullWidth
-              sx={{ direction: "rtl" }}
             >
               צור קטגוריה
             </Button>
-            <Table sx={{ direction: "rtl" }}>
+            <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ textAlign: "right" }}>שם קטגוריה</TableCell>
+                  <TableCell sx={{ textAlign: "left", fontSize: "0.9rem" }}>
+                    שם קטגוריה
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Array.isArray(categories) && categories.length > 0 ? (
+                {categories.length > 0 ? (
                   categories.map((c) => (
                     <TableRow key={c.id}>
-                      <TableCell sx={{ textAlign: "right" }}>
+                      <TableCell sx={{ textAlign: "left", fontSize: "0.9rem" }}>
                         {c.description}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={1} align="right">
+                    <TableCell colSpan={1} align="left">
                       אין קטגוריות זמינות
                     </TableCell>
                   </TableRow>
@@ -134,8 +145,16 @@ export default function ManageCategories() {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Paper sx={{ p: 3, borderRadius: 2, boxShadow: 3, direction: "rtl" }}>
-            <Typography variant="h6" sx={{ mb: 2, textAlign: "right" }}>
+          <Paper
+            sx={{
+              p: 3,
+              borderRadius: 2,
+              boxShadow: 1,
+              backgroundColor: "#f9f9f9",
+              textAlign: "left",
+            }}
+          >
+            <Typography variant="body1" sx={{ mb: 2, fontSize: "0.9rem" }}>
               תגיות
             </Typography>
             <TextField
@@ -143,35 +162,31 @@ export default function ManageCategories() {
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
               fullWidth
-              sx={{ mb: 2, textAlign: "right", direction: "rtl" }}
-              InputProps={{ sx: { textAlign: "right" } }}
+              sx={{ mb: 2, fontSize: "0.9rem" }}
             />
-            <Button
-              variant="contained"
-              onClick={handleCreateTag}
-              fullWidth
-              sx={{ direction: "rtl" }}
-            >
+            <Button variant="contained" onClick={handleCreateTag} fullWidth>
               צור תגית
             </Button>
-            <Table sx={{ direction: "rtl" }}>
+            <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ textAlign: "right" }}>שם תגית</TableCell>
+                  <TableCell sx={{ textAlign: "left", fontSize: "0.9rem" }}>
+                    שם תגית
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {Array.isArray(tags) && tags.length > 0 ? (
+                {tags.length > 0 ? (
                   tags.map((t) => (
                     <TableRow key={t.id}>
-                      <TableCell sx={{ textAlign: "right" }}>
+                      <TableCell sx={{ textAlign: "left", fontSize: "0.9rem" }}>
                         {t.description}
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={1} align="right">
+                    <TableCell colSpan={1} align="left">
                       אין תגיות זמינות
                     </TableCell>
                   </TableRow>

@@ -37,6 +37,7 @@ import {
   CANCEL_BUTTON,
   SAVE_USER_BUTTON,
 } from "../constants";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function ManageUsers() {
   const [users, setUsers] = useState<any[]>([]);
@@ -82,30 +83,29 @@ export default function ManageUsers() {
       <Typography variant="h5" sx={{ mb: 3 }}>
         {USERS_TITLE}
       </Typography>
-
       <Box
         sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mb: 3 }}
       >
         <Button variant="contained" onClick={handleOpenDialog}>
-          {CREATE_USER_BUTTON}
+          <AddIcon />
         </Button>
       </Box>
 
       <Table style={{ width: "70%" }}>
         <TableHead>
           <TableRow>
-            <TableCell align="right">{EMAIL_LABEL}</TableCell>
-            <TableCell align="right">{ROLE_LABEL}</TableCell>
-            <TableCell align="right"></TableCell>
+            <TableCell align="left">{EMAIL_LABEL}</TableCell>
+            <TableCell align="left">{ROLE_LABEL}</TableCell>
+            <TableCell align="left"></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {users.map((user: any) => (
             <TableRow key={user.id}>
-              <TableCell align="right" width="20%">
+              <TableCell align="left" width="20%">
                 {user.email}
               </TableCell>
-              <TableCell align="right" width="30%">
+              <TableCell align="left" width="30%">
                 <FormControl>
                   <Select
                     value={user.role}
@@ -120,7 +120,7 @@ export default function ManageUsers() {
                   </Select>
                 </FormControl>
               </TableCell>
-              <TableCell align="right" width="20%">
+              <TableCell align="left" width="20%">
                 <Button onClick={() => resetPassword(user.id)} color="warning">
                   {RESET_PASSWORD_BUTTON}
                 </Button>
