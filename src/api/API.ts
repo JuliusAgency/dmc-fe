@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import {CONFIG} from "../consts/config.ts";
+import { CONFIG } from "../consts/config.ts";
 
 const apiConfig = {
   BASE_URL: CONFIG.BASE_URL,
@@ -12,6 +12,7 @@ const axiosConfig: AxiosRequestConfig = {
   headers: {
     Accept: "application/json",
   },
+  withCredentials: true,
 };
 
 // axios.defaults.withCredentials = true;

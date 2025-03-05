@@ -1,76 +1,230 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import AuthForm from "./components/auth-form";
-import Dashboard from "./dashboard";
-import {Document} from "./pages/document";
-import {WithTheme} from "../theme/Theme.tsx";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+import { useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  IconButton,
+  Box,
+  Typography,
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import DescriptionIcon from "@mui/icons-material/Description";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+import AuthForm from "./components/auth-form";
+import AdminDashboard from "./pages/dashboard/adminDashboard";
+import { Document } from "./pages/document";
+import { HomePage } from "./pages/home";
+import { WithTheme } from "../theme/Theme";
+import { useSelector } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {SnackbarProvider} from "notistack";
+import { SnackbarProvider } from "notistack";
 import WithCache from "./hooks/cache/withCache.tsx";
 
+const menuItems = [
+  { path: "/home", icon: <HomeIcon />, text: "דף הבית" },
+  { path: "/dashboard", icon: <DashboardIcon />, text: "לוח בקרה" },
+  { path: "/documents", icon: <DescriptionIcon />, text: "מסמכים" },
+];
 
 export default function App() {
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                refetchOnWindowFocus: false,
-                retryDelay: 1500,
-            },
-        },
-    })
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
+  const user = useSelector((state: any) => state.user.user);
+
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/register";
+
+  const handleSuccess = () => navigate("/home");
+  const handleNavigation = (path: string) => navigate(path);
+  const toggleDrawer = () => setOpen(!open);
+
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retryDelay: 1500,
+      },
+    },
+  });
 
   return (
-      <WithCache>
-          <QueryClientProvider client={queryClient}>
-              <WithTheme>
-                  <SnackbarProvider maxSnack={3}>
-                      <LocalizationProvider
-                          dateAdapter={AdapterDayjs}
-                          adapterLocale={"he"}
-                          localeText={{
-                              start: "התחלה",
-                              end: "סיום",
-                              nextMonth: "חודש הבא",
-                              previousMonth: "חודש קודם",
-                              clearButtonLabel: "נקה תאריכים",
-                              dateRangePickerToolbarTitle: "בחר טווח תאריכים",
-                          }}
+    <WithCache>
+      <QueryClientProvider client={queryClient}>
+        <WithTheme>
+          <SnackbarProvider maxSnack={3}>
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              adapterLocale={"he"}
+              localeText={{
+                start: "התחלה",
+                end: "סיום",
+                nextMonth: "חודש הבא",
+                previousMonth: "חודש קודם",
+                clearButtonLabel: "נקה תאריכים",
+                dateRangePickerToolbarTitle: "בחר טווח תאריכים",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                  height: "100vh",
+                }}
+              >
+                {user && !isAuthPage && (
+                  <Drawer
+                    variant="permanent"
+                    anchor="left"
+                    sx={{
+                      width: open ? "100px" : "80px",
+                      flexShrink: 0,
+                      transition: "width 0.3s ease-in-out",
+                      "& .MuiDrawer-paper": {
+                        width: open ? "130px" : "80px",
+                        backgroundColor: "#ffffff",
+                        borderRight: "1px solid #ddd",
+                        overflowX: "hidden",
+                        direction: "rtl",
+                        transition: "all 0.3s ease-in-out",
+                        padding: "10px 0",
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: open ? "flex-start" : "center",
+                        alignItems: "center",
+                        padding: "12px",
+                      }}
+                    >
+                      <IconButton
+                        onClick={toggleDrawer}
+                        sx={{
+                          color: "#37474f",
+                          "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.05)" },
+                        }}
                       >
-                          <Router>
-                              <Routes>
-                                  <Route
-                                      path="/login"
-                                      element={
-                                          <AuthForm
-                                              type="login"
-                                              onSuccess={() => (window.location.href = "/")}
-                                          />
-                                      }
-                                  />
-                                  <Route
-                                      path="/register"
-                                      element={
-                                          <AuthForm
-                                              type="register"
-                                              onSuccess={() => (window.location.href = "/")}
-                                          />
-                                      }
-                                  />
-                                  <Route
-                                      path="/documents"
-                                      element={
-                                          <Document />
-                                      }
-                                  />
-                                  <Route path="/" element={<Dashboard />} />
-                              </Routes>
-                          </Router>
-                      </LocalizationProvider>
-                  </SnackbarProvider>
-              </WithTheme>
-          </QueryClientProvider>
-      </WithCache>
+                        {open ? <ChevronRightIcon /> : <MenuIcon />}
+                      </IconButton>
+                    </Box>
+
+                    <List sx={{ padding: 0 }}>
+                      {menuItems.map((item) => (
+                        <ListItem key={item.path} disablePadding>
+                          <ListItemButton
+                            onClick={() => handleNavigation(item.path)}
+                            sx={{
+                              padding: "12px",
+                              justifyContent: open ? "flex-start" : "center",
+                              borderRadius: "8px",
+                              transition: "all 0.3s ease-in-out",
+                              "&:hover": {
+                                backgroundColor: "rgba(0, 0, 0, 0.05)",
+                              },
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: open ? 2 : 0,
+                              }}
+                            >
+                              {open && (
+                                <Typography
+                                  variant="body1"
+                                  sx={{
+                                    fontWeight: "bold",
+                                    color: "#37474f",
+                                  }}
+                                >
+                                  {item.text}
+                                </Typography>
+                              )}
+                              <ListItemIcon
+                                sx={{
+                                  color: "#37474f",
+                                  fontSize: "24px",
+                                  minWidth: 0,
+                                }}
+                              >
+                                {item.icon}
+                              </ListItemIcon>
+                            </Box>
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Drawer>
+                )}
+
+                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                  <Routes>
+                    <Route
+                      path="/login"
+                      element={
+                        <AuthForm type="login" onSuccess={handleSuccess} />
+                      }
+                    />
+                    <Route
+                      path="/register"
+                      element={
+                        <AuthForm type="register" onSuccess={handleSuccess} />
+                      }
+                    />
+                    <Route
+                      path="/documents"
+                      element={
+                        user ? <Document /> : <Navigate to="/login" replace />
+                      }
+                    />
+                    <Route
+                      path="/dashboard"
+                      element={
+                        user && user.role === "SYSTEM_ADMIN" ? (
+                          <AdminDashboard />
+                        ) : (
+                          <Navigate to="/login" replace />
+                        )
+                      }
+                    />
+                    <Route
+                      path="/home"
+                      element={
+                        user ? <HomePage /> : <Navigate to="/login" replace />
+                      }
+                    />
+                    <Route
+                      path="/"
+                      element={<Navigate to="/login" replace />}
+                    />
+                    <Route
+                      path="*"
+                      element={<Navigate to="/login" replace />}
+                    />
+                  </Routes>
+                </Box>
+              </Box>
+            </LocalizationProvider>
+          </SnackbarProvider>
+        </WithTheme>
+      </QueryClientProvider>
+    </WithCache>
   );
 }
