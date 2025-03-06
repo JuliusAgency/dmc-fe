@@ -1,15 +1,30 @@
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { login } from "../api/authAPI/auth";
-import { AuthFormProps, AuthData } from "../api/authAPI/types";
+import { useLogin } from "../../hooks/auth/authsHooks";
+import { AuthFormProps, AuthData } from "../../api/authAPI/types";
 import { useDispatch } from "react-redux";
-import { setUser } from "../actions/userActions";
+import { setUser } from "../../actions/userActions";
 import { useNavigate } from "react-router-dom";
+import {
+  AUTH_FORM_TITLE,
+  EMAIL_LABEL,
+  PASSWORD_LABEL,
+  EMAIL_REQUIRED_ERROR,
+  INVALID_EMAIL_ERROR,
+  PASSWORD_REQUIRED_ERROR,
+  PASSWORD_MIN_LENGTH_ERROR,
+  LOGIN_BUTTON_TEXT,
+  LOGIN_ERROR_MESSAGE,
+  LOGIN_CONTAINER_STYLES,
+  FORM_BOX_STYLES,
+  BUTTON_STYLES,
+} from "./constants";
 
 export default function AuthForm({ onSuccess }: AuthFormProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const loginMutation = useLogin();
 
   const formik = useFormik<AuthData>({
     initialValues: {
@@ -17,56 +32,42 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       password: "",
     },
     validationSchema: Yup.object({
-      email: Yup.string().email("מייל לא תקין").required("מייל חובה"),
-      password: Yup.string().min(6, "לפחות 6 תווים").required("סיסמה חובה"),
+      email: Yup.string()
+        .email(INVALID_EMAIL_ERROR)
+        .required(EMAIL_REQUIRED_ERROR),
+      password: Yup.string()
+        .min(6, PASSWORD_MIN_LENGTH_ERROR)
+        .required(PASSWORD_REQUIRED_ERROR),
     }),
     onSubmit: async (values) => {
-      try {
-        const response = await login(values);
-        dispatch(setUser(response.user));
-        onSuccess();
-        navigate("/home");
-      } catch (error: any) {
-        console.log(error);
-        alert(error.response?.data?.message || "שגיאה");
-      }
+      loginMutation.mutate(values, {
+        onSuccess: (response: any) => {
+          dispatch(setUser(response.user));
+          localStorage.setItem("user", JSON.stringify(response.user));
+          onSuccess();
+          navigate("/home");
+        },
+        onError: (error: any) => {
+          alert(error.response?.data?.message || LOGIN_ERROR_MESSAGE);
+        },
+      });
     },
   });
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        padding: 2,
-        backgroundColor: "#f4f4f9",
-      }}
-    >
+    <Box sx={LOGIN_CONTAINER_STYLES}>
       <Container maxWidth="xs">
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            mt: 5,
-            p: 4,
-            backgroundColor: "white",
-            borderRadius: "10px",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          }}
-        >
+        <Box sx={FORM_BOX_STYLES}>
           <Typography
             variant="h4"
             align="center"
             sx={{ fontWeight: "bold", mb: 3 }}
           >
-            התחברות
+            {AUTH_FORM_TITLE}
           </Typography>
 
           <TextField
-            label="אימייל"
+            label={EMAIL_LABEL}
             {...formik.getFieldProps("email")}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
@@ -75,7 +76,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             sx={{ mb: 2 }}
           />
           <TextField
-            label="סיסמה"
+            label={PASSWORD_LABEL}
             type="password"
             {...formik.getFieldProps("password")}
             error={formik.touched.password && Boolean(formik.errors.password)}
@@ -89,9 +90,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             variant="contained"
             onClick={() => formik.handleSubmit()}
             fullWidth
-            sx={{ bgcolor: "#1976d2", "&:hover": { bgcolor: "#1565c0" } }}
+            sx={BUTTON_STYLES}
           >
-            התחבר
+            {LOGIN_BUTTON_TEXT}
           </Button>
         </Box>
       </Container>

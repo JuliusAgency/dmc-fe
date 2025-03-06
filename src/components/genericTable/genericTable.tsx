@@ -8,14 +8,17 @@ export const GenericTable = ({
   columns,
   rows,
   loading,
-  handlePagination,
-  totalCount,
+  onPaginationModelChange,
+  rowCount,
   sx,
   pageSize = 25,
   initialPage = 0,
-  disableFooter = false,
+  hideFooterPagination = false,
   getDetailPanelHeight,
   getDetailPanelContent,
+  disableColumnMenu = false,
+  disableColumnFilter = false,
+  disableColumnSelector = false,
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -30,19 +33,19 @@ export const GenericTable = ({
   );
 
   return (
-    <Box sx={{ width: "90%", height: "70vh", ...sx }}>
+    <Box sx={{ width: "95%", height: "70vh", ...sx }}>
       <DataGridPro
-        onPaginationModelChange={handlePagination}
+        onPaginationModelChange={onPaginationModelChange}
         loading={loading}
         rows={rows}
         columns={columns}
         paginationMode="server"
-        rowCount={totalCount}
+        rowCount={rowCount}
         pageSizeOptions={[5, 10, 25]}
         initialState={initialState}
         disableRowSelectionOnClick
         pagination
-        hideFooterPagination={disableFooter}
+        hideFooterPagination={hideFooterPagination}
         getDetailPanelHeight={
           getDetailPanelHeight
             ? (params: GridRowParams) => getDetailPanelHeight(params)
@@ -50,6 +53,9 @@ export const GenericTable = ({
         }
         getDetailPanelContent={getDetailPanelContent}
         getRowId={(row) => row.id || Math.random()}
+        disableColumnMenu={disableColumnMenu}
+        disableColumnFilter={disableColumnFilter}
+        disableColumnSelector={disableColumnSelector}
       />
     </Box>
   );

@@ -1,42 +1,56 @@
 import { useState, useEffect } from "react";
 import { Container, Typography, Box } from "@mui/material";
-import { HOME_PAGE_TITLE } from "./constants";
-import { getHomeImages, getHomeAnnouncements } from "../../api/homeAPI/home"; // API
+import {
+  HOME_PAGE_TITLE,
+  NO_IMAGE_AVAILABLE,
+  ERROR_LOADING_HOMEPAGE,
+  LOADING_TEXT,
+  ANNOUNCEMENT_POSITION_STYLES,
+  IMAGE_STYLES,
+} from "./constants";
+import {
+  useGetHomeImages,
+  useGetHomeAnnouncements,
+} from "../../hooks/home/homeHooks";
 
 export const HomePage = () => {
   const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
-  const [homeContent, setHomeContent] = useState<any>({
-    imageUrl: "",
-    announcements: [],
-  });
+
+  const {
+    data: homeImages,
+    isLoading: loadingImages,
+    error: errorImages,
+  } = useGetHomeImages();
+  const {
+    data: homeAnnouncements,
+    isLoading: loadingAnnouncements,
+    error: errorAnnouncements,
+  } = useGetHomeAnnouncements();
+
+  const homeContent = {
+    imageUrl: homeImages?.imageUrl || "",
+    announcements: homeAnnouncements?.map((item) => item.text) || [],
+  };
 
   useEffect(() => {
-    fetchHomeContent();
-  }, []);
+    if (homeContent.announcements.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentAnnouncement(
+          (prev) => (prev + 1) % homeContent.announcements.length
+        );
+      }, 3000);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentAnnouncement(
-        (prev) => (prev + 1) % homeContent.announcements.length
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
+      return () => clearInterval(interval);
+    }
   }, [homeContent.announcements]);
 
-  const fetchHomeContent = async () => {
-    try {
-      const imageData = await getHomeImages();
-      const announcementsData = await getHomeAnnouncements();
+  if (loadingImages || loadingAnnouncements) {
+    return <Typography>{LOADING_TEXT}</Typography>;
+  }
 
-      setHomeContent({
-        imageUrl: imageData.imageUrl || "",
-        announcements: announcementsData.map((item: any) => item.text) || [],
-      });
-    } catch (error) {
-      console.error("Error fetching home content:", error);
-    }
-  };
+  if (errorImages || errorAnnouncements) {
+    return <Typography color="error">{ERROR_LOADING_HOMEPAGE}</Typography>;
+  }
 
   return (
     <Container>
@@ -53,31 +67,19 @@ export const HomePage = () => {
           alignItems: "center",
         }}
       >
-        {homeContent.imageUrl && (
+        {homeContent?.imageUrl ? (
           <Box
             component="img"
             src={homeContent.imageUrl}
-            alt="תמונת דף הבית"
-            sx={{ width: "80%", borderRadius: 2, boxShadow: 2 }}
+            alt="Homepage Image"
+            sx={IMAGE_STYLES}
           />
+        ) : (
+          <Typography color="gray">{NO_IMAGE_AVAILABLE}</Typography>
         )}
 
         {homeContent.announcements.length > 0 && (
-          <Typography
-            variant="h6"
-            sx={{
-              position: "absolute",
-              top: "10%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "rgba(0, 0, 0, 0.6)",
-              color: "white",
-              px: 2,
-              py: 1,
-              borderRadius: 1,
-              fontWeight: "bold",
-            }}
-          >
+          <Typography variant="h6" sx={ANNOUNCEMENT_POSITION_STYLES}>
             {homeContent.announcements[currentAnnouncement]}
           </Typography>
         )}

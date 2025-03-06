@@ -1,66 +1,36 @@
-import {
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
-import { useState } from "react";
+import Sidebar from "./components/sideBar/sidebar.tsx";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Box } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SnackbarProvider } from "notistack";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  IconButton,
-  Box,
-  Typography,
-} from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import DescriptionIcon from "@mui/icons-material/Description";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useNavigate } from "react-router-dom";
 
-import AuthForm from "./components/auth-form";
+import AuthForm from "./pages/auth/index.tsx";
 import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
 import { HomePage } from "./pages/home";
 import { WithTheme } from "../theme/Theme";
-import { useSelector } from "react-redux";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SnackbarProvider } from "notistack";
 import WithCache from "./hooks/cache/withCache.tsx";
 
-const menuItems = [
-  { path: "/home", icon: <HomeIcon />, text: "דף הבית" },
-  { path: "/dashboard", icon: <DashboardIcon />, text: "לוח בקרה" },
-  { path: "/documents", icon: <DescriptionIcon />, text: "מסמכים" },
-];
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retryDelay: 1500,
+    },
+  },
+});
 
 export default function App() {
-  const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const user = useSelector((state: any) => state.user.user);
-
-  const isAuthPage =
-    location.pathname === "/login" || location.pathname === "/register";
-
-  const handleSuccess = () => navigate("/home");
-  const handleNavigation = (path: string) => navigate(path);
-  const toggleDrawer = () => setOpen(!open);
-
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retryDelay: 1500,
-      },
-    },
-  });
+  const navigate = useNavigate();
+  const storedUser = localStorage.getItem("user");
+  const user =
+    useSelector((state: any) => state.user.user) ||
+    (storedUser ? JSON.parse(storedUser) : null);
 
   return (
     <WithCache>
@@ -86,106 +56,19 @@ export default function App() {
                   height: "100vh",
                 }}
               >
-                {user && !isAuthPage && (
-                  <Drawer
-                    variant="permanent"
-                    anchor="left"
-                    sx={{
-                      width: open ? "100px" : "80px",
-                      flexShrink: 0,
-                      transition: "width 0.3s ease-in-out",
-                      "& .MuiDrawer-paper": {
-                        width: open ? "130px" : "80px",
-                        backgroundColor: "#ffffff",
-                        borderRight: "1px solid #ddd",
-                        overflowX: "hidden",
-                        direction: "rtl",
-                        transition: "all 0.3s ease-in-out",
-                        padding: "10px 0",
-                      },
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: open ? "flex-start" : "center",
-                        alignItems: "center",
-                        padding: "12px",
-                      }}
-                    >
-                      <IconButton
-                        onClick={toggleDrawer}
-                        sx={{
-                          color: "#37474f",
-                          "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.05)" },
-                        }}
-                      >
-                        {open ? <ChevronRightIcon /> : <MenuIcon />}
-                      </IconButton>
-                    </Box>
-
-                    <List sx={{ padding: 0 }}>
-                      {menuItems.map((item) => (
-                        <ListItem key={item.path} disablePadding>
-                          <ListItemButton
-                            onClick={() => handleNavigation(item.path)}
-                            sx={{
-                              padding: "12px",
-                              justifyContent: open ? "flex-start" : "center",
-                              borderRadius: "8px",
-                              transition: "all 0.3s ease-in-out",
-                              "&:hover": {
-                                backgroundColor: "rgba(0, 0, 0, 0.05)",
-                              },
-                            }}
-                          >
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: open ? 2 : 0,
-                              }}
-                            >
-                              {open && (
-                                <Typography
-                                  variant="body1"
-                                  sx={{
-                                    fontWeight: "bold",
-                                    color: "#37474f",
-                                  }}
-                                >
-                                  {item.text}
-                                </Typography>
-                              )}
-                              <ListItemIcon
-                                sx={{
-                                  color: "#37474f",
-                                  fontSize: "24px",
-                                  minWidth: 0,
-                                }}
-                              >
-                                {item.icon}
-                              </ListItemIcon>
-                            </Box>
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Drawer>
-                )}
+                {user &&
+                  location.pathname !== "/login" &&
+                  location.pathname !== "/register" && <Sidebar />}
 
                 <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                   <Routes>
                     <Route
                       path="/login"
                       element={
-                        <AuthForm type="login" onSuccess={handleSuccess} />
-                      }
-                    />
-                    <Route
-                      path="/register"
-                      element={
-                        <AuthForm type="register" onSuccess={handleSuccess} />
+                        <AuthForm
+                          type="login"
+                          onSuccess={() => navigate("/home")}
+                        />
                       }
                     />
                     <Route
