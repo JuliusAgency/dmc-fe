@@ -90,7 +90,7 @@ export default function ManageHomePage() {
           <Button
             variant="contained"
             onClick={handleAddAnnouncement}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, textTransform: "none" }}
           >
             {ADD_ANNOUNCEMENT_BUTTON}
           </Button>
@@ -120,7 +120,7 @@ export default function ManageHomePage() {
           <Button
             variant="contained"
             onClick={handleUploadImage}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, textTransform: "none" }}
           >
             {UPLOAD_HOMEPAGE_IMAGE_BUTTON}
           </Button>

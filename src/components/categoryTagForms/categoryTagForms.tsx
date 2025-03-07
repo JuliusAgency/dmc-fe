@@ -35,7 +35,12 @@ export const CategoryForm = ({
         fullWidth
         sx={{ mb: 2, fontSize: "0.9rem" }}
       />
-      <Button variant="contained" onClick={handleSubmit} fullWidth>
+      <Button
+        variant="contained"
+        onClick={handleSubmit}
+        fullWidth
+        sx={{ textTransform: "none" }}
+      >
         {ADD_CATEGORY_BUTTON}
       </Button>
     </>
@@ -64,7 +69,12 @@ export const TagForm = ({ onSubmit }: { onSubmit: (name: string) => void }) => {
         fullWidth
         sx={{ mb: 2, fontSize: "0.9rem" }}
       />
-      <Button variant="contained" onClick={handleSubmit} fullWidth>
+      <Button
+        variant="contained"
+        onClick={handleSubmit}
+        fullWidth
+        sx={{ textTransform: "none" }}
+      >
         {ADD_TAG_BUTTON}
       </Button>
     </>
