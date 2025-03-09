@@ -19,14 +19,14 @@ export const WithTheme = ({ children }: themeProps) => {
 
   const theme: Theme = createTheme(
     {
-      direction: "rtl",
+      direction: "ltr",
       palette: {
         mode: currentTheme,
         ...(currentTheme === "light" ? lightThemePalette : darkThemePalette),
       },
       typography: isMobile ? mobileTypography : deskTopTypography,
     },
-    heIL,
+    heIL
   );
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

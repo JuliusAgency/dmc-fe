@@ -8,13 +8,16 @@ export interface GenericTableProps {
   rows: any[];
   toolBar?: any;
   loading: boolean;
-  totalCount: number;
+  disableColumnMenu?: boolean;
+  disableColumnFilter?: boolean;
+  disableColumnSelector?: boolean;
   sx?: SxProps<Theme> | undefined;
-  handlePagination: (model: GridPaginationModel) => void;
+  onPaginationModelChange: (model: GridPaginationModel) => void;
   StyledComponent?: any;
   pageSize?: number;
   initialPage?: number;
-  disableFooter?: boolean;
-  getDetailPanelHeight?: (params: GridRowParams) => number | 'auto'
-  getDetailPanelContent?: ({ row }: GridRowParams) => JSX.Element
+  hideFooterPagination?: boolean;
+  getDetailPanelHeight?: (params: GridRowParams) => number | "auto";
+  getDetailPanelContent?: ({ row }: GridRowParams) => JSX.Element;
+  rowCount?: number;
 }

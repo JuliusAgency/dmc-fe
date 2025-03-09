@@ -16,6 +16,7 @@ export default function AdminDashboard() {
         value={tabIndex}
         onChange={(e, newIndex) => setTabIndex(newIndex)}
         centered
+        sx={{ "& .MuiTab-root": { textTransform: "none" } }}
       >
         {TAB_LABELS.map((label, index) => (
           <Tab key={index} label={label} />
