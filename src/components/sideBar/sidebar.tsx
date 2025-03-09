@@ -63,6 +63,7 @@ const Sidebar = () => {
         {MENU_ITEMS.map((item: any) => (
           <ListItem key={item.path} disablePadding>
             <ListItemButton
+                disabled={item.disabled}
               onClick={() => handleNavigation(item.path)}
               sx={{
                 padding: "12px",

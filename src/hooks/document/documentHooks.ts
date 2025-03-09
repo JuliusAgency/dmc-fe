@@ -5,7 +5,7 @@ import {createDocument, getAllDocuments, getFile, restoreRevision, uploadDocumen
 import {PaginationModel} from "../../consts/types.ts";
 import { GetAllDocumentsResponse} from "../../api/documentAPI/types.ts";
 import {DocumentFilters} from "../../pages/document/types.ts";
-import {snackBarError} from "../../components/toast/Toast.tsx";
+import {snackBarError, snackBarSuccess} from "../../components/toast/Toast.tsx";
 
 export const useGetAllDocuments = (
   headers: PaginationModel,
@@ -37,6 +37,11 @@ export const useGetFile = (fileName?: string): UseQueryResult<Blob, Error> => {
   return useQuery(["getFile", fileName], () => getFile(fileName!), {
     refetchOnWindowFocus: false,
     enabled: Boolean(fileName),
+      onSuccess: () => {
+          snackBarSuccess("Document downloaded successfully");
+      }, onError: () => {
+          snackBarError("Document download failed");
+      }
   });
 };
 
@@ -47,7 +52,13 @@ export const useCreateDocument = (): UseMutationResult<
 > => useMutation(createDocument);
 
 export const useRestoreRevision = (): UseMutationResult<
-  DocumentType,
-  AxiosError,
-  string
-> => useMutation<DocumentType, AxiosError, string>(restoreRevision);
+    DocumentType,
+    AxiosError,
+    string
+> => useMutation<DocumentType, AxiosError, string>(restoreRevision, {
+    onSuccess: () => {
+        snackBarSuccess("Document restored successfully");
+    }, onError: () => {
+        snackBarError("Error restoring document");
+    }
+});

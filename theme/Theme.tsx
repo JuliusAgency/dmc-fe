@@ -6,7 +6,6 @@ import {
   deskTopTypography,
   mobileTypography,
 } from "./shared/typography/Typography";
-import { heIL } from "@mui/material/locale";
 import useWidthType from "../src/hooks/useWidthType/useWidthType.tsx";
 
 interface themeProps {
@@ -26,7 +25,6 @@ export const WithTheme = ({ children }: themeProps) => {
       },
       typography: isMobile ? mobileTypography : deskTopTypography,
     },
-    heIL
   );
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;

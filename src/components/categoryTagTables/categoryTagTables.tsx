@@ -19,7 +19,7 @@ export const CategoryTable = ({
       headerName: "Actions",
       flex: 0.3,
       renderCell: (params) => (
-        <IconButton onClick={() => onDelete(params.row.id)}>
+        <IconButton onClick={() => onDelete(params.row.id)}  disabled={true}>
           <DeleteIcon fontSize="small" />
         </IconButton>
       ),
@@ -56,7 +56,7 @@ export const TagTable = ({
       headerName: "Actions",
       flex: 0.3,
       renderCell: (params) => (
-        <IconButton onClick={() => onDelete(params.row.id)}>
+        <IconButton onClick={() => onDelete(params.row.id)} disabled={true}>
           <DeleteIcon fontSize="small" />
         </IconButton>
       ),

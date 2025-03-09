@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import {useCallback, useMemo, useState} from "react";
+import {DataGridPro, GridRowId} from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
 import { GenericTableProps } from "./types.ts";
 import { GridRowParams } from "@mui/x-data-grid";
@@ -32,6 +32,17 @@ export const GenericTable = ({
     [initialPage, pageSize]
   );
 
+  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
+      GridRowId[]
+  >([]);
+
+  const handleDetailPanelExpandedRowIdsChange = useCallback(
+      (newIds: GridRowId[]) => {
+        setDetailPanelExpandedRowIds([newIds[newIds.length - 1]]);
+      },
+      [],
+  );
+
   return (
     <Box sx={{ width: "95%", height: "70vh", ...sx }}>
       <DataGridPro
@@ -56,6 +67,14 @@ export const GenericTable = ({
         disableColumnMenu={disableColumnMenu}
         disableColumnFilter={disableColumnFilter}
         disableColumnSelector={disableColumnSelector}
+        detailPanelExpandedRowIds={detailPanelExpandedRowIds}
+        onDetailPanelExpandedRowIdsChange={handleDetailPanelExpandedRowIdsChange}
+        sx={{
+          "& .MuiDataGrid-footerContainer": {
+            justifyContent: "flex-start",
+          },
+          ...sx,
+        }}
       />
     </Box>
   );

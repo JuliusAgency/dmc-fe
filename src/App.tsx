@@ -39,15 +39,7 @@ export default function App() {
           <SnackbarProvider maxSnack={3}>
             <LocalizationProvider
               dateAdapter={AdapterDayjs}
-              adapterLocale={"he"}
-              localeText={{
-                start: "התחלה",
-                end: "סיום",
-                nextMonth: "חודש הבא",
-                previousMonth: "חודש קודם",
-                clearButtonLabel: "נקה תאריכים",
-                dateRangePickerToolbarTitle: "בחר טווח תאריכים",
-              }}
+              adapterLocale={"en"}
             >
               <Box
                 sx={{

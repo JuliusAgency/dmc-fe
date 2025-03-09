@@ -1,27 +1,26 @@
-import {GridColDef} from "@mui/x-data-grid";
-import {formatDate} from "../../utils/formatDate";
-import {Chip, Stack} from "@mui/material";
-import {DocumentTag} from "../../api/documentAPI/types.ts";
-
+import { GridColDef } from "@mui/x-data-grid";
+import { formatDate } from "../../utils/formatDate";
+import { Chip, Stack } from "@mui/material";
+import { DocumentTag } from "../../api/documentAPI/types.ts";
 
 export const COLUMNS: GridColDef[] = [
     {
         field: "name",
-        headerName: "שם",
+        headerName: "Name",
         headerAlign: "center",
         align: "center",
         width: 150,
     },
     {
         field: "projectCode",
-        headerName: "קוד פרויקט",
+        headerName: "Project Code",
         headerAlign: "center",
         align: "center",
         width: 150,
     },
     {
         field: "updateDate",
-        headerName: "תאריך עדכון",
+        headerName: "Update Date",
         headerAlign: "center",
         align: "center",
         width: 150,
@@ -29,21 +28,21 @@ export const COLUMNS: GridColDef[] = [
     },
     {
         field: "revision",
-        headerName: "גרסה",
+        headerName: "Revision",
         headerAlign: "center",
         align: "center",
         width: 150,
     },
     {
         field: "revisionGroup",
-        headerName: "קבוצת גרסאות",
+        headerName: "Revision Group",
         headerAlign: "center",
         align: "center",
         width: 150,
     },
     {
         field: "secretLevel",
-        headerName: "רמת סיווג",
+        headerName: "Secret Level",
         headerAlign: "center",
         align: "center",
         width: 150,
@@ -51,7 +50,7 @@ export const COLUMNS: GridColDef[] = [
     },
     {
         field: "category",
-        headerName: "קטגוריה",
+        headerName: "Category",
         headerAlign: "center",
         align: "center",
         width: 150,
@@ -59,7 +58,7 @@ export const COLUMNS: GridColDef[] = [
     },
     {
         field: "tags",
-        headerName: "תגיות",
+        headerName: "Tags",
         headerAlign: "center",
         align: "left",
         width: 200,
@@ -73,11 +72,10 @@ export const COLUMNS: GridColDef[] = [
     },
     {
         field: "isFinal",
-        headerName: "האם סופי",
+        headerName: "Is Final",
         type: "boolean",
         headerAlign: "center",
         align: "center",
         width: 150,
     },
-
 ];

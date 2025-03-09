@@ -1,7 +1,8 @@
-import {QueryObserverResult, RefetchOptions, RefetchQueryFilters} from "react-query";
-import {GetAllDocumentsResponse} from "../../../../api/documentAPI/types.ts";
+import {Dispatch, SetStateAction } from "react";
+import {DocumentType} from "../../../../api/documentAPI/types.ts";
 
 export interface Props {
     revisionGroup: string
-    refetchMainDocuments: <TPageData>(options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined) => Promise<QueryObserverResult<GetAllDocumentsResponse, Error>>;
+    rows: DocumentType[]
+    setRows: Dispatch<SetStateAction<DocumentType[]>>
 }
