@@ -147,14 +147,23 @@ export const AddDocument = ({
 console.log(documentToEdit);
   useEffect(() => {
     if (documentToEdit) {
-      const tags = documentToEdit.tags?.map((item) => ({
-        id: item.tag.id,
-        name: item.tag.name,
-      }));
-      console.log(tags);
+      const tags = documentToEdit.tags?.map((item) => {
+        if ('tag' in item) {
+          return {
+            id: item.tag.id,
+            name: item.tag.name,
+          };
+        } else {
+          return {
+            id: item.id,
+            name: item.name,
+          };
+        }
+      });
+
       setFormData({ ...documentToEdit, tags: tags });
     } else {
-        setFormData({});
+      setFormData({});
     }
   }, [documentToEdit]);
 

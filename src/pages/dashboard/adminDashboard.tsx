@@ -14,7 +14,7 @@ export default function AdminDashboard() {
 
       <Tabs
         value={tabIndex}
-        onChange={(e, newIndex) => setTabIndex(newIndex)}
+        onChange={(_, newIndex) => setTabIndex(newIndex)}
         centered
         sx={{ "& .MuiTab-root": { textTransform: "none" } }}
       >

@@ -13,7 +13,6 @@ import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
 import { HomePage } from "./pages/home";
 import { WithTheme } from "../theme/Theme";
-import WithCache from "./hooks/cache/withCache.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,7 +32,6 @@ export default function App() {
     (storedUser ? JSON.parse(storedUser) : null);
 
   return (
-    <WithCache>
       <QueryClientProvider client={queryClient}>
         <WithTheme>
           <SnackbarProvider maxSnack={3}>
@@ -100,6 +98,5 @@ export default function App() {
           </SnackbarProvider>
         </WithTheme>
       </QueryClientProvider>
-    </WithCache>
   );
 }
