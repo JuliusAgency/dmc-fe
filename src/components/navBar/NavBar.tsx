@@ -22,6 +22,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useLogout } from "../../hooks/auth/authsHooks";
 
 export type MenuItem = {
   path: string;
@@ -41,6 +42,8 @@ export function NavBar({
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { mutate } = useLogout();
 
   // Mobile drawer state
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -62,6 +65,11 @@ export function NavBar({
 
   const handleUserMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    mutate();
+    handleUserMenuClose();
   };
 
   const handleDrawerToggle = () => {
@@ -192,9 +200,7 @@ export function NavBar({
                 horizontal: "right",
               }}
             >
-              <MenuItem onClick={handleUserMenuClose}>Profile</MenuItem>
-              <MenuItem onClick={handleUserMenuClose}>Settings</MenuItem>
-              <MenuItem onClick={handleUserMenuClose}>Logout</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>
         </Toolbar>
