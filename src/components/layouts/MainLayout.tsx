@@ -25,7 +25,7 @@ export const MainLayout = () => {
       }}
     >
       <NavBar menuItems={menuItems} loading={isLoading} />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
+      <Box component="main" sx={{ p: 3, overflow: "auto" }}>
         <Outlet />
       </Box>
     </Box>
