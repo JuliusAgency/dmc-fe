@@ -1,4 +1,4 @@
-import Sidebar from "./components/sideBar/sidebar.tsx";
+import { NavBar } from "./components/navBar/index.tsx";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Box } from "@mui/material";
@@ -32,71 +32,62 @@ export default function App() {
     (storedUser ? JSON.parse(storedUser) : null);
 
   return (
-      <QueryClientProvider client={queryClient}>
-        <WithTheme>
-          <SnackbarProvider maxSnack={3}>
-            <LocalizationProvider
-              dateAdapter={AdapterDayjs}
-              adapterLocale={"en"}
+    <QueryClientProvider client={queryClient}>
+      <WithTheme>
+        <SnackbarProvider maxSnack={3}>
+          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"en"}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "100vh",
+              }}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row-reverse",
-                  height: "100vh",
-                }}
-              >
-                {user &&
-                  location.pathname !== "/login" &&
-                  location.pathname !== "/register" && <Sidebar />}
+              {user &&
+                location.pathname !== "/login" &&
+                location.pathname !== "/register" && <NavBar />}
 
-                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                  <Routes>
-                    <Route
-                      path="/login"
-                      element={
-                        <AuthForm
-                          type="login"
-                          onSuccess={() => navigate("/home")}
-                        />
-                      }
-                    />
-                    <Route
-                      path="/documents"
-                      element={
-                        user ? <Document /> : <Navigate to="/login" replace />
-                      }
-                    />
-                    <Route
-                      path="/dashboard"
-                      element={
-                        user && user.role === "SYSTEM_ADMIN" ? (
-                          <AdminDashboard />
-                        ) : (
-                          <Navigate to="/login" replace />
-                        )
-                      }
-                    />
-                    <Route
-                      path="/home"
-                      element={
-                        user ? <HomePage /> : <Navigate to="/login" replace />
-                      }
-                    />
-                    <Route
-                      path="/"
-                      element={<Navigate to="/login" replace />}
-                    />
-                    <Route
-                      path="*"
-                      element={<Navigate to="/login" replace />}
-                    />
-                  </Routes>
-                </Box>
+              <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
+                <Routes>
+                  <Route
+                    path="/login"
+                    element={
+                      <AuthForm
+                        type="login"
+                        onSuccess={() => navigate("/home")}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/documents"
+                    element={
+                      user ? <Document /> : <Navigate to="/login" replace />
+                    }
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      user && user.role === "SYSTEM_ADMIN" ? (
+                        <AdminDashboard />
+                      ) : (
+                        <Navigate to="/login" replace />
+                      )
+                    }
+                  />
+                  <Route
+                    path="/home"
+                    element={
+                      user ? <HomePage /> : <Navigate to="/login" replace />
+                    }
+                  />
+                  <Route path="/" element={<Navigate to="/login" replace />} />
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+                </Routes>
               </Box>
-            </LocalizationProvider>
-          </SnackbarProvider>
-        </WithTheme>
-      </QueryClientProvider>
+            </Box>
+          </LocalizationProvider>
+        </SnackbarProvider>
+      </WithTheme>
+    </QueryClientProvider>
   );
 }
