@@ -20,10 +20,15 @@ import {
   CircularProgress,
   InputBase,
   alpha,
+  Popper,
+  Paper,
+  Grow,
+  ClickAwayListener,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SearchIcon from "@mui/icons-material/Search";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
 
@@ -32,6 +37,7 @@ export type MenuItem = {
   icon: React.ReactNode;
   text: string;
   disabled?: boolean;
+  childItems?: MenuItem[];
 };
 
 export function NavBar({
@@ -57,6 +63,10 @@ export function NavBar({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
 
+  // Hover menu state for child items
+  const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -65,6 +75,7 @@ export function NavBar({
     if (isMobile) {
       setMobileOpen(false);
     }
+    setOpenMenuIndex(null);
   };
 
   const handleUserMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -131,16 +142,36 @@ export function NavBar({
       </Box>
       <List>
         {menuItems.map((item) => (
-          <ListItem key={item.path} disablePadding>
-            <ListItemButton
-              onClick={() => handleNavigation(item.path)}
-              disabled={item.disabled}
-              selected={location.pathname === item.path}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
+          <React.Fragment key={item.path}>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => handleNavigation(item.path)}
+                disabled={item.disabled}
+                selected={location.pathname === item.path}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+                {item.childItems && item.childItems.length > 0 && (
+                  <ArrowDropDownIcon fontSize="small" />
+                )}
+              </ListItemButton>
+            </ListItem>
+            {item.childItems && item.childItems.length > 0 && (
+              <List component="div" disablePadding>
+                {item.childItems.map((child) => (
+                  <ListItem key={child.path} disablePadding>
+                    <ListItemButton
+                      onClick={() => handleNavigation(child.path)}
+                      sx={{ pl: 4 }}
+                      dense
+                    >
+                      <ListItemText primary={child.text} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </React.Fragment>
         ))}
       </List>
     </Box>
@@ -188,28 +219,78 @@ export function NavBar({
           {/* Desktop navigation */}
           {!isMobile && (
             <Box sx={{ display: "flex", flexGrow: 1 }}>
-              {menuItems.map((item) => (
-                <Button
-                  key={item.path}
-                  startIcon={item.icon}
-                  onClick={() => handleNavigation(item.path)}
-                  disabled={item.disabled}
-                  color="inherit"
-                  sx={{
-                    mx: 1,
-                    borderRadius: 1,
-                    textTransform: "none",
-                    fontWeight:
-                      location.pathname === item.path ? "bold" : "normal",
-                    borderBottom:
-                      location.pathname === item.path ? "2px solid" : "none",
-                    "&:hover": {
-                      backgroundColor: "rgba(0, 0, 0, 0.04)",
-                    },
-                  }}
-                >
-                  {item.text}
-                </Button>
+              {menuItems.map((item, index) => (
+                <Box key={item.path} sx={{ position: "relative" }}>
+                  <Button
+                    startIcon={item.icon}
+                    onClick={() => handleNavigation(item.path)}
+                    disabled={item.disabled}
+                    color="inherit"
+                    onMouseEnter={(event) => {
+                      if (item.childItems && item.childItems.length > 0) {
+                        setOpenMenuIndex(index);
+                        setMenuAnchorEl(event.currentTarget);
+                      }
+                    }}
+                    endIcon={
+                      item.childItems && item.childItems.length > 0 ? (
+                        <ArrowDropDownIcon />
+                      ) : null
+                    }
+                    sx={{
+                      mx: 1,
+                      borderRadius: 1,
+                      textTransform: "none",
+                      fontWeight:
+                        location.pathname === item.path ? "bold" : "normal",
+                      borderBottom:
+                        location.pathname === item.path ? "2px solid" : "none",
+                      "&:hover": {
+                        backgroundColor: "rgba(0, 0, 0, 0.04)",
+                      },
+                    }}
+                  >
+                    {item.text}
+                  </Button>
+                  {item.childItems && item.childItems.length > 0 && (
+                    <Popper
+                      open={openMenuIndex === index}
+                      anchorEl={menuAnchorEl}
+                      placement="bottom-start"
+                      transition
+                      disablePortal
+                      sx={{ zIndex: 1300 }}
+                    >
+                      {({ TransitionProps }) => (
+                        <Grow
+                          {...TransitionProps}
+                          style={{ transformOrigin: "top left" }}
+                        >
+                          <Paper elevation={3} sx={{ mt: 0.5 }}>
+                            <ClickAwayListener
+                              onClickAway={() => setOpenMenuIndex(null)}
+                            >
+                              <List dense sx={{ py: 0.5, minWidth: 150 }}>
+                                {item.childItems?.map((child) => (
+                                  <ListItem key={child.path} disablePadding>
+                                    <ListItemButton
+                                      onClick={() =>
+                                        handleNavigation(child.path)
+                                      }
+                                      dense
+                                    >
+                                      <ListItemText primary={child.text} />
+                                    </ListItemButton>
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </ClickAwayListener>
+                          </Paper>
+                        </Grow>
+                      )}
+                    </Popper>
+                  )}
+                </Box>
               ))}
             </Box>
           )}
