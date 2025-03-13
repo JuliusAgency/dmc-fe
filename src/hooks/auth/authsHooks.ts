@@ -17,10 +17,11 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: async () => {
-      await logout();
       localStorage.removeItem("user");
       dispatch(setUser(null));
       navigate("/login");
+
+      await logout();
     },
   });
 };
