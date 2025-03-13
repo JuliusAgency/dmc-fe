@@ -18,9 +18,12 @@ import {
   ListItemText,
   Divider,
   CircularProgress,
+  InputBase,
+  alpha,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
 
@@ -34,9 +37,11 @@ export type MenuItem = {
 export function NavBar({
   menuItems,
   loading,
+  onSearch,
 }: {
   menuItems: MenuItem[];
   loading?: boolean;
+  onSearch?: (query: string) => void;
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -51,6 +56,9 @@ export function NavBar({
   // User menu state
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -72,6 +80,17 @@ export function NavBar({
     handleUserMenuClose();
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
+  };
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -85,6 +104,31 @@ export function NavBar({
         </Typography>
       </Box>
       <Divider />
+      {/* Mobile search */}
+      <Box
+        component="form"
+        onSubmit={handleSearchSubmit}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          padding: theme.spacing(1, 2),
+          backgroundColor: alpha(theme.palette.common.white, 0.15),
+          margin: theme.spacing(1),
+          borderRadius: 2,
+          border: `1px solid black`,
+        }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Search…"
+          inputProps={{ "aria-label": "search" }}
+          value={searchQuery}
+          onChange={handleSearchChange}
+        />
+        <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+          <SearchIcon />
+        </IconButton>
+      </Box>
       <List>
         {menuItems.map((item) => (
           <ListItem key={item.path} disablePadding>
@@ -169,6 +213,50 @@ export function NavBar({
               ))}
             </Box>
           )}
+
+          {/* Search box */}
+          <Box
+            component="form"
+            onSubmit={handleSearchSubmit}
+            sx={{
+              position: "relative",
+              borderRadius: 2,
+              border: `1px solid black`,
+              backgroundColor: alpha(theme.palette.common.white, 0.15),
+              "&:hover": {
+                backgroundColor: alpha(theme.palette.common.white, 0.25),
+              },
+              marginRight: 2,
+              marginLeft: 0,
+              width: "auto",
+              [theme.breakpoints.up("sm")]: {
+                marginLeft: theme.spacing(1),
+                width: "auto",
+              },
+              display: { xs: isMobile ? "none" : "flex", md: "flex" },
+            }}
+          >
+            <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
+              <SearchIcon />
+            </IconButton>
+            <InputBase
+              sx={{
+                color: "inherit",
+                "& .MuiInputBase-input": {
+                  padding: theme.spacing(1, 1, 1, 0),
+                  paddingLeft: 0,
+                  width: "100%",
+                  [theme.breakpoints.up("md")]: {
+                    width: "20ch",
+                  },
+                },
+              }}
+              placeholder="Search…"
+              inputProps={{ "aria-label": "search" }}
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+          </Box>
 
           {/* User menu */}
           <Box>
