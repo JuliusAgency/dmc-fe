@@ -6,16 +6,23 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  IconButton,
   List,
   ListItem,
+  ListItemSecondaryAction,
   ListItemText,
   TextField,
   Typography,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { CreateCategoryDto } from "../../api/categoryAPI/category";
 import { Category } from "../../api/categoryAPI/types";
-import { useCreateCategory } from "../../hooks/category/categoryHooks";
+import {
+  useChildCategories,
+  useCreateCategory,
+  useDeleteCategory,
+} from "../../hooks/category/categoryHooks";
 
 interface SubCategoryModalProps {
   open: boolean;
@@ -30,6 +37,12 @@ export const SubCategoryModal = ({
 }: SubCategoryModalProps) => {
   const [newCategoryName, setNewCategoryName] = useState("");
   const { mutate: createCategory, isPending } = useCreateCategory();
+  const { mutate: deleteCategory } = useDeleteCategory();
+  const { data: childCategories } = useChildCategories();
+
+  const childCategoriesForSelectedCategory = childCategories?.filter(
+    (cat) => cat.parentCategoryId === category.id
+  );
 
   const handleAddSubCategory = () => {
     if (newCategoryName.trim()) {
@@ -41,10 +54,13 @@ export const SubCategoryModal = ({
       createCategory(categoryData, {
         onSuccess: () => {
           setNewCategoryName("");
-          onClose();
         },
       });
     }
+  };
+
+  const handleDeleteSubCategory = (id: number) => {
+    deleteCategory(id);
   };
 
   return (
@@ -53,11 +69,22 @@ export const SubCategoryModal = ({
       <DialogContent>
         <Box sx={{ mb: 3, mt: 2 }}>
           <Typography variant="h6">Current Subcategories</Typography>
-          {category.childCategories && category.childCategories.length > 0 ? (
+          {childCategoriesForSelectedCategory &&
+          childCategoriesForSelectedCategory?.length > 0 ? (
             <List>
-              {category.childCategories.map((child) => (
+              {childCategoriesForSelectedCategory.map((child) => (
                 <ListItem key={child.id}>
                   <ListItemText primary={child.name} />
+                  <ListItemSecondaryAction>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => handleDeleteSubCategory(child.id)}
+                      size="small"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </ListItemSecondaryAction>
                 </ListItem>
               ))}
             </List>
