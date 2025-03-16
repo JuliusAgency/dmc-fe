@@ -26,7 +26,7 @@ export const RevisionGroup = ({ revisionGroup, rows, setRows }: Props) => {
     pagination,
     {
       isFinal: false,
-      revisionGroup,
+
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
     ["tags", "tags.tag", "category", "processOwner"],

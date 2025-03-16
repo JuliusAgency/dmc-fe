@@ -162,7 +162,7 @@ export const AddDocument = ({
       snackBarError("All fields are required, including a file upload!");
       return;
     }
-
+    console.log(!documentToEdit);
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("file", file);
@@ -217,18 +217,18 @@ export const AddDocument = ({
           <Typography variant="h5" align="center" gutterBottom>
             {documentToEdit ? "Edit Document" : "Create New Document"}
           </Typography>
-          <Grid item xs={12} md={12}>
-            <GridInput
-              label="Name"
-              required
-              onChange={(value) => handleInputChange("name", value)}
-              value={formData.name ?? ""}
-              fullWidth
-              sx={{ minWidth: 250, typography: "h6" }}
-            />
-          </Grid>
 
           <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+              <GridInput
+                label="Name"
+                required
+                onChange={(value) => handleInputChange("name", value)}
+                value={formData.name ?? ""}
+                fullWidth
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
             <Grid item xs={12} md={12}>
               <GridMultipleAutocomplete
                 multiple={false}
@@ -285,6 +285,24 @@ export const AddDocument = ({
                 sx={{ minWidth: 250, typography: "h6" }}
               />
             </Grid>
+            <GridMultipleAutocomplete
+              multiple={false}
+              onChange={(value) => handleInputChange("type", value)}
+              value={formData.type ?? null}
+              fullWidth
+              selectorData={{
+                label: "File Type",
+                accessorId: "type",
+                options: [
+                  { id: 1, name: "PDF" },
+                  { id: 2, name: "DOCX" },
+                  { id: 3, name: "XLSX" },
+                  { id: 4, name: "PPTX" },
+                  { id: 5, name: "PNG" },
+                ],
+              }}
+              sx={{ minWidth: 250, typography: "h6" }}
+            />
             <Grid item xs={12} md={12}>
               <GridInput
                 label="Revision"
@@ -304,26 +322,7 @@ export const AddDocument = ({
               />
             </Grid>
 
-            <Grid item xs={12} md={12}>
-              <GridMultipleAutocomplete
-                multiple={false}
-                onChange={(value) => handleInputChange("type", value)}
-                value={formData.type ?? null}
-                fullWidth
-                selectorData={{
-                  label: "File Type",
-                  accessorId: "type",
-                  options: [
-                    { id: 1, name: "PDF" },
-                    { id: 2, name: "DOCX" },
-                    { id: 3, name: "XLSX" },
-                    { id: 4, name: "PPTX" },
-                    { id: 5, name: "PNG" },
-                  ],
-                }}
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
+            <Grid item xs={12} md={12}></Grid>
             <Grid item xs={12} md={12}>
               <input
                 type="file"
