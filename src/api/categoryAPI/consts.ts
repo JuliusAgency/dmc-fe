@@ -1,5 +1,5 @@
 export const CategoryEndpoints = {
-  getAllCategories: "/category/getAll",
+  getAllCategories: "/category",
   createCategory: "/category",
   deleteCategory: (id: number) => `/category/${id}`,
 };

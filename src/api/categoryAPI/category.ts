@@ -3,13 +3,26 @@ import { Category } from "./types.ts";
 import { CategoryEndpoints } from "./consts.ts";
 
 export const getAllCategories = async (): Promise<Category[]> => {
-  const { data } = await API.get(CategoryEndpoints.getAllCategories);
+  const { data } = await API.get(CategoryEndpoints.getAllCategories, {
+    params: {
+      relations: JSON.stringify(["childCategories", "parentCategory"]),
+    },
+    headers: {
+      "page-size": 1000,
+      "page-number": 0,
+    },
+  });
 
-  return data;
+  return data?.data;
 };
 
-export const createCategory = async (name: string) => {
-  return API.post(CategoryEndpoints.createCategory, { name });
+export interface CreateCategoryDto {
+  name: string;
+  parentCategoryId?: number;
+}
+
+export const createCategory = async (categoryData: CreateCategoryDto) => {
+  return API.post(CategoryEndpoints.createCategory, categoryData);
 };
 
 export async function deleteCategory(id: number) {
