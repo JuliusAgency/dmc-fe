@@ -13,9 +13,11 @@ import { GridColDef } from "@mui/x-data-grid";
 import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
+import { useParams } from "react-router-dom";
 
 export const Document = () => {
   const [rows, setRows] = useState<DocumentType[]>([]);
+  const { id: categoryId } = useParams();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 10,
     page: 0,
@@ -29,17 +31,23 @@ export const Document = () => {
     DocumentType | undefined
   >(undefined);
 
-  const documentsQuery = useGetAllDocuments(pagination, { isFinal: true }, [
-    "tags",
-    "tags.tag",
-    "category",
-    "secretLevel",
-  ]);
+  const documentsQuery = useGetAllDocuments(
+    pagination,
+    { isFinal: true, categoryId: categoryId ? Number(categoryId) : undefined },
+    ["tags", "tags.tag", "category", "processOwner"]
+  );
+
   const fileQuery = useGetFile(fileNameToDownload ?? "");
 
   const toggleDocumentModal = useCallback(() => {
     setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
   }, [isAddDocumentModalOpen]);
+
+  useEffect(() => {
+    if (categoryId) {
+      documentsQuery.refetch();
+    }
+  }, [categoryId]);
 
   useEffect(() => {
     if (fileQuery.data) {
@@ -143,7 +151,6 @@ export const Document = () => {
           rows={rows}
           getDetailPanelHeight={() => 200}
           getDetailPanelContent={(params) => {
-            console.log("Opening detail panel for:", params.row);
             return (
               <RevisionGroup
                 key={params.row.id}

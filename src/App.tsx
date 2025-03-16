@@ -35,7 +35,7 @@ const MainRoutes = () => {
         <Route path="/documents" element={<Document />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         {/* TODO: implement category page */}
-        <Route path="/category/:id" element={null} />
+        <Route path="/category/:id" element={<Document />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>

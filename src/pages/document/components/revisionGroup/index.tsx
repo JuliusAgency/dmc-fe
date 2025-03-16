@@ -12,9 +12,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { GenericTable } from "../../../../components/genericTable/genericTable.tsx";
 import { COLUMNS } from "../../consts.tsx";
 import { DocumentType } from "../../../../api/documentAPI/types.ts";
+import { useParams } from "react-router-dom";
 
 export const RevisionGroup = ({ revisionGroup, rows, setRows }: Props) => {
   const queryClient = useQueryClient();
+  const { id: categoryId } = useParams();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 5,
     page: 0,
@@ -25,8 +27,9 @@ export const RevisionGroup = ({ revisionGroup, rows, setRows }: Props) => {
     {
       isFinal: false,
       revisionGroup,
+      categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "secretLevel"],
+    ["tags", "tags.tag", "category", "processOwner"],
     "GetRevisionGroupDocuments"
   );
 

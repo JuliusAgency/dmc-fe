@@ -2,11 +2,10 @@ import { Autocomplete, Grid, SxProps, Chip } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import { styled } from "@mui/system";
 
-
 export type Option = {
-  id: number
-  name: string
-}
+  id: number;
+  name: string;
+};
 
 export interface AutocompleteData {
   label: string;
@@ -24,13 +23,14 @@ export interface GridMultipleAutocompleteProps {
   multiple?: boolean;
   required?: boolean;
   name?: string;
+  fullWidth?: boolean;
   sx?: SxProps;
 }
 
 const StyledChip = styled(Chip)({
-    '& .MuiChip-deleteIcon': {
-        marginLeft: '2px', // Adjust this value to move the cancel button
-    },
+  "& .MuiChip-deleteIcon": {
+    marginLeft: "2px", // Adjust this value to move the cancel button
+  },
 });
 
 export const GridMultipleAutocomplete = ({
@@ -45,9 +45,7 @@ export const GridMultipleAutocomplete = ({
   name,
   sx,
 }: GridMultipleAutocompleteProps) => {
-
-
-    return (
+  return (
     <Grid item xs={gridSize}>
       <Autocomplete
         disabled={disabled}
@@ -59,18 +57,15 @@ export const GridMultipleAutocomplete = ({
         value={value}
         id={`${selectorData.accessorId}-multiple-autocomplete`}
         options={selectorData.options}
-        getOptionLabel={(option: Option) => (option?.name ?? '') ?? "לא צוין"}
+        getOptionLabel={(option: Option) => option?.name ?? "" ?? "לא צוין"}
         onChange={(_: any, newValue: Option[] | null | Option): void => {
           onChange(newValue!);
         }}
         renderTags={(value: Option[], getTagProps) =>
-            value.map((option: Option, index: number) => (
-                <StyledChip
-                    label={option.name ?? ''}
-                    {...getTagProps({ index })}
-                />
-            ))
-      }
+          value.map((option: Option, index: number) => (
+            <StyledChip label={option.name ?? ""} {...getTagProps({ index })} />
+          ))
+        }
         renderInput={(params) => (
           <TextField
             sx={{ ...sx }}

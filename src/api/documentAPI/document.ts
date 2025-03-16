@@ -1,4 +1,3 @@
-// src/api/documentAPI/document.ts
 import { PaginationModel } from "../../consts/types.ts";
 import { API } from "../API.ts";
 import { DocumentEndpoints } from "./consts.ts";
@@ -46,11 +45,24 @@ export const getAllDocuments = async (
         },
       },
     ],
+    [
+      "categoryId",
+      {
+        description: "categoryId",
+        action: () => {
+          const categoryId = filters["categoryId"];
+          if (categoryId) {
+            transformedFilters = {
+              ...transformedFilters,
+              categoryId,
+            };
+          }
+        },
+      },
+    ],
   ]);
 
   Object.keys(filters).forEach((field) => {
-    console.log("Filters received:", filters);
-
     const addToQueryParams = setFilterParams.get(field)?.action;
     if (addToQueryParams) {
       addToQueryParams();
@@ -71,10 +83,10 @@ export const getAllDocuments = async (
   return data;
 };
 
-export const uploadDocument = async (file: File) => {
-  const { data } = await API.post<DocumentType[]>(
+export const uploadDocument = async (formData: FormData) => {
+  const { data } = await API.post<DocumentType>(
     DocumentEndpoints.uploadDocument,
-    file,
+    formData,
     {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -100,6 +112,13 @@ export const restoreRevision = async (id: string): Promise<DocumentType> => {
 export const getFile = async (fileName: string): Promise<Blob> => {
   const response = await API.get(`${DocumentEndpoints.getFile}${fileName}`, {
     responseType: "blob",
+  });
+  return response.data;
+};
+
+export const getLastDocumentPartNumber = async (docTypeId: number) => {
+  const response = await API.get(DocumentEndpoints.lastDocumentPartNumber, {
+    params: { docTypeId },
   });
   return response.data;
 };

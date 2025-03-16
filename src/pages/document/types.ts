@@ -1,4 +1,5 @@
 export interface DocumentFilters {
-  isFinal: boolean
-  revisionGroup: string
+  isFinal: boolean;
+  categoryId: number;
+  revisionGroup: string;
 }
