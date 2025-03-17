@@ -104,6 +104,8 @@ export const useGenerateDocumentPartNumber = (
             nextNumber = parseInt(match[1], 10) + 1;
           }
         }
+
+        console.log(data, nextNumber);
         return `${docType}-${String(nextNumber).padStart(4, "0")}-WI`;
       } catch (error) {
         console.error("Error generating documentPartNumber:", error);

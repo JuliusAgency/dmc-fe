@@ -111,7 +111,7 @@ export function NavBar({
     <Box sx={{ width: 250 }} role="presentation">
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" component="div">
-          DMC
+          DMS
         </Typography>
       </Box>
       <Divider />
@@ -200,7 +200,7 @@ export function NavBar({
             }}
             onClick={() => navigate("/home")}
           >
-            DMC
+            DMS
           </Typography>
 
           {/* Mobile menu button */}

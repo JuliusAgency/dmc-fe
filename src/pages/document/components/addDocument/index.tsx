@@ -1,16 +1,8 @@
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  Grid,
-  Typography,
-  IconButton,
-} from "@mui/material";
+import { Box, Grid, Typography, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { GridCloseIcon } from "@mui/x-data-grid-pro";
 import {
-  useCreateDocument,
   useUploadDocument,
   useGenerateDocumentPartNumber,
 } from "../../../../hooks/document/documentHooks.ts";
@@ -21,47 +13,41 @@ import {
   Option,
 } from "../../../../components/gridItems/gridMultipleAutocomplete/GridMultipleAutocomplete.tsx";
 import GridInput from "../../../../components/gridItems/gridInput/GridInput.tsx";
-import GridButton from "../../../../components/gridItems/gridButton/GridButton.tsx";
 import {
   snackBarError,
   snackBarSuccess,
 } from "../../../../components/toast/Toast.tsx";
-import { DocumentType } from "../../../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
-
-export type AddDocumentProps = {
-  open: boolean;
-  onClose: () => void;
-  refetch: () => void;
-  documentToEdit?: DocumentType;
-};
+import {
+  CLASSIFICATION_OPTIONS,
+  FILE_TYPE_OPTIONS,
+  ALLOWED_FILE_TYPES,
+  TITLE_NEW_DOCUMENT,
+  TITLE_EDIT_DOCUMENT,
+  ERROR_REQUIRED_FIELDS,
+  ERROR_INVALID_FILE,
+  SUCCESS_UPLOAD,
+  BUTTON_SAVE,
+  BUTTON_CANCEL,
+  ERROR_UPLOAD,
+} from "./constants.ts";
+import { Props } from "./types.ts";
+import { GenericPopup } from "../../../../components/genericPopup/genericPopup";
 
 export const AddDocument = ({
   open,
   onClose,
   refetch,
   documentToEdit,
-}: AddDocumentProps) => {
+}: Props) => {
   const storedUser = localStorage.getItem("user");
 
   const uploadDocumentMutation = useUploadDocument();
-
-  const { id: categoryId } = useParams();
-  const createDocument = useCreateDocument();
-
   const { data: tags } = useGetAllTags();
+  const { data: users } = useGetUsers();
   const user =
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
-
-  const { data: users } = useGetUsers();
-
-  const userOptions = users
-    ? users.map((user: any) => ({ id: user.id, name: user.email }))
-    : [];
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
     docType: null as Option | null,
@@ -77,10 +63,19 @@ export const AddDocument = ({
     categoryId: "",
   });
 
+  const [file, setFile] = useState<File | null>(null);
+
   const { data: generatedPartNumber } = useGenerateDocumentPartNumber(
     formData.docType?.id || null,
     formData.docType?.name || null
   );
+
+  const { id: categoryId } = useParams();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const userOptions = users
+    ? users.map((user: any) => ({ id: user.id, name: user.email }))
+    : [];
 
   const tagOptions: Option[] = tags
     ? tags.map((tag) => ({ id: tag.id, name: tag.name }))
@@ -123,18 +118,8 @@ export const AddDocument = ({
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "image/jpeg",
-      "image/png",
-    ];
-
-    if (!allowedTypes.includes(selectedFile.type)) {
-      snackBarError("Invalid file format! Allowed: PDF, Word, Excel, Images.");
+    if (!ALLOWED_FILE_TYPES.includes(selectedFile.type)) {
+      snackBarError(ERROR_INVALID_FILE);
       return;
     }
 
@@ -159,10 +144,10 @@ export const AddDocument = ({
       !file ||
       !formData.processOwner
     ) {
-      snackBarError("All fields are required, including a file upload!");
+      snackBarError(ERROR_REQUIRED_FIELDS);
       return;
     }
-    console.log(!documentToEdit);
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("file", file);
@@ -185,7 +170,7 @@ export const AddDocument = ({
       );
 
       await uploadDocumentMutation.mutateAsync(formDataToSend);
-      snackBarSuccess("Document uploaded successfully!");
+      snackBarSuccess(SUCCESS_UPLOAD);
       refetch();
       onClose();
 
@@ -205,156 +190,133 @@ export const AddDocument = ({
 
       setFile(null);
     } catch (error) {
-      console.error("❌ Upload Error:", error);
-      snackBarError("An error occurred while uploading the document.");
+      snackBarError(ERROR_UPLOAD);
     }
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogContent>
-        <form onSubmit={handleSubmit} style={{ padding: 20, width: "50vw" }}>
-          <Typography variant="h5" align="center" gutterBottom>
-            {documentToEdit ? "Edit Document" : "Create New Document"}
-          </Typography>
+    <GenericPopup
+      open={open}
+      onClose={onClose}
+      title={documentToEdit ? TITLE_EDIT_DOCUMENT : TITLE_NEW_DOCUMENT}
+      onConfirm={handleSubmit}
+      confirmButtonText={BUTTON_SAVE}
+      cancelButtonText={BUTTON_CANCEL}
+    >
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={12}>
+          <GridInput
+            label="Name"
+            required
+            onChange={(value) => handleInputChange("name", value)}
+            value={formData.name ?? ""}
+            fullWidth
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <GridMultipleAutocomplete
+            multiple={false}
+            onChange={(value) => handleInputChange("docType", value)}
+            value={formData.docType}
+            fullWidth
+            selectorData={{
+              label: "Document Type",
+              accessorId: "docType",
+              options: tagOptions || [],
+            }}
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <GridInput
+            label="Document P.N"
+            value={formData.documentPartNumber ?? ""}
+            disabled
+            fullWidth
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <GridMultipleAutocomplete
+            multiple={false}
+            onChange={(value) => handleInputChange("classification", value)}
+            value={formData.classification ?? ""}
+            fullWidth
+            selectorData={{
+              label: "Classification",
+              accessorId: "classification",
+              options: CLASSIFICATION_OPTIONS,
+            }}
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <GridMultipleAutocomplete
+            multiple={false}
+            onChange={(value) => handleInputChange("processOwner", value)}
+            value={formData.processOwner ?? null}
+            fullWidth
+            selectorData={{
+              label: "Process Owner",
+              accessorId: "processOwner",
+              options: userOptions,
+            }}
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <GridMultipleAutocomplete
+          multiple={false}
+          onChange={(value) => handleInputChange("type", value)}
+          value={formData.type ?? null}
+          fullWidth
+          selectorData={{
+            label: "File Type",
+            accessorId: "type",
+            options: FILE_TYPE_OPTIONS,
+          }}
+          sx={{ minWidth: 250, typography: "h6" }}
+        />
+        <Grid item xs={12} md={12}>
+          <GridInput
+            label="Revision"
+            value={formData.revision ?? "01"}
+            disabled
+            fullWidth
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <GridInput
+            label="Created By"
+            value={formData.createdBy ?? user?.name ?? ""}
+            disabled
+            fullWidth
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={12}>
-              <GridInput
-                label="Name"
-                required
-                onChange={(value) => handleInputChange("name", value)}
-                value={formData.name ?? ""}
-                fullWidth
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <GridMultipleAutocomplete
-                multiple={false}
-                onChange={(value) => handleInputChange("docType", value)}
-                value={formData.docType}
-                fullWidth
-                selectorData={{
-                  label: "Document Type",
-                  accessorId: "docType",
-                  options: tagOptions || [],
-                }}
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <GridInput
-                label="Document P.N"
-                value={formData.documentPartNumber ?? ""}
-                disabled
-                fullWidth
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <GridMultipleAutocomplete
-                multiple={false}
-                onChange={(value) => handleInputChange("classification", value)}
-                value={formData.classification ?? ""}
-                fullWidth
-                selectorData={{
-                  label: "Classification",
-                  accessorId: "classification",
-                  options: [
-                    { id: 1, name: "Public" },
-                    { id: 2, name: "Internal" },
-                    { id: 3, name: "Confidential" },
-                    { id: 4, name: "Secret" },
-                  ],
-                }}
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <GridMultipleAutocomplete
-                multiple={false}
-                onChange={(value) => handleInputChange("processOwner", value)}
-                value={formData.processOwner ?? null}
-                fullWidth
-                selectorData={{
-                  label: "Process Owner",
-                  accessorId: "processOwner",
-                  options: userOptions,
-                }}
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <GridMultipleAutocomplete
-              multiple={false}
-              onChange={(value) => handleInputChange("type", value)}
-              value={formData.type ?? null}
-              fullWidth
-              selectorData={{
-                label: "File Type",
-                accessorId: "type",
-                options: [
-                  { id: 1, name: "PDF" },
-                  { id: 2, name: "DOCX" },
-                  { id: 3, name: "XLSX" },
-                  { id: 4, name: "PPTX" },
-                  { id: 5, name: "PNG" },
-                ],
-              }}
-              sx={{ minWidth: 250, typography: "h6" }}
-            />
-            <Grid item xs={12} md={12}>
-              <GridInput
-                label="Revision"
-                value={formData.revision ?? "01"}
-                disabled
-                fullWidth
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={12}>
-              <GridInput
-                label="Created By"
-                value={formData.createdBy ?? user?.name ?? ""}
-                disabled
-                fullWidth
-                sx={{ minWidth: 250, typography: "h6" }}
-              />
-            </Grid>
-
-            <Grid item xs={12} md={12}></Grid>
-            <Grid item xs={12} md={12}>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg"
-                onChange={handleFileChange}
-                ref={fileInputRef}
-                style={{ width: "100%", fontSize: "1.1rem" }}
-              />
-              {file && (
-                <Box display="flex" alignItems="center" mt={1}>
-                  <Typography variant="body1" sx={{ mr: 1 }}>
-                    {file.name}
-                  </Typography>
-                  <IconButton size="small" onClick={handleRemoveFile}>
-                    <GridCloseIcon color="error" />
-                  </IconButton>
-                </Box>
-              )}
-            </Grid>
-
-            <Grid item xs={12}>
-              <GridButton
-                buttonText="Save"
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ fontSize: "1.2rem", padding: "12px" }}
-              />
-            </Grid>
-          </Grid>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <Grid item xs={12} md={12}></Grid>
+        <Grid item xs={12} md={12}>
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            style={{ width: "100%", fontSize: "1.1rem" }}
+          />
+          {file && (
+            <Box display="flex" alignItems="center" mt={1}>
+              <Typography variant="body1" sx={{ mr: 1 }}>
+                {file.name}
+              </Typography>
+              <IconButton size="small" onClick={handleRemoveFile}>
+                <GridCloseIcon color="error" />
+              </IconButton>
+            </Box>
+          )}
+        </Grid>
+      </Grid>
+    </GenericPopup>
   );
 };
