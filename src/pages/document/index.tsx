@@ -215,7 +215,7 @@ export const Document = () => {
             }}
             rowCount={documentsQuery?.data?.total ?? 0}
             rows={rows}
-            getDetailPanelHeight={() => 100}
+            getDetailPanelHeight={() => 150}
             getDetailPanelContent={(params) => {
               return (
                 <Box
