@@ -32,10 +32,10 @@ const MainRoutes = () => {
     <Routes>
       <Route element={<MainLayout />}>
         <Route path="/home" element={<HomePage />} />
-        <Route path="/documents" element={<Document />} />
+        <Route path="/documents" element={<Document key="documents" />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         {/* TODO: implement category page */}
-        <Route path="/category/:id" element={<Document />} />
+        <Route path="/category/:id" element={<Document key="category" />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>
