@@ -14,6 +14,7 @@ import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
+import SelectSignersPopup from "./components/selectSignersPopup";
 
 export const Document = () => {
   const [rows, setRows] = useState<DocumentType[]>([]);
@@ -30,6 +31,11 @@ export const Document = () => {
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
   >(undefined);
+
+  const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
+  const [documentIdForSigners, setDocumentIdForSigners] = useState<
+    number | null
+  >(null);
 
   const documentsQuery = useGetAllDocuments(
     pagination,
@@ -69,6 +75,11 @@ export const Document = () => {
   const handleEdit = (document: DocumentType) => {
     setDocumentToEdit(document);
     toggleDocumentModal();
+  };
+
+  const handleDocumentAdded = (documentId: number) => {
+    setDocumentIdForSigners(documentId);
+    setIsSignersPopupOpen(true);
   };
 
   useEffect(() => {
@@ -169,6 +180,13 @@ export const Document = () => {
           }}
           refetch={documentsQuery.refetch}
           documentToEdit={documentToEdit}
+          onDocumentAdded={handleDocumentAdded}
+        />
+
+        <SelectSignersPopup
+          open={isSignersPopupOpen}
+          onClose={() => setIsSignersPopupOpen(false)}
+          documentId={documentIdForSigners}
         />
       </Grid>
     </Box>

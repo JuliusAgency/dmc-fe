@@ -6,7 +6,6 @@ import {
   useUploadDocument,
   useGenerateDocumentPartNumber,
 } from "../../../../hooks/document/documentHooks.ts";
-import { useGetUsers } from "../../../../hooks/user/userHooks.ts";
 import { useGetAllTags } from "../../../../hooks/tag/tagHooks.ts";
 import {
   GridMultipleAutocomplete,
@@ -39,12 +38,13 @@ export const AddDocument = ({
   onClose,
   refetch,
   documentToEdit,
+  onDocumentAdded,
 }: Props) => {
   const storedUser = localStorage.getItem("user");
 
   const uploadDocumentMutation = useUploadDocument();
   const { data: tags } = useGetAllTags();
-  const { data: users } = useGetUsers();
+
   const user =
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
@@ -72,10 +72,6 @@ export const AddDocument = ({
 
   const { id: categoryId } = useParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const userOptions = users
-    ? users.map((user: any) => ({ id: user.id, name: user.email }))
-    : [];
 
   const tagOptions: Option[] = tags
     ? tags.map((tag) => ({ id: tag.id, name: tag.name }))
@@ -141,8 +137,7 @@ export const AddDocument = ({
       !formData.documentPartNumber ||
       !formData.name ||
       !formData.classification ||
-      !file ||
-      !formData.processOwner
+      !file
     ) {
       snackBarError(ERROR_REQUIRED_FIELDS);
       return;
@@ -156,12 +151,11 @@ export const AddDocument = ({
         JSON.stringify({
           docTypeId: formData.docType.id,
           classification: formData.classification.name.toUpperCase(),
-          processOwnerId: formData.processOwner.id,
           updatedBy: user?.email || null,
           revision: Number(formData.revision),
           name: formData.name,
           documentPartNumber: formData.documentPartNumber,
-          status: "NEW",
+          status: "DRAFT",
           published: new Date(),
           isFinal: !documentToEdit,
           type: formData.type?.name.toUpperCase(),
@@ -169,10 +163,14 @@ export const AddDocument = ({
         })
       );
 
-      await uploadDocumentMutation.mutateAsync(formDataToSend);
-      snackBarSuccess(SUCCESS_UPLOAD);
-      refetch();
-      onClose();
+      const response = await uploadDocumentMutation.mutateAsync(formDataToSend);
+
+      if (response?.id) {
+        snackBarSuccess(SUCCESS_UPLOAD);
+        refetch();
+        onClose();
+        onDocumentAdded(response.id);
+      }
 
       setFormData({
         docType: null,
@@ -247,20 +245,6 @@ export const AddDocument = ({
               label: "Classification",
               accessorId: "classification",
               options: CLASSIFICATION_OPTIONS,
-            }}
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <GridMultipleAutocomplete
-            multiple={false}
-            onChange={(value) => handleInputChange("processOwner", value)}
-            value={formData.processOwner ?? null}
-            fullWidth
-            selectorData={{
-              label: "Process Owner",
-              accessorId: "processOwner",
-              options: userOptions,
             }}
             sx={{ minWidth: 250, typography: "h6" }}
           />
