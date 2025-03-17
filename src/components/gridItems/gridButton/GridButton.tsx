@@ -1,44 +1,46 @@
-import {Button, Grid, Tooltip} from '@mui/material'
+import { Button, Grid, Tooltip, SxProps } from "@mui/material";
 
 interface Props {
-    buttonText: string
-    gridSize?: number
-    onClick?: any
-    variant?: 'text' | 'contained' | 'outlined'
-    disabled?: boolean
-    showTooltip?: boolean
-    tooltipMessage?: string
-    type?: 'button' | 'submit' | 'reset'
-    fullWidth?: boolean
+  buttonText: string;
+  gridSize?: number;
+  onClick?: any;
+  variant?: "text" | "contained" | "outlined";
+  disabled?: boolean;
+  showTooltip?: boolean;
+  tooltipMessage?: string;
+  type?: "button" | "submit" | "reset";
+  fullWidth?: boolean;
+  sx?: SxProps;
 }
 
 const GridButton = ({
-                        buttonText,
-                        gridSize = 3,
-                        onClick = () => {
-                        },
-                        variant,
-                        disabled = false,
-                        showTooltip = false,
-                        tooltipMessage,
-                        type = 'button',
-                        fullWidth = false
-                    }: Props) => (
-    <Grid item xs={gridSize} alignSelf={'center'}>
-        <Tooltip title={showTooltip ? tooltipMessage : ''} placement='top'>
+  buttonText,
+  gridSize = 3,
+  onClick = () => {},
+  variant,
+  disabled = false,
+  showTooltip = false,
+  tooltipMessage,
+  type = "button",
+  fullWidth = false,
+  sx = {},
+}: Props) => (
+  <Grid item xs={gridSize} alignSelf={"center"}>
+    <Tooltip title={showTooltip ? tooltipMessage : ""} placement="top">
       <span>
         <Button
-            variant={variant}
-            onClick={onClick}
-            disabled={disabled}
-            type={type}
-            fullWidth={fullWidth}
+          variant={variant}
+          onClick={onClick}
+          disabled={disabled}
+          type={type}
+          fullWidth={fullWidth}
+          sx={sx}
         >
           {buttonText}
         </Button>
       </span>
-        </Tooltip>
-    </Grid>
-)
+    </Tooltip>
+  </Grid>
+);
 
-export default GridButton
+export default GridButton;

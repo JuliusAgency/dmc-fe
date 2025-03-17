@@ -1,4 +1,4 @@
-import { Grid, TextField } from "@mui/material";
+import { Grid, TextField, SxProps } from "@mui/material";
 
 interface Props {
   label: string;
@@ -16,6 +16,7 @@ interface Props {
   type?: "text" | "number"; // Add type property to the Props interface
   defaultValue?: number | string;
   outlined?: boolean;
+  sx?: SxProps;
 }
 
 const GridInput = ({
@@ -34,6 +35,7 @@ const GridInput = ({
   type = "text",
   defaultValue,
   outlined = false,
+  sx = {},
 }: Props) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // If the type is "number," filter out non-numeric characters
@@ -48,7 +50,6 @@ const GridInput = ({
   return (
     <Grid item md={gridSize} xl={gridSizeXL} xs={gridSize} container>
       <TextField
-        sx={{ ".MuiInputBase-input": { fontSize: "16px", margin: 0 } }}
         variant={outlined ? "standard" : "outlined"}
         fullWidth={fullWidth}
         required={required}
@@ -66,6 +67,7 @@ const GridInput = ({
           readOnly: readOnly,
         }}
         type={type} // Pass the type to the TextField
+        sx={sx}
       />
     </Grid>
   );

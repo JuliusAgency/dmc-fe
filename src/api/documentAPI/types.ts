@@ -1,26 +1,60 @@
-import {Category} from "../categoryAPI/types.ts";
+import { Category } from "../categoryAPI/types.ts";
 import { Tag } from "../tagsAPI/types.ts";
-import {SecretLevel} from "../secretLevelAPI/types.ts";
+import { SecretLevel } from "../secretLevelAPI/types.ts";
 
 export interface DocumentType {
-    id: number
-    name: string
-    fileName: string
-    format: string
-    projectCode: string
-    updateDate: Date
-    revision: string
-    isFinal: boolean
-    revisionGroup: string
-    category: Category
-    secretLevel: SecretLevel
-    tags: DocumentTag[] | Tag[]
+  id: number;
+  name: string;
+  fileName: string;
+  type: FileType;
+  documentPartNumber: string;
+  docType: Tag;
+  classification: Classification;
+  revision: string;
+  isFinal: boolean;
+  revisionGroup: string;
+  updateDate: Date;
+  createdBy: User;
+  processOwner: User;
+  dcoNumber: string;
+  category: Category;
+  secretLevel: SecretLevel;
+  tags: DocumentTag[] | Tag[];
+}
+
+export enum FileType {
+  PDF = "PDF",
+  DOCX = "DOCX",
+  XLSX = "XLSX",
+  PPTX = "PPTX",
+  PNG = "PNG",
+  JPG = "JPG",
+}
+
+export enum Classification {
+  PUBLIC = "Public",
+  INTERNAL = "Internal",
+  CONFIDENTIAL = "Confidential",
+  SECRET = "Secret",
+}
+
+export enum UserRole {
+  USER = "USER",
+  ADMIN = "ADMIN",
+  SYSTEM_ADMIN = "SYSTEM_ADMIN",
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
 }
 
 export interface DocumentTag {
-    tagId: number
-    documentId: number
-    tag: Tag
+  tagId: number;
+  documentId: number;
+  tag: Tag;
 }
 
-export type GetAllDocumentsResponse = { data: DocumentType[], total: number };
+export type GetAllDocumentsResponse = { data: DocumentType[]; total: number };

@@ -7,16 +7,31 @@ import App from "./App.tsx";
 import { LicenseInfo } from "@mui/x-license";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { CONFIG } from "./consts/config.ts";
+import {
+  QueryClient as TanStackQueryClient,
+  QueryClientProvider as TanStackQueryClientProvider,
+} from "@tanstack/react-query";
 
 LicenseInfo.setLicenseKey(CONFIG.MUI_LICENSE_KEY);
 const queryClient = new QueryClient();
+
+const tanstackQueryClient = new TanStackQueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retryDelay: 1500,
+    },
+  },
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <Router>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <TanStackQueryClientProvider client={tanstackQueryClient}>
+            <App />
+          </TanStackQueryClientProvider>
         </QueryClientProvider>
       </Router>
     </Provider>

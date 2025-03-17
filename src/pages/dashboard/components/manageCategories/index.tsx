@@ -1,8 +1,8 @@
 import { Typography, Container, Grid, Paper } from "@mui/material";
 import {
-  useGetAllCategories,
   useCreateCategory,
   useDeleteCategory,
+  useParentCategories,
 } from "../../../../hooks/category/categoryHooks";
 import {
   useGetAllTags,
@@ -21,7 +21,7 @@ import { MANAGE_CATEGORIES_TITLE, PAPER_STYLE } from "./constants";
 
 export const ManageCategories = () => {
   const { data: categories = [], isLoading: loadingCategories } =
-    useGetAllCategories();
+    useParentCategories();
   const { data: tags = [], isLoading: loadingTags } = useGetAllTags();
 
   const createCategoryMutation = useCreateCategory();
@@ -38,7 +38,11 @@ export const ManageCategories = () => {
       <Grid container spacing={4} justifyContent="flex-start">
         <Grid item xs={12} md={6}>
           <Paper sx={PAPER_STYLE}>
-            <CategoryForm onSubmit={createCategoryMutation.mutate} />
+            <CategoryForm
+              onSubmit={(name: string) =>
+                createCategoryMutation.mutate({ name })
+              }
+            />
             <CategoryTable
               categories={categories}
               loading={loadingCategories}
