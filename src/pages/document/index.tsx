@@ -15,6 +15,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
+import SelectSignersPopup from "./components/selectSignersPopup/index.tsx";
 
 export const Document = () => {
   const theme = useTheme();
@@ -32,6 +33,11 @@ export const Document = () => {
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
   >(undefined);
+
+  const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
+  const [documentIdForSigners, setDocumentIdForSigners] = useState<
+    number | null
+  >(null);
 
   const documentsQuery = useGetAllDocuments(
     pagination,
@@ -71,6 +77,11 @@ export const Document = () => {
   const handleEdit = (document: DocumentType) => {
     setDocumentToEdit(document);
     toggleDocumentModal();
+  };
+
+  const handleDocumentAdded = (documentId: number) => {
+    setDocumentIdForSigners(documentId);
+    setIsSignersPopupOpen(true);
   };
 
   useEffect(() => {
@@ -218,19 +229,12 @@ export const Document = () => {
             getDetailPanelHeight={() => 150}
             getDetailPanelContent={(params) => {
               return (
-                <Box
-                  sx={{
-                    p: 1,
-                    bgcolor: alpha(theme.palette.background.default, 0.6),
-                  }}
-                >
-                  <RevisionGroup
-                    key={params.row.id}
-                    revisionGroup={params.row.revisionGroup}
-                    rows={rows}
-                    setRows={setRows}
-                  />
-                </Box>
+                <RevisionGroup
+                  key={params.row.id}
+                  revisionGroup={params.row.revisionGroup}
+                  rows={rows}
+                  setRows={setRows}
+                />
               );
             }}
           />
@@ -242,6 +246,13 @@ export const Document = () => {
             }}
             refetch={documentsQuery.refetch}
             documentToEdit={documentToEdit}
+            onDocumentAdded={handleDocumentAdded}
+          />
+
+          <SelectSignersPopup
+            open={isSignersPopupOpen}
+            onClose={() => setIsSignersPopupOpen(false)}
+            documentId={documentIdForSigners}
           />
         </Grid>
       </Paper>

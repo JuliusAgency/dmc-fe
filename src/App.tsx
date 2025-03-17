@@ -9,6 +9,7 @@ import { MainLayout } from "./components/layouts/MainLayout.tsx";
 import AuthForm from "./pages/auth/index.tsx";
 import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
+import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
 
 // Auth routes component - only for login
@@ -33,6 +34,7 @@ const MainRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/documents" element={<Document key="documents" />} />
+        <Route path="/pending-signature" element={<PendingSignatures />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         {/* TODO: implement category page */}
         <Route path="/category/:id" element={<Document key="category" />} />
