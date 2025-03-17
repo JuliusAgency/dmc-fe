@@ -31,6 +31,7 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 100,
+    valueGetter: (params) => params.row.category?.name,
   },
   {
     field: "processOwner",
