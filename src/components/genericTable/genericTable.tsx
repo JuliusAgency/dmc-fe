@@ -1,5 +1,10 @@
-import {useCallback, useMemo, useState} from "react";
-import {DataGridPro, GridRowId} from "@mui/x-data-grid-pro";
+import { useCallback, useMemo, useState } from "react";
+import {
+  DataGridPro,
+  GridRowId,
+  GridToolbarContainer,
+  GridToolbarExport,
+} from "@mui/x-data-grid-pro";
 import Box from "@mui/material/Box";
 import { GenericTableProps } from "./types.ts";
 import { GridRowParams } from "@mui/x-data-grid";
@@ -33,14 +38,14 @@ export const GenericTable = ({
   );
 
   const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
-      GridRowId[]
+    GridRowId[]
   >([]);
 
   const handleDetailPanelExpandedRowIdsChange = useCallback(
-      (newIds: GridRowId[]) => {
-        setDetailPanelExpandedRowIds([newIds[newIds.length - 1]]);
-      },
-      [],
+    (newIds: GridRowId[]) => {
+      setDetailPanelExpandedRowIds([newIds[newIds.length - 1]]);
+    },
+    []
   );
 
   return (
@@ -68,12 +73,28 @@ export const GenericTable = ({
         disableColumnFilter={disableColumnFilter}
         disableColumnSelector={disableColumnSelector}
         detailPanelExpandedRowIds={detailPanelExpandedRowIds}
-        onDetailPanelExpandedRowIdsChange={handleDetailPanelExpandedRowIdsChange}
+        onDetailPanelExpandedRowIdsChange={
+          handleDetailPanelExpandedRowIdsChange
+        }
         sx={{
           "& .MuiDataGrid-footerContainer": {
             justifyContent: "flex-start",
           },
           ...sx,
+        }}
+        slots={{
+          toolbar: () => (
+            <GridToolbarContainer>
+              <GridToolbarExport
+                csvOptions={{
+                  delimiter: ",",
+                  fileName: "exported-data",
+                  utf8WithBom: true,
+                }}
+                printOptions={{ disableToolbarButton: true }}
+              />
+            </GridToolbarContainer>
+          ),
         }}
       />
     </Box>
