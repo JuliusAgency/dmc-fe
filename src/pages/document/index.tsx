@@ -6,15 +6,9 @@ import {
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
-import {
-  Box,
-  Button,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
+import { Box, Button, Grid, Tooltip, Paper, alpha } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,13 +18,14 @@ import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
-import SelectSignersPopup from "./components/selectSignersPopup";
 import { DocumentHistory } from "./components/documentHistory";
+import SelectSignersPopup from "./components/selectSignersPopup/index.tsx";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
+  const theme = useTheme();
   const [pagination, setPagination] = useState<PaginationModel>({
-    pageSize: 10,
+    pageSize: 15,
     page: 0,
   });
 
@@ -117,31 +112,50 @@ export const Document = () => {
     field: "action",
     headerName: "Actions",
     headerAlign: "center",
-    width: 280,
+    width: 150,
     align: "center",
     renderCell: ({ row }) => {
       return (
         <Box display={"flex"} gap={1}>
           <Button
-            variant="outlined"
             onClick={() => handleOpenFile(row.fileName)}
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
           >
             <DownloadForOfflineIcon />
           </Button>
-          <Button variant="outlined" onClick={() => handleEdit(row)}>
+          <Button
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
+            onClick={() => handleEdit(row)}
+          >
             <EditIcon />
           </Button>
           <Button
-            variant="outlined"
             color="error"
             onClick={() => handleDelete(row.id)}
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
           >
             <DeleteIcon />
           </Button>
           <Button
-            variant="outlined"
             color="primary"
             onClick={() => handleShowHistory(row.documentPartNumber)}
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
           >
             <HistoryIcon />
           </Button>
@@ -158,22 +172,17 @@ export const Document = () => {
         alignItems: "center",
       }}
     >
-      <Grid
-        container
-        display={"flex"}
-        flexDirection={"column"}
-        alignItems={"center"}
-        justifyContent={"center"}
+      <Paper
+        elevation={2}
         sx={{
           width: "100%",
-          bgcolor: "background.default",
-          p: 1,
           borderRadius: 2,
+          overflow: "hidden",
+          padding: 4,
         }}
       >
         <Grid
-          item
-          xs={12}
+          container
           display={"flex"}
           justifyContent={"flex-start"}
           width={"100%"}
@@ -190,10 +199,47 @@ export const Document = () => {
           pageSize={pagination.pageSize}
           onPaginationModelChange={setPagination}
           sx={{
-            bgcolor: "background.default",
-            height: "60vh",
-            mb: 3,
+            height: "65vh",
+            mb: 2,
             width: "100%",
+            "& .MuiDataGrid-root": {
+              border: "none",
+              fontSize: "0.75rem",
+            },
+            "& .MuiDataGrid-cell": {
+              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+              padding: "2px 4px",
+              lineHeight: "1.1",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: alpha(theme.palette.primary.main, 0.08),
+              color: theme.palette.primary.main,
+              fontWeight: "bold",
+              fontSize: "0.75rem",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              padding: "2px 4px",
+            },
+            "& .MuiDataGrid-columnHeaderTitle": {
+              fontWeight: "bold",
+            },
+            "& .MuiDataGrid-row:nth-of-type(even)": {
+              backgroundColor: alpha(theme.palette.background.default, 0.4),
+            },
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: alpha(theme.palette.primary.light, 0.1),
+            },
+            "& .actionColumn": {
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              borderTop: `1px solid ${theme.palette.divider}`,
+            },
+            "& .MuiTablePagination-root": {
+              fontSize: "0.75rem",
+            },
           }}
           rowCount={documentsQuery?.data?.total ?? 0}
           rows={filteredDocs}
@@ -241,7 +287,7 @@ export const Document = () => {
             )}
           </DialogContent>
         </Dialog>
-      </Grid>
+      </Paper>
     </Box>
   );
 };
