@@ -1,5 +1,5 @@
 import { API } from "../API.ts";
-import { Signature, DocumentHistory } from "./types.ts";
+import { Signature } from "./types.ts";
 import { SignatureEndpoints } from "./consts.ts";
 
 export const getSignaturesForDocument = async (
@@ -22,15 +22,6 @@ export const signDocument = async (documentId: number, userId: number) => {
 
 export const rejectSignature = async (documentId: number, userId: number) => {
   return API.post(SignatureEndpoints.rejectSignature(documentId, userId));
-};
-
-export const getDocumentHistoryWithSignatures = async (
-  revisionGroup: string
-): Promise<DocumentHistory[]> => {
-  const { data } = await API.get(
-    SignatureEndpoints.getDocumentHistory(revisionGroup)
-  );
-  return data;
 };
 
 export const getPendingSignatures = async (

@@ -1,12 +1,5 @@
-import { useState } from "react";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-} from "@mui/material";
+import { useState, useMemo } from "react";
+import { Typography } from "@mui/material";
 import {
   GridMultipleAutocomplete,
   Option,
@@ -17,20 +10,9 @@ import {
 } from "../../../../components/toast/Toast.tsx";
 import { useGetUsers } from "../../../../hooks/user/userHooks.ts";
 import { useAddSignersToDocument } from "../../../../hooks/signatures/signaturesHooks.ts";
-import {
-  TITLE_SELECT_SIGNERS,
-  TEXT_SELECT_SIGNERS,
-  BUTTON_CANCEL,
-  BUTTON_SUBMIT,
-  ERROR_NO_SIGNERS,
-  SUCCESS_SEND_SIGNERS,
-} from "./constants.ts";
-
-interface SelectSignersPopupProps {
-  open: boolean;
-  onClose: () => void;
-  documentId: number | null;
-}
+import { GenericPopup } from "../../../../components/genericPopup/genericPopup.tsx";
+import { LABELS, BUTTONS, MESSAGES } from "./constants";
+import { SelectSignersPopupProps } from "./types";
 
 const SelectSignersPopup = ({
   open,
@@ -41,9 +23,14 @@ const SelectSignersPopup = ({
   const addSignersMutation = useAddSignersToDocument();
   const [selectedSigners, setSelectedSigners] = useState<Option[]>([]);
 
-  const userOptions = users
-    ? users.map((user: any) => ({ id: user.id, name: user.email }))
-    : [];
+  const userOptions = useMemo<Option[]>(
+    () =>
+      users?.map((user: any) => ({
+        id: user.id,
+        name: user.email,
+      })) || [],
+    [users]
+  );
 
   const handleChange = (value: Option | Option[]) => {
     setSelectedSigners(Array.isArray(value) ? value : [value]);
@@ -51,57 +38,54 @@ const SelectSignersPopup = ({
 
   const handleSubmit = async () => {
     if (!documentId || selectedSigners.length === 0) {
-      snackBarError(ERROR_NO_SIGNERS);
+      snackBarError(MESSAGES.errorNoSigners);
       return;
     }
 
-    const signerIds = selectedSigners.map((signer) => signer.id);
+    try {
+      await addSignersMutation.mutateAsync({
+        documentId,
+        userIds: selectedSigners.map((signer) => signer.id),
+      });
 
-    addSignersMutation.mutate(
-      { documentId, userIds: signerIds },
-      {
-        onSuccess: () => {
-          snackBarSuccess(SUCCESS_SEND_SIGNERS);
-          onClose();
-        },
-        onError: (error) => {
-          console.error("Error adding signers:", error);
-          snackBarError("Failed to add signers.");
-        },
-      }
-    );
+      snackBarSuccess(MESSAGES.successSendSigners);
+      handleClose();
+    } catch (error) {
+      snackBarError(MESSAGES.errorSendSigners);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedSigners([]);
+    onClose();
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{TITLE_SELECT_SIGNERS}</DialogTitle>
-      <DialogContent>
-        <Typography variant="body1" sx={{ mb: 2 }}>
-          {TEXT_SELECT_SIGNERS}
-        </Typography>
+    <GenericPopup
+      open={open}
+      onClose={handleClose}
+      title={LABELS.title}
+      onConfirm={handleSubmit}
+      confirmButtonText={BUTTONS.submit}
+      cancelButtonText={BUTTONS.cancel}
+    >
+      <Typography variant="body1" gutterBottom>
+        {LABELS.description}
+      </Typography>
 
-        <GridMultipleAutocomplete
-          multiple
-          onChange={handleChange}
-          value={selectedSigners}
-          fullWidth
-          selectorData={{
-            label: "Signers",
-            accessorId: "signers",
-            options: userOptions || [],
-          }}
-          sx={{ minWidth: 250 }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="inherit">
-          {BUTTON_CANCEL}
-        </Button>
-        <Button onClick={handleSubmit} variant="contained" color="primary">
-          {BUTTON_SUBMIT}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <GridMultipleAutocomplete
+        multiple
+        value={selectedSigners}
+        onChange={handleChange}
+        fullWidth
+        selectorData={{
+          label: LABELS.autocompleteLabel,
+          accessorId: "signers",
+          options: userOptions,
+        }}
+        sx={{ minWidth: 250 }}
+      />
+    </GenericPopup>
   );
 };
 

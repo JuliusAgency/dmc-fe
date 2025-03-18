@@ -9,10 +9,9 @@ import {
   addSignersToDocument,
   signDocument,
   rejectSignature,
-  getDocumentHistoryWithSignatures,
   getPendingSignatures,
 } from "../../api/signaturesAPI/signatures.ts";
-import { Signature, DocumentHistory } from "../../api/signaturesAPI/types.ts";
+import { Signature } from "../../api/signaturesAPI/types.ts";
 
 export const useGetSignaturesForDocument = (
   documentId: number
@@ -78,16 +77,6 @@ export const useRejectSignature = () => {
         queryKey: ["getSignatures", documentId],
       });
     },
-  });
-};
-
-export const useGetDocumentHistoryWithSignatures = (
-  revisionGroup: string
-): UseQueryResult<DocumentHistory[], Error> => {
-  return useQuery({
-    queryKey: ["documentHistory", revisionGroup],
-    queryFn: () => getDocumentHistoryWithSignatures(revisionGroup),
-    refetchOnWindowFocus: false,
   });
 };
 

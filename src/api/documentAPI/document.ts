@@ -11,6 +11,7 @@ export const getAllDocuments = async (
 ): Promise<GetAllDocumentsResponse> => {
   let transformedFilters: Record<string, any> = {};
 
+  console.log("📌 Filters before transformation:", filters);
   const setFilterParams: Map<
     string,
     { description: string; action: () => void }
@@ -31,15 +32,15 @@ export const getAllDocuments = async (
       },
     ],
     [
-      "revisionGroup",
+      "documentPartNumber",
       {
-        description: "קבוצת גרסא",
+        description: "documentPartNumber",
         action: () => {
-          const revisionGroup = filters["revisionGroup"];
-          if (revisionGroup) {
+          const documentPartNumber = filters["documentPartNumber"];
+          if (documentPartNumber) {
             transformedFilters = {
               ...transformedFilters,
-              revisionGroup,
+              documentPartNumber,
             };
           }
         },
@@ -60,6 +61,20 @@ export const getAllDocuments = async (
         },
       },
     ],
+    [
+      "status",
+      {
+        description: "status",
+        action: () => {
+          const status = filters["status"];
+          if (Array.isArray(status)) {
+            transformedFilters.status = { in: status };
+          } else if (typeof status === "string") {
+            transformedFilters.status = status;
+          }
+        },
+      },
+    ],
   ]);
 
   Object.keys(filters).forEach((field) => {
@@ -68,7 +83,6 @@ export const getAllDocuments = async (
       addToQueryParams();
     }
   });
-
   const { data } = await API.get(DocumentEndpoints.getAllDocuments, {
     params: {
       filters: JSON.stringify(transformedFilters),
@@ -121,4 +135,12 @@ export const getLastDocumentPartNumber = async (docTypeId: number) => {
     params: { docTypeId },
   });
   return response.data;
+};
+
+export const deleteDocument = async (documentId: number): Promise<void> => {
+  try {
+    await API.delete(DocumentEndpoints.deleteDocument(documentId));
+  } catch (error) {
+    throw new Error("Failed to delete document");
+  }
 };

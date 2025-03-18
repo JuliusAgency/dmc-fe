@@ -3,50 +3,65 @@ import { COLUMNS } from "./consts.tsx";
 import {
   useGetAllDocuments,
   useGetFile,
+  useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
-import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
+import DeleteIcon from "@mui/icons-material/Delete";
+import HistoryIcon from "@mui/icons-material/History";
 import { GridColDef } from "@mui/x-data-grid";
 import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import SelectSignersPopup from "./components/selectSignersPopup";
+import { DocumentHistory } from "./components/documentHistory";
 
 export const Document = () => {
-  const [rows, setRows] = useState<DocumentType[]>([]);
   const { id: categoryId } = useParams();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 10,
     page: 0,
   });
-  const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] =
-    useState<boolean>(false);
+
+  const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
   const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
     null
   );
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
   >(undefined);
-
   const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
   const [documentIdForSigners, setDocumentIdForSigners] = useState<
     number | null
+  >(null);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
+    string | null
   >(null);
 
   const documentsQuery = useGetAllDocuments(
     pagination,
     {
-      status: ["APPROVED", "IN_PROGRESS"],
+      status: ["APPROVED"],
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "processOwner"]
+    ["tags", "tags.tag", "category", "processOwner"],
+    "getActiveDocuments"
   );
 
   const fileQuery = useGetFile(fileNameToDownload ?? "");
+  const deleteMutation = useDeleteDocument();
 
   const toggleDocumentModal = useCallback(() => {
     setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
@@ -83,30 +98,27 @@ export const Document = () => {
   const handleDocumentAdded = (documentId: number) => {
     setDocumentIdForSigners(documentId);
     setIsSignersPopupOpen(true);
+    documentsQuery.refetch();
   };
 
-  useEffect(() => {
-    if (documentsQuery.data?.data) {
-      const docs = documentsQuery.data.data;
+  const handleDelete = async (documentId: number) => {
+    await deleteMutation.mutateAsync(documentId);
+    documentsQuery.refetch();
+  };
 
-      const approvedDoc = docs.find((doc) => doc.status === "APPROVED");
+  const handleShowHistory = (documentPartNumber: string) => {
+    setSelectedDocumentPartNumber(documentPartNumber);
+    setIsHistoryDialogOpen(true);
+  };
 
-      if (approvedDoc) {
-        setRows([approvedDoc]);
-      } else {
-        const inProgressDoc = docs.find((doc) => doc.status === "IN_PROGRESS");
-        setRows(inProgressDoc ? [inProgressDoc] : []);
-      }
-    }
-  }, [documentsQuery.data]);
+  const filteredDocs = documentsQuery.data?.data ?? [];
 
   const ACTION_COLUMN: GridColDef = {
     field: "action",
-    headerName: "Action",
+    headerName: "Actions",
     headerAlign: "center",
-    width: 150,
+    width: 280,
     align: "center",
-    cellClassName: "socialMedia",
     renderCell: ({ row }) => {
       return (
         <Box display={"flex"} gap={1}>
@@ -118,6 +130,20 @@ export const Document = () => {
           </Button>
           <Button variant="outlined" onClick={() => handleEdit(row)}>
             <EditIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => handleDelete(row.id)}
+          >
+            <DeleteIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => handleShowHistory(row.documentPartNumber)}
+          >
+            <HistoryIcon />
           </Button>
         </Box>
       );
@@ -150,7 +176,6 @@ export const Document = () => {
           xs={12}
           display={"flex"}
           justifyContent={"flex-start"}
-          alignItems={"start"}
           width={"100%"}
           mb={2}
         >
@@ -171,19 +196,18 @@ export const Document = () => {
             width: "100%",
           }}
           rowCount={documentsQuery?.data?.total ?? 0}
-          rows={rows}
+          rows={filteredDocs}
           getDetailPanelHeight={() => 200}
-          getDetailPanelContent={(params) => {
-            return (
-              <RevisionGroup
-                key={params.row.id}
-                revisionGroup={params.row.revisionGroup}
-                rows={rows}
-                setRows={setRows}
-              />
-            );
-          }}
+          getDetailPanelContent={(params) => (
+            <RevisionGroup
+              key={params.row.id}
+              documentPartNumber={params.row.documentPartNumber}
+              rows={filteredDocs}
+              setRows={() => {}}
+            />
+          )}
         />
+
         <AddDocument
           open={isAddDocumentModalOpen}
           onClose={() => {
@@ -200,6 +224,23 @@ export const Document = () => {
           onClose={() => setIsSignersPopupOpen(false)}
           documentId={documentIdForSigners}
         />
+
+        <Dialog
+          open={isHistoryDialogOpen}
+          onClose={() => setIsHistoryDialogOpen(false)}
+          fullWidth
+          maxWidth="lg"
+        >
+          <DialogTitle>Document History</DialogTitle>
+          <DialogContent>
+            {selectedDocumentPartNumber && (
+              <DocumentHistory
+                documentPartNumber={selectedDocumentPartNumber}
+                onClose={() => setIsHistoryDialogOpen(false)}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </Grid>
     </Box>
   );

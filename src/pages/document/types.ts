@@ -1,6 +1,6 @@
 export interface DocumentFilters {
   isFinal: boolean;
   categoryId: number;
-  revisionGroup: string;
+  documentPartNumber: string;
   status: string[];
 }
