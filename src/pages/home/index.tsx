@@ -72,7 +72,9 @@ export const HomePage = () => {
             component="img"
             src={homeContent.imageUrl}
             alt="Homepage Image"
-            
+            sx={{
+              width: "50vh",
+            }}
           />
         ) : (
           <Typography color="gray">{NO_IMAGE_AVAILABLE}</Typography>
