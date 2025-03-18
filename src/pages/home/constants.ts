@@ -19,7 +19,5 @@ export const ANNOUNCEMENT_POSITION_STYLES = {
 };
 
 export const IMAGE_STYLES = {
-  width: "80%",
-  borderRadius: 2,
-  boxShadow: 2,
+  width: "100%",
 };
