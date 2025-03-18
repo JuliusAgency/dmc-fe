@@ -180,17 +180,10 @@ export const Document = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
       }}
     >
-      <Paper
-        elevation={2}
-        sx={{
-          width: "100%",
-          borderRadius: 2,
-          overflow: "hidden",
-          padding: 4,
-        }}
-      >
+    
         <Grid
           container
           display={"flex"}
@@ -297,7 +290,7 @@ export const Document = () => {
             )}
           </DialogContent>
         </Dialog>
-      </Paper>
+      
     </Box>
   );
 };

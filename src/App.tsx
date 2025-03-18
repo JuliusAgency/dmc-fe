@@ -12,6 +12,8 @@ import { Document } from "./pages/document";
 import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
 
+import "./styles.css";
+
 // Auth routes component - only for login
 const AuthRoutes = () => {
   const navigate = useNavigate();
