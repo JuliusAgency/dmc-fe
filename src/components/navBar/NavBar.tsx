@@ -180,7 +180,9 @@ export function NavBar({
   return (
     <>
       <AppBar position="static" color="default" elevation={1}>
-        <Toolbar>
+        <Toolbar
+          sx={{ flexWrap: "wrap", minHeight: { xs: "56px", sm: "64px" } }}
+        >
           {/* Loading indicator */}
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>
@@ -218,9 +220,25 @@ export function NavBar({
 
           {/* Desktop navigation */}
           {!isMobile && (
-            <Box sx={{ display: "flex", flexGrow: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                flexWrap: "wrap", // Allow items to wrap to next line
+                alignItems: "center",
+                maxWidth: "100%",
+                overflow: "visible",
+              }}
+            >
               {menuItems.map((item, index) => (
-                <Box key={item.path} sx={{ position: "relative" }}>
+                <Box
+                  key={item.path}
+                  sx={{
+                    position: "relative",
+                    mb: 0.5, // Add some margin bottom for wrapped items
+                    mt: 0.5, // Add some margin top for wrapped items
+                  }}
+                >
                   <Button
                     startIcon={item.icon}
                     onClick={() => handleNavigation(item.path)}
@@ -248,6 +266,8 @@ export function NavBar({
                       "&:hover": {
                         backgroundColor: "rgba(0, 0, 0, 0.04)",
                       },
+                      whiteSpace: "nowrap", // Prevent text from wrapping inside button
+                      minHeight: "36px", // Ensure consistent height
                     }}
                   >
                     {item.text}
