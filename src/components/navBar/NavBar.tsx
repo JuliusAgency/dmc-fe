@@ -209,7 +209,7 @@ export function NavBar({
                 flexGrow: 1,
                 flexWrap: "wrap", // Allow items to wrap to next line
                 alignItems: "center",
-                maxWidth: "calc(100% - 100px)", // Reserve space for search and user menu
+                maxWidth: "calc(100% - 50px)", // Reserve space for search and user menu
                 overflow: "visible",
               }}
             >
