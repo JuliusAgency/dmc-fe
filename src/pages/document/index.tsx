@@ -180,6 +180,7 @@ export const Document = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
       }}
     >
     
