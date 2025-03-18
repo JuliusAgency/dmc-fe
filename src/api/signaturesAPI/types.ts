@@ -6,12 +6,3 @@ export interface Signature {
   status: "PENDING" | "SIGNED" | "REJECTED";
   signedAt?: string;
 }
-
-export interface DocumentHistory {
-  id: number;
-  documentPartNumber: string;
-  revision: number;
-  createdAt: string;
-  status: "DRAFT" | "IN_PROGRESS" | "SIGNED" | "REJECTED";
-  signatures: Signature[];
-}

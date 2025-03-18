@@ -87,14 +87,14 @@ export const PendingSignatures = () => {
       ) : (
         <Grid container spacing={2}>
           {pendingSignatures.map((signature) => (
-            <Grid item xs={12} md={6} lg={4} key={signature.id}>
+            <Grid item xs={12} md={6} lg={2.1} key={signature.id}>
               <Card sx={{ p: 2, boxShadow: 3 }}>
                 <CardContent>
                   <Typography variant="h6">
                     {signature.document.name}
                   </Typography>
                   <Typography variant="body2">
-                    גרסה: {signature.document.revision} | תאריך יצירה:{" "}
+                    Revision: {signature.document.revision} | Created on:{" "}
                     {new Date(
                       signature.document.createdAt
                     ).toLocaleDateString()}

@@ -8,6 +8,7 @@ import {
   restoreRevision,
   uploadDocument,
   getLastDocumentPartNumber,
+  deleteDocument,
 } from "../../api/documentAPI/document.ts";
 import { PaginationModel } from "../../consts/types.ts";
 import { GetAllDocumentsResponse } from "../../api/documentAPI/types.ts";
@@ -28,6 +29,7 @@ export const useGetAllDocuments = (
     () => getAllDocuments(headers, filters, relations),
     {
       refetchOnWindowFocus: false,
+      keepPreviousData: true,
       onError: () => {
         snackBarError("שגיאה בטעינת המסמכים");
       },
@@ -85,6 +87,25 @@ export const useRestoreRevision = (): UseMutationResult<
     },
   });
 
+export const useDeleteDocument = (): UseMutationResult<
+  void,
+  AxiosError,
+  number
+> =>
+  useMutation<void, AxiosError, number>(
+    async (documentId: number) => {
+      await deleteDocument(documentId);
+    },
+    {
+      onSuccess: () => {
+        snackBarSuccess("Document deleted successfully");
+      },
+      onError: () => {
+        snackBarError("Error deleting document");
+      },
+    }
+  );
+
 export const useGenerateDocumentPartNumber = (
   docTypeId: number | null,
   docType: string | null
@@ -105,7 +126,6 @@ export const useGenerateDocumentPartNumber = (
           }
         }
 
-        console.log(data, nextNumber);
         return `${docType}-${String(nextNumber).padStart(4, "0")}-WI`;
       } catch (error) {
         console.error("Error generating documentPartNumber:", error);

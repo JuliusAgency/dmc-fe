@@ -1,7 +1,9 @@
 import { GridColDef } from "@mui/x-data-grid";
-import { formatDate } from "../../utils/formatDate";
-import { Chip, Stack } from "@mui/material";
-import { DocumentTag } from "../../api/documentAPI/types.ts";
+import { formatDate } from "../../../../utils/formatDate";
+
+export const BUTTON_CLOSE = "Close";
+export const ARCHIVED_DOCUMENTS = (documentPartNumber: string) =>
+  `getArchivedDocuments-${documentPartNumber}`;
 
 export const COLUMNS: GridColDef[] = [
   {

@@ -72,6 +72,7 @@ export const AddDocument = ({
 
   const { id: categoryId } = useParams();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isEditingRef = useRef(!!documentToEdit);
 
   const tagOptions: Option[] = tags
     ? tags.map((tag) => ({ id: tag.id, name: tag.name }))
@@ -82,33 +83,29 @@ export const AddDocument = ({
   };
 
   useEffect(() => {
-    if (generatedPartNumber) {
+    if (documentToEdit) {
+      setFormData((prev) => ({
+        ...prev,
+        documentPartNumber: documentToEdit.documentPartNumber,
+        revision: String(Number(documentToEdit.revision) + 1).padStart(2, "0"),
+        fileName: documentToEdit.fileName || "",
+        isFinal: false,
+        docType: documentToEdit.docType
+          ? { id: documentToEdit.docType.id, name: documentToEdit.docType.name }
+          : null,
+        type: documentToEdit.type ? { id: 1, name: documentToEdit.type } : null,
+      }));
+    }
+  }, [documentToEdit]);
+
+  useEffect(() => {
+    if (!isEditingRef.current && generatedPartNumber) {
       setFormData((prev) => ({
         ...prev,
         documentPartNumber: generatedPartNumber,
       }));
     }
   }, [generatedPartNumber]);
-
-  useEffect(() => {
-    if (!documentToEdit) return;
-    setFormData((prev) => ({
-      ...prev,
-      revision: String(Number(documentToEdit.revision) + 1).padStart(2, "0"),
-      fileName: documentToEdit.fileName || "",
-      isFinal: false,
-      docType: documentToEdit.docType
-        ? { id: documentToEdit.docType.id, name: documentToEdit.docType.name }
-        : null,
-      processOwner: documentToEdit.processOwner
-        ? {
-            id: documentToEdit.processOwner.id,
-            name: documentToEdit.processOwner.name,
-          }
-        : null,
-      type: documentToEdit.type ? { id: 1, name: documentToEdit.type } : null,
-    }));
-  }, [documentToEdit]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -133,7 +130,6 @@ export const AddDocument = ({
     event.preventDefault();
 
     if (
-      !formData.docType ||
       !formData.documentPartNumber ||
       !formData.name ||
       !formData.classification ||
@@ -149,7 +145,7 @@ export const AddDocument = ({
       formDataToSend.append(
         "entityData",
         JSON.stringify({
-          docTypeId: formData.docType.id,
+          docTypeId: formData.docType?.id,
           classification: formData.classification.name.toUpperCase(),
           updatedBy: user?.email || null,
           revision: Number(formData.revision),
@@ -212,20 +208,23 @@ export const AddDocument = ({
             sx={{ minWidth: 250, typography: "h6" }}
           />
         </Grid>
-        <Grid item xs={12} md={12}>
-          <GridMultipleAutocomplete
-            multiple={false}
-            onChange={(value) => handleInputChange("docType", value)}
-            value={formData.docType}
-            fullWidth
-            selectorData={{
-              label: "Document Type",
-              accessorId: "docType",
-              options: tagOptions || [],
-            }}
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
+        {!documentToEdit && (
+          <Grid item xs={12} md={12}>
+            <GridMultipleAutocomplete
+              multiple={false}
+              onChange={(value) => handleInputChange("docType", value)}
+              value={formData.docType}
+              fullWidth
+              selectorData={{
+                label: "Document Type",
+                accessorId: "docType",
+                options: tagOptions || [],
+              }}
+              sx={{ minWidth: 250, typography: "h6" }}
+            />
+          </Grid>
+        )}
+
         <Grid item xs={12} md={12}>
           <GridInput
             label="Document P.N"
@@ -279,8 +278,6 @@ export const AddDocument = ({
             sx={{ minWidth: 250, typography: "h6" }}
           />
         </Grid>
-
-        <Grid item xs={12} md={12}></Grid>
         <Grid item xs={12} md={12}>
           <input
             type="file"
