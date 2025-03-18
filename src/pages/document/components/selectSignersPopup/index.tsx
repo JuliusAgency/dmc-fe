@@ -14,7 +14,7 @@ import { GenericPopup } from "../../../../components/genericPopup/genericPopup.t
 import { LABELS, BUTTONS, MESSAGES } from "./constants";
 import { SelectSignersPopupProps } from "./types";
 
-const SelectSignersPopup = ({
+export const SelectSignersPopup = ({
   open,
   onClose,
   documentId,
@@ -88,5 +88,3 @@ const SelectSignersPopup = ({
     </GenericPopup>
   );
 };
-
-export default SelectSignersPopup;

@@ -20,6 +20,7 @@ import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
+import { SelectSignersPopup } from "./components/selectSignersPopup";
 
 export const Document = () => {
   const { id: categoryId } = useParams();

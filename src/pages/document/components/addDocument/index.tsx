@@ -6,7 +6,7 @@ import {
   useUploadDocument,
   useGenerateDocumentPartNumber,
 } from "../../../../hooks/document/documentHooks.ts";
-import { useGetAllTags } from "../../../../hooks/tag/tagHooks.ts";
+import { useGetAllPartNumbers } from "../../../../hooks/partNumber/partNumberHooks.ts";
 import {
   GridMultipleAutocomplete,
   Option,
@@ -43,7 +43,7 @@ export const AddDocument = ({
   const storedUser = localStorage.getItem("user");
 
   const uploadDocumentMutation = useUploadDocument();
-  const { data: tags } = useGetAllTags();
+  const { data: partNumber } = useGetAllPartNumbers();
 
   const user =
     useSelector((state: any) => state.user.user) ||
@@ -74,8 +74,11 @@ export const AddDocument = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditingRef = useRef(!!documentToEdit);
 
-  const tagOptions: Option[] = tags
-    ? tags.map((tag) => ({ id: tag.id, name: tag.name }))
+  const partNumberOptions: Option[] = partNumber
+    ? partNumber.map((partNumber) => ({
+        id: partNumber.id,
+        name: partNumber.number,
+      }))
     : [];
 
   const handleInputChange = (field: keyof typeof formData, value: any) => {
@@ -218,7 +221,7 @@ export const AddDocument = ({
               selectorData={{
                 label: "Document Type",
                 accessorId: "docType",
-                options: tagOptions || [],
+                options: partNumberOptions || [],
               }}
               sx={{ minWidth: 250, typography: "h6" }}
             />
