@@ -299,7 +299,7 @@ export function NavBar({
           )}
 
           {/* Search box */}
-          <Box
+          {/* <Box
             component="form"
             onSubmit={handleSearchSubmit}
             sx={{
@@ -341,7 +341,7 @@ export function NavBar({
               value={searchQuery}
               onChange={handleSearchChange}
             />
-          </Box>
+          </Box> */}
 
           {/* User menu */}
           <Box sx={{ flexShrink: 0 }}>

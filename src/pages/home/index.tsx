@@ -73,7 +73,7 @@ export const HomePage = () => {
             src={homeContent.imageUrl}
             alt="Homepage Image"
             sx={{
-              width: "50vh",
+              width: "50vw",
             }}
           />
         ) : (
