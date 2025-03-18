@@ -55,10 +55,10 @@ export const AddDocument = ({
     name: "",
     classification: { id: 1, name: "Public" } as Option,
     revision: "01",
-    createdBy: user?.name || "Unknown",
+    createdBy: user?.email || "Unknown",
     dcoNumber: "Generated in approval process",
     uploadDate: new Date(),
-    processOwner: null as Option | null,
+    processOwner: user?.id || "Unknown",
     type: null as Option | null,
     categoryId: "",
   });

@@ -26,6 +26,7 @@ import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import SelectSignersPopup from "./components/selectSignersPopup";
 import { DocumentHistory } from "./components/documentHistory";
+import { useSelector } from "react-redux";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
@@ -49,6 +50,12 @@ export const Document = () => {
   const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
     string | null
   >(null);
+
+  const storedUser = localStorage.getItem("user");
+
+  const user =
+    useSelector((state: any) => state.user.user) ||
+    (storedUser ? JSON.parse(storedUser) : null);
 
   const documentsQuery = useGetAllDocuments(
     pagination,
@@ -131,13 +138,16 @@ export const Document = () => {
           <Button variant="outlined" onClick={() => handleEdit(row)}>
             <EditIcon />
           </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={() => handleDelete(row.id)}
-          >
-            <DeleteIcon />
-          </Button>
+          {user.role === "ADMIN" ||
+            (user.role === "SYSTEM_ADMIN" && (
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={() => handleDelete(row.id)}
+              >
+                <DeleteIcon />
+              </Button>
+            ))}
           <Button
             variant="outlined"
             color="primary"
