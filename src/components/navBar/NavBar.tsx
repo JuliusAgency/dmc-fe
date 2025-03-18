@@ -18,8 +18,6 @@ import {
   ListItemText,
   Divider,
   CircularProgress,
-  InputBase,
-  alpha,
   Popper,
   Paper,
   Grow,
@@ -27,10 +25,10 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SearchIcon from "@mui/icons-material/Search";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
+import { SearchBar } from "../search/SearchBar";
 
 export type MenuItem = {
   path: string;
@@ -67,8 +65,7 @@ export function NavBar({
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Search state
-  const [searchQuery, setSearchQuery] = useState("");
+
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -91,16 +88,7 @@ export function NavBar({
     handleUserMenuClose();
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
 
-  const handleSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (onSearch && searchQuery.trim()) {
-      onSearch(searchQuery.trim());
-    }
-  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -116,29 +104,11 @@ export function NavBar({
       </Box>
       <Divider />
       {/* Mobile search */}
-      <Box
-        component="form"
-        onSubmit={handleSearchSubmit}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          padding: theme.spacing(1, 2),
-          backgroundColor: alpha(theme.palette.common.white, 0.15),
-          margin: theme.spacing(1),
-          borderRadius: 2,
-          border: `1px solid black`,
-        }}
-      >
-        <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Search…"
-          inputProps={{ "aria-label": "search" }}
-          value={searchQuery}
-          onChange={handleSearchChange}
+      <Box sx={{ margin: theme.spacing(1) }}>
+        <SearchBar 
+          onSearch={onSearch || (() => {})} 
+          fullWidth 
         />
-        <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-          <SearchIcon />
-        </IconButton>
       </Box>
       <List>
         {menuItems.map((item) => (
@@ -296,47 +266,8 @@ export function NavBar({
           )}
 
           {/* Search box */}
-          <Box
-            component="form"
-            onSubmit={handleSearchSubmit}
-            sx={{
-              position: "relative",
-              borderRadius: 2,
-              border: `1px solid black`,
-              backgroundColor: alpha(theme.palette.common.white, 0.15),
-              "&:hover": {
-                backgroundColor: alpha(theme.palette.common.white, 0.25),
-              },
-              marginRight: 2,
-              marginLeft: 0,
-              width: "auto",
-              [theme.breakpoints.up("sm")]: {
-                marginLeft: theme.spacing(1),
-                width: "auto",
-              },
-              display: { xs: isMobile ? "none" : "flex", md: "flex" },
-            }}
-          >
-            <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              sx={{
-                color: "inherit",
-                "& .MuiInputBase-input": {
-                  padding: theme.spacing(1, 1, 1, 0),
-                  paddingLeft: 0,
-                  width: "100%",
-                  [theme.breakpoints.up("md")]: {
-                    width: "20ch",
-                  },
-                },
-              }}
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
+          <Box sx={{ display: { xs: isMobile ? "none" : "flex", md: "flex" } }}>
+            <SearchBar onSearch={onSearch || (() => {})} />
           </Box>
 
           {/* User menu */}

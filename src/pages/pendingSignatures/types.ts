@@ -4,6 +4,7 @@ export interface Document {
   revision: string;
   createdAt: string;
   fileName: string;
+  categoryId: string;
 }
 
 export interface PendingSignature {
