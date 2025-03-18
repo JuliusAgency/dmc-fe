@@ -65,8 +65,6 @@ export function NavBar({
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
 
-
-
   const handleNavigation = (path: string) => {
     navigate(path);
     if (isMobile) {
@@ -88,8 +86,6 @@ export function NavBar({
     handleUserMenuClose();
   };
 
-
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -105,10 +101,7 @@ export function NavBar({
       <Divider />
       {/* Mobile search */}
       <Box sx={{ margin: theme.spacing(1) }}>
-        <SearchBar 
-          onSearch={onSearch || (() => {})} 
-          fullWidth 
-        />
+        <SearchBar onSearch={onSearch || (() => {})} fullWidth />
       </Box>
       <List>
         {menuItems.map((item) => (

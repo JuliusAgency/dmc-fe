@@ -6,7 +6,7 @@ import {
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, useTheme, Typography } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
 import { Box, Button, Grid, Tooltip, Paper, alpha } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
@@ -21,6 +21,7 @@ import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
+import { useGetCategoryById } from "../../hooks/category/categoryHooks.ts";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
@@ -29,6 +30,9 @@ export const Document = () => {
     pageSize: 15,
     page: 0,
   });
+  
+  // Fetch category data
+  const categoryQuery = useGetCategoryById(categoryId ? Number(categoryId) : undefined);
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
   const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
@@ -191,6 +195,23 @@ export const Document = () => {
           padding: 4,
         }}
       >
+        {/* Category Name Header */}
+        {categoryQuery.data && (
+          <Typography 
+            variant="h5" 
+            component="h1" 
+            sx={{ 
+              mb: 3, 
+              fontWeight: 600,
+              color: theme.palette.primary.main,
+              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+              paddingBottom: 1
+            }}
+          >
+            {categoryQuery.data.name}
+          </Typography>
+        )}
+        
         <Grid
           container
           display={"flex"}

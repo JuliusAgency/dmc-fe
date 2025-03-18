@@ -9,7 +9,10 @@ export const MainLayout = () => {
   const { menuItems } = useMenuItems({
     additionalItems:
       categoriesData?.map((category) => ({
-        path: `/`,
+        path:
+          category.childCategories?.length > 0
+            ? `/category/${category.childCategories[0].id}`
+            : "/",
         icon: null,
         text: category.name,
         disabled: false,
