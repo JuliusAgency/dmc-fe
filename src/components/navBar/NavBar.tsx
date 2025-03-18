@@ -180,30 +180,13 @@ export function NavBar({
   return (
     <>
       <AppBar position="static" color="default" elevation={1}>
-        <Toolbar
-          sx={{ minHeight: { xs: "56px", sm: "64px" } }}
-        >
+        <Toolbar sx={{ minHeight: { xs: "56px", sm: "64px" } }}>
           {/* Loading indicator */}
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>
               <CircularProgress size={24} color="primary" />
             </Box>
           )}
-          {/* Logo/Brand */}
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              flexGrow: 0,
-              mr: 2,
-              display: { xs: "none", sm: "block" },
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/home")}
-          >
-            DMS
-          </Typography>
 
           {/* Mobile menu button */}
           {isMobile ? (
@@ -226,7 +209,7 @@ export function NavBar({
                 flexGrow: 1,
                 flexWrap: "wrap", // Allow items to wrap to next line
                 alignItems: "center",
-                maxWidth: "calc(100% - 250px)", // Reserve space for search and user menu
+                maxWidth: "calc(100% - 100px)", // Reserve space for search and user menu
                 overflow: "visible",
               }}
             >
@@ -349,7 +332,7 @@ export function NavBar({
                   paddingLeft: 0,
                   width: "100%",
                   [theme.breakpoints.up("md")]: {
-                    width: "20ch",
+                    width: "150px",
                   },
                 },
               }}
