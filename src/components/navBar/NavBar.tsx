@@ -181,7 +181,7 @@ export function NavBar({
     <>
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar
-          sx={{ flexWrap: "wrap", minHeight: { xs: "56px", sm: "64px" } }}
+          sx={{ minHeight: { xs: "56px", sm: "64px" } }}
         >
           {/* Loading indicator */}
           {loading && (
@@ -226,7 +226,7 @@ export function NavBar({
                 flexGrow: 1,
                 flexWrap: "wrap", // Allow items to wrap to next line
                 alignItems: "center",
-                maxWidth: "100%",
+                maxWidth: "calc(100% - 250px)", // Reserve space for search and user menu
                 overflow: "visible",
               }}
             >
@@ -330,6 +330,7 @@ export function NavBar({
               marginRight: 2,
               marginLeft: 0,
               width: "auto",
+              flexShrink: 0, // Prevent search box from shrinking
               [theme.breakpoints.up("sm")]: {
                 marginLeft: theme.spacing(1),
                 width: "auto",
@@ -360,7 +361,7 @@ export function NavBar({
           </Box>
 
           {/* User menu */}
-          <Box>
+          <Box sx={{ flexShrink: 0 }}>
             <IconButton
               onClick={handleUserMenuClick}
               size="large"
