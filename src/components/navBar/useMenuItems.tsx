@@ -15,7 +15,7 @@ export const MENU_ITEMS = [
   {
     path: "/pending-signature",
     icon: <DescriptionIcon />,
-    text: "pending signature",
+    text: "Pending signature",
     disabled: false,
   },
 ];

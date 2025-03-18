@@ -115,21 +115,24 @@ export const useGenerateDocumentPartNumber = (
     async () => {
       if (!docTypeId) return null;
 
+      const prefix = docType?.slice(0, 3);
+      const suffix = docType?.slice(-2);
       try {
         const data = await getLastDocumentPartNumber(docTypeId);
         let nextNumber = 1;
 
-        if (data) {
-          const match = data.match(/-(\d+)-WI$/);
+        if (data?.lastNumber) {
+          const match = data.lastNumber.slice(4, 8);
+
           if (match) {
-            nextNumber = parseInt(match[1], 10) + 1;
+            nextNumber = parseInt(match, 10) + 1;
           }
         }
 
-        return `${docType}-${String(nextNumber).padStart(4, "0")}-WI`;
+        return `${prefix}-${String(nextNumber).padStart(4, "0")}-${suffix}`;
       } catch (error) {
         console.error("Error generating documentPartNumber:", error);
-        return `${docType}-0001-WI`;
+        return `${prefix}-0001-${suffix}`;
       }
     },
     {

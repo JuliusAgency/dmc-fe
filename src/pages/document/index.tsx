@@ -19,7 +19,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
-import SelectSignersPopup from "./components/selectSignersPopup/index.tsx";
+import { useSelector } from "react-redux";
+import { SelectSignersPopup } from "./components/selectSignersPopup";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
@@ -44,6 +45,12 @@ export const Document = () => {
   const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
     string | null
   >(null);
+
+  const storedUser = localStorage.getItem("user");
+
+  const user =
+    useSelector((state: any) => state.user.user) ||
+    (storedUser ? JSON.parse(storedUser) : null);
 
   const documentsQuery = useGetAllDocuments(
     pagination,
@@ -137,17 +144,20 @@ export const Document = () => {
           >
             <EditIcon />
           </Button>
-          <Button
-            color="error"
-            onClick={() => handleDelete(row.id)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
-          >
-            <DeleteIcon />
-          </Button>
+          {user.role === "ADMIN" ||
+            (user.role === "SYSTEM_ADMIN" && (
+              <Button
+                color="error"
+                onClick={() => handleDelete(row.id)}
+                sx={{
+                  padding: 0,
+                  minWidth: 0,
+                  color: theme.palette.primary.main,
+                }}
+              >
+                <DeleteIcon />
+              </Button>
+            ))}
           <Button
             color="primary"
             onClick={() => handleShowHistory(row.documentPartNumber)}
