@@ -39,7 +39,10 @@ export const Document = () => {
 
   const documentsQuery = useGetAllDocuments(
     pagination,
-    { isFinal: true, categoryId: categoryId ? Number(categoryId) : undefined },
+    {
+      status: ["APPROVED", "IN_PROGRESS"],
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    },
     ["tags", "tags.tag", "category", "processOwner"]
   );
 
@@ -83,10 +86,19 @@ export const Document = () => {
   };
 
   useEffect(() => {
-    if (documentsQuery?.data?.data) {
-      setRows(documentsQuery.data.data);
+    if (documentsQuery.data?.data) {
+      const docs = documentsQuery.data.data;
+
+      const approvedDoc = docs.find((doc) => doc.status === "APPROVED");
+
+      if (approvedDoc) {
+        setRows([approvedDoc]);
+      } else {
+        const inProgressDoc = docs.find((doc) => doc.status === "IN_PROGRESS");
+        setRows(inProgressDoc ? [inProgressDoc] : []);
+      }
     }
-  }, [documentsQuery?.data?.data]);
+  }, [documentsQuery.data]);
 
   const ACTION_COLUMN: GridColDef = {
     field: "action",
