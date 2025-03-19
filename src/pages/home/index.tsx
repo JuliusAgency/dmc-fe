@@ -54,10 +54,6 @@ export const HomePage = () => {
 
   return (
     <Container>
-      <Typography variant="h4" sx={{ textAlign: "center", mt: 3, mb: 2 }}>
-        {HOME_PAGE_TITLE}
-      </Typography>
-
       <Box
         sx={{
           position: "relative",
@@ -72,7 +68,9 @@ export const HomePage = () => {
             component="img"
             src={homeContent.imageUrl}
             alt="Homepage Image"
-            sx={IMAGE_STYLES}
+            sx={{
+              width: "60vw",
+            }}
           />
         ) : (
           <Typography color="gray">{NO_IMAGE_AVAILABLE}</Typography>

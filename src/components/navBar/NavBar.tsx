@@ -143,28 +143,13 @@ export function NavBar({
   return (
     <>
       <AppBar position="static" color="default" elevation={1}>
-        <Toolbar>
+        <Toolbar sx={{ minHeight: { xs: "56px", sm: "64px" } }}>
           {/* Loading indicator */}
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>
               <CircularProgress size={24} color="primary" />
             </Box>
           )}
-          {/* Logo/Brand */}
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{
-              flexGrow: 0,
-              mr: 2,
-              display: { xs: "none", sm: "block" },
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-            onClick={() => navigate("/home")}
-          >
-            DMS
-          </Typography>
 
           {/* Mobile menu button */}
           {isMobile ? (
@@ -181,9 +166,25 @@ export function NavBar({
 
           {/* Desktop navigation */}
           {!isMobile && (
-            <Box sx={{ display: "flex", flexGrow: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexGrow: 1,
+                flexWrap: "wrap", // Allow items to wrap to next line
+                alignItems: "center",
+                maxWidth: "calc(100% - 50px)", // Reserve space for search and user menu
+                overflow: "visible",
+              }}
+            >
               {menuItems.map((item, index) => (
-                <Box key={item.path} sx={{ position: "relative" }}>
+                <Box
+                  key={item.path}
+                  sx={{
+                    position: "relative",
+                    mb: 0.5, // Add some margin bottom for wrapped items
+                    mt: 0.5, // Add some margin top for wrapped items
+                  }}
+                >
                   <Button
                     startIcon={item.icon}
                     onClick={() => handleNavigation(item.path)}
@@ -211,6 +212,8 @@ export function NavBar({
                       "&:hover": {
                         backgroundColor: "rgba(0, 0, 0, 0.04)",
                       },
+                      whiteSpace: "nowrap", // Prevent text from wrapping inside button
+                      minHeight: "36px", // Ensure consistent height
                     }}
                   >
                     {item.text}
@@ -264,7 +267,7 @@ export function NavBar({
           </Box>
 
           {/* User menu */}
-          <Box>
+          <Box sx={{ flexShrink: 0 }}>
             <IconButton
               onClick={handleUserMenuClick}
               size="large"

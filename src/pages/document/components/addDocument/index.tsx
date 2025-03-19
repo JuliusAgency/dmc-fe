@@ -162,7 +162,8 @@ export const AddDocument = ({
         })
       );
 
-      const response = await uploadDocumentMutation.mutateAsync(formDataToSend);
+      const response: any =
+        await uploadDocumentMutation.mutateAsync(formDataToSend);
 
       if (response?.id) {
         snackBarSuccess(SUCCESS_UPLOAD);
@@ -196,6 +197,7 @@ export const AddDocument = ({
       open={open}
       onClose={onClose}
       title={documentToEdit ? TITLE_EDIT_DOCUMENT : TITLE_NEW_DOCUMENT}
+      // @ts-ignore
       onConfirm={handleSubmit}
       confirmButtonText={BUTTON_SAVE}
       cancelButtonText={BUTTON_CANCEL}
