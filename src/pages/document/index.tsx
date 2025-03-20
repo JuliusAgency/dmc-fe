@@ -16,13 +16,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import { GridColDef } from "@mui/x-data-grid";
 import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
-import { DocumentType, Classification } from "../../api/documentAPI/types.ts";
+import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
-
+import { CONFIG } from "../../consts/config.ts";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 export const Document = () => {
   const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
@@ -98,6 +99,15 @@ export const Document = () => {
     setIsHistoryDialogOpen(true);
   };
 
+  const handleViewFile = (fileName: string) => {
+    if (!fileName) {
+      return;
+    }
+
+    const fileUrl = `${CONFIG.BASE_URL}/document/view/${fileName}`;
+    window.open(fileUrl, "_blank");
+  };
+
   const handleRowUpdate = async (
     newRow: DocumentType,
     oldRow: DocumentType
@@ -152,6 +162,16 @@ export const Document = () => {
             }}
           >
             <DownloadForOfflineIcon />
+          </Button>
+          <Button
+            onClick={() => handleViewFile(row.fileName)}
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
+          >
+            <VisibilityIcon />
           </Button>
           <Button
             sx={{
