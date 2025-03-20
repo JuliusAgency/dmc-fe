@@ -9,6 +9,7 @@ import {
   uploadDocument,
   getLastDocumentPartNumber,
   deleteDocument,
+  updateDocumentField,
 } from "../../api/documentAPI/document.ts";
 import { PaginationModel } from "../../consts/types.ts";
 import { GetAllDocumentsResponse } from "../../api/documentAPI/types.ts";
@@ -102,6 +103,25 @@ export const useDeleteDocument = (): UseMutationResult<
       },
       onError: () => {
         snackBarError("Error deleting document");
+      },
+    }
+  );
+
+export const useUpdateDocument = (): UseMutationResult<
+  DocumentType,
+  AxiosError,
+  { id: number; field: string; value: any }
+> =>
+  useMutation(
+    async ({ id, field, value }) => {
+      return await updateDocumentField(id, field, value);
+    },
+    {
+      onSuccess: () => {
+        snackBarSuccess("Document updated successfully");
+      },
+      onError: () => {
+        snackBarError("Error updating document");
       },
     }
   );

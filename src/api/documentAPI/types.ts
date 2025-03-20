@@ -20,6 +20,8 @@ export interface DocumentType {
   category: Category;
   secretLevel: SecretLevel;
   tags: DocumentTag[] | Tag[];
+  department: string;
+  nextReview: Date;
 }
 
 export enum FileType {

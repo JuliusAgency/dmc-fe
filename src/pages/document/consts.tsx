@@ -1,7 +1,7 @@
-import { GridColDef } from "@mui/x-data-grid";
+import { GridColDef, GridRenderEditCellParams } from "@mui/x-data-grid";
 import { formatDate } from "../../utils/formatDate";
-import { Chip, Stack } from "@mui/material";
-import { DocumentTag } from "../../api/documentAPI/types.ts";
+import { Classification, FileType } from "../../api/documentAPI/types";
+import { GridEditSingleSelectCell } from "@mui/x-data-grid-pro";
 
 export const COLUMNS: GridColDef[] = [
   {
@@ -10,6 +10,7 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 100,
+    editable: true,
   },
   {
     field: "documentPartNumber",
@@ -24,6 +25,12 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 110,
+    editable: true,
+    type: "singleSelect",
+    valueOptions: Object.values(Classification),
+    renderEditCell: (params: GridRenderEditCellParams) => (
+      <GridEditSingleSelectCell {...params} />
+    ),
   },
   {
     field: "department",
@@ -31,7 +38,9 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 100,
-    valueGetter: (params) => params.row.category?.name,
+    editable: true,
+    type: "string",
+    valueGetter: (params) => params.row.category?.name || "Not Assigned",
   },
   {
     field: "processOwner",
@@ -39,6 +48,7 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 120,
+    editable: true,
     valueGetter: (params) =>
       params.row.processOwner?.name || params.row.processOwner?.email || "N/A",
   },
@@ -70,6 +80,12 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 100,
+    editable: true,
+    type: "singleSelect",
+    valueOptions: Object.values(FileType),
+    renderEditCell: (params: GridRenderEditCellParams) => (
+      <GridEditSingleSelectCell {...params} />
+    ),
   },
   {
     field: "status",
@@ -99,6 +115,8 @@ export const COLUMNS: GridColDef[] = [
     headerAlign: "center",
     align: "center",
     width: 100,
+    editable: true,
+    type: "date",
     valueGetter: (params) => (params.value ? formatDate(params.value) : ""),
   },
 ];

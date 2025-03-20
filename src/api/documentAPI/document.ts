@@ -144,3 +144,20 @@ export const deleteDocument = async (documentId: number): Promise<void> => {
     throw new Error("Failed to delete document");
   }
 };
+
+export const updateDocumentField = async (
+  documentId: number,
+  field: string,
+  value: Partial<DocumentType>
+): Promise<DocumentType> => {
+  try {
+    const { data } = await API.patch<DocumentType>(
+      DocumentEndpoints.updateDocumentField(documentId, field),
+      value
+    );
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to update document");
+  }
+};

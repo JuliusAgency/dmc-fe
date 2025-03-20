@@ -24,6 +24,7 @@ export const GenericTable = ({
   disableColumnMenu = false,
   disableColumnFilter = false,
   disableColumnSelector = false,
+  processRowUpdate,
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -62,6 +63,7 @@ export const GenericTable = ({
         disableRowSelectionOnClick
         pagination
         hideFooterPagination={hideFooterPagination}
+        processRowUpdate={processRowUpdate}
         getDetailPanelHeight={
           getDetailPanelHeight
             ? (params: GridRowParams) => getDetailPanelHeight(params)

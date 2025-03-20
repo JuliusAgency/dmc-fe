@@ -162,8 +162,9 @@ export const AddDocument = ({
         })
       );
 
-      const response: any =
-        await uploadDocumentMutation.mutateAsync(formDataToSend);
+      const response: any = await uploadDocumentMutation.mutateAsync(
+        formDataToSend
+      );
 
       if (response?.id) {
         snackBarSuccess(SUCCESS_UPLOAD);

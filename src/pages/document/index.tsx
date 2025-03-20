@@ -2,13 +2,13 @@ import { GenericTable } from "../../components/genericTable/genericTable";
 import { COLUMNS } from "./consts.tsx";
 import {
   useGetAllDocuments,
-  useGetFile,
+  useUpdateDocument,
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
-import { Box, Button, Grid, Tooltip, Paper, alpha } from "@mui/material";
+import { Box, Button, Grid, alpha } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -16,7 +16,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import { GridColDef } from "@mui/x-data-grid";
 import { RevisionGroup } from "./components/revisionGroup";
 import EditIcon from "@mui/icons-material/Edit";
-import { DocumentType } from "../../api/documentAPI/types.ts";
+import { DocumentType, Classification } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
@@ -64,6 +64,7 @@ export const Document = () => {
   );
 
   const deleteMutation = useDeleteDocument();
+  const updateDocumentMutation = useUpdateDocument();
 
   const toggleDocumentModal = useCallback(() => {
     setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
@@ -94,6 +95,40 @@ export const Document = () => {
   const handleShowHistory = (documentPartNumber: string) => {
     setSelectedDocumentPartNumber(documentPartNumber);
     setIsHistoryDialogOpen(true);
+  };
+
+  const handleRowUpdate = async (
+    newRow: DocumentType,
+    oldRow: DocumentType
+  ) => {
+    try {
+      const changedFields = Object.keys(newRow).filter(
+        (key) =>
+          newRow[key as keyof DocumentType] !==
+          oldRow[key as keyof DocumentType]
+      );
+
+      console.log("🔹 Before update:", newRow);
+
+      if (changedFields.length === 0) {
+        return newRow;
+      }
+
+      await Promise.all(
+        changedFields.map((field) =>
+          updateDocumentMutation.mutateAsync({
+            id: newRow.id,
+            field,
+            value: newRow[field as keyof DocumentType],
+          })
+        )
+      );
+
+      return newRow;
+    } catch (error) {
+      console.error("Failed to update document:", error);
+      return oldRow;
+    }
   };
 
   const filteredDocs = documentsQuery.data?.data ?? [];
@@ -229,6 +264,7 @@ export const Document = () => {
         rowCount={documentsQuery?.data?.total ?? 0}
         rows={filteredDocs}
         getDetailPanelHeight={() => 200}
+        processRowUpdate={handleRowUpdate}
         getDetailPanelContent={(params) => (
           <RevisionGroup
             key={params.row.id}
