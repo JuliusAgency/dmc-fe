@@ -29,6 +29,8 @@ export enum FileType {
   PPTX = "PPTX",
   PNG = "PNG",
   JPG = "JPG",
+  EXCEL = "EXCEL",
+  WORD = "WORD",
 }
 
 export enum Classification {
