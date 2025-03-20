@@ -108,7 +108,9 @@ export const COLUMNS: GridColDef[] = [
   },
 ];
 
-export const getActionColumn = (handleOpenFile: (fileName: string) => void) => {
+export const getActionColumn = (
+  handleDownloadFile: (fileName: string) => void
+) => {
   const theme = useTheme();
 
   return {
@@ -121,7 +123,7 @@ export const getActionColumn = (handleOpenFile: (fileName: string) => void) => {
       return (
         <Box display={"flex"} gap={1}>
           <Button
-            onClick={() => handleOpenFile(row.fileName)}
+            onClick={() => handleDownloadFile(row.fileName)}
             sx={{
               padding: 0,
               minWidth: 0,

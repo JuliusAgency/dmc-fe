@@ -21,9 +21,12 @@ import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
+import { useFileDownload } from "../../hooks/utils/useFileDownload";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
+  const { handleDownloadFile } = useFileDownload();
+
   const theme = useTheme();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 15,
@@ -31,9 +34,7 @@ export const Document = () => {
   });
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
-  const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
-    null
-  );
+
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
   >(undefined);
@@ -62,7 +63,6 @@ export const Document = () => {
     "getActiveDocuments"
   );
 
-  const fileQuery = useGetFile(fileNameToDownload ?? "");
   const deleteMutation = useDeleteDocument();
 
   const toggleDocumentModal = useCallback(() => {
@@ -74,23 +74,6 @@ export const Document = () => {
       documentsQuery.refetch();
     }
   }, [categoryId]);
-
-  useEffect(() => {
-    if (fileQuery.data) {
-      const url = window.URL.createObjectURL(new Blob([fileQuery.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileNameToDownload ?? "");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setFileNameToDownload(null);
-    }
-  }, [fileQuery.data, fileNameToDownload]);
-
-  const handleOpenFile = (fileName: string) => {
-    setFileNameToDownload(fileName);
-  };
 
   const handleEdit = (document: DocumentType) => {
     setDocumentToEdit(document);
@@ -125,7 +108,7 @@ export const Document = () => {
       return (
         <Box display={"flex"} gap={1}>
           <Button
-            onClick={() => handleOpenFile(row.fileName)}
+            onClick={() => handleDownloadFile(row.fileName)}
             sx={{
               padding: 0,
               minWidth: 0,
@@ -183,114 +166,112 @@ export const Document = () => {
         flexDirection: "column",
       }}
     >
-    
-        <Grid
-          container
-          display={"flex"}
-          justifyContent={"flex-start"}
-          width={"100%"}
-          mb={2}
-        >
-          <Button variant="outlined" onClick={toggleDocumentModal}>
-            Add Document
-          </Button>
-        </Grid>
+      <Grid
+        container
+        display={"flex"}
+        justifyContent={"flex-start"}
+        width={"100%"}
+        mb={2}
+      >
+        <Button variant="outlined" onClick={toggleDocumentModal}>
+          Add Document
+        </Button>
+      </Grid>
 
-        <GenericTable
-          loading={documentsQuery.isLoading ?? false}
-          columns={[...COLUMNS, ACTION_COLUMN]}
-          pageSize={pagination.pageSize}
-          onPaginationModelChange={setPagination}
-          sx={{
-            height: "65vh",
-            mb: 2,
-            width: "100%",
-            "& .MuiDataGrid-root": {
-              border: "none",
-              fontSize: "0.75rem",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
-              padding: "2px 4px",
-              lineHeight: "1.1",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: alpha(theme.palette.primary.main, 0.08),
-              color: theme.palette.primary.main,
-              fontWeight: "bold",
-              fontSize: "0.75rem",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              padding: "2px 4px",
-            },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontWeight: "bold",
-            },
-            "& .MuiDataGrid-row:nth-of-type(even)": {
-              backgroundColor: alpha(theme.palette.background.default, 0.4),
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: alpha(theme.palette.primary.light, 0.1),
-            },
-            "& .actionColumn": {
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: `1px solid ${theme.palette.divider}`,
-            },
-            "& .MuiTablePagination-root": {
-              fontSize: "0.75rem",
-            },
-          }}
-          rowCount={documentsQuery?.data?.total ?? 0}
-          rows={filteredDocs}
-          getDetailPanelHeight={() => 200}
-          getDetailPanelContent={(params) => (
-            <RevisionGroup
-              key={params.row.id}
-              documentPartNumber={params.row.documentPartNumber}
-              rows={filteredDocs}
-              setRows={() => {}}
+      <GenericTable
+        loading={documentsQuery.isLoading ?? false}
+        columns={[...COLUMNS, ACTION_COLUMN]}
+        pageSize={pagination.pageSize}
+        onPaginationModelChange={setPagination}
+        sx={{
+          height: "65vh",
+          mb: 2,
+          width: "100%",
+          "& .MuiDataGrid-root": {
+            border: "none",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+            padding: "2px 4px",
+            lineHeight: "1.1",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+            color: theme.palette.primary.main,
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            padding: "2px 4px",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row:nth-of-type(even)": {
+            backgroundColor: alpha(theme.palette.background.default, 0.4),
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: alpha(theme.palette.primary.light, 0.1),
+          },
+          "& .actionColumn": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiTablePagination-root": {
+            fontSize: "0.75rem",
+          },
+        }}
+        rowCount={documentsQuery?.data?.total ?? 0}
+        rows={filteredDocs}
+        getDetailPanelHeight={() => 200}
+        getDetailPanelContent={(params) => (
+          <RevisionGroup
+            key={params.row.id}
+            documentPartNumber={params.row.documentPartNumber}
+            rows={filteredDocs}
+            setRows={() => {}}
+          />
+        )}
+      />
+
+      <AddDocument
+        open={isAddDocumentModalOpen}
+        onClose={() => {
+          setDocumentToEdit(undefined);
+          toggleDocumentModal();
+        }}
+        refetch={documentsQuery.refetch}
+        documentToEdit={documentToEdit}
+        onDocumentAdded={handleDocumentAdded}
+      />
+
+      <SelectSignersPopup
+        open={isSignersPopupOpen}
+        onClose={() => setIsSignersPopupOpen(false)}
+        documentId={documentIdForSigners}
+      />
+
+      <Dialog
+        open={isHistoryDialogOpen}
+        onClose={() => setIsHistoryDialogOpen(false)}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle>Document History</DialogTitle>
+        <DialogContent>
+          {selectedDocumentPartNumber && (
+            <DocumentHistory
+              documentPartNumber={selectedDocumentPartNumber}
+              onClose={() => setIsHistoryDialogOpen(false)}
             />
           )}
-        />
-
-        <AddDocument
-          open={isAddDocumentModalOpen}
-          onClose={() => {
-            setDocumentToEdit(undefined);
-            toggleDocumentModal();
-          }}
-          refetch={documentsQuery.refetch}
-          documentToEdit={documentToEdit}
-          onDocumentAdded={handleDocumentAdded}
-        />
-
-        <SelectSignersPopup
-          open={isSignersPopupOpen}
-          onClose={() => setIsSignersPopupOpen(false)}
-          documentId={documentIdForSigners}
-        />
-
-        <Dialog
-          open={isHistoryDialogOpen}
-          onClose={() => setIsHistoryDialogOpen(false)}
-          fullWidth
-          maxWidth="lg"
-        >
-          <DialogTitle>Document History</DialogTitle>
-          <DialogContent>
-            {selectedDocumentPartNumber && (
-              <DocumentHistory
-                documentPartNumber={selectedDocumentPartNumber}
-                onClose={() => setIsHistoryDialogOpen(false)}
-              />
-            )}
-          </DialogContent>
-        </Dialog>
-      
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
