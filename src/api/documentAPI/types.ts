@@ -36,10 +36,10 @@ export enum FileType {
 }
 
 export enum Classification {
-  PUBLIC = "Public",
-  INTERNAL = "Internal",
-  CONFIDENTIAL = "Confidential",
-  SECRET = "Secret",
+  PUBLIC = "PUBLIC",
+  INTERNAL = "INTERNAL",
+  CONFIDENTIAL = "CONFIDENTIAL",
+  SECRET = "SECRET",
 }
 
 export enum UserRole {

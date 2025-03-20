@@ -8,7 +8,7 @@ import {
 import { useCallback, useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
-import { Box, Button, Grid, alpha } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -24,6 +24,7 @@ import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../consts/config.ts";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
 export const Document = () => {
   const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
@@ -119,8 +120,6 @@ export const Document = () => {
           oldRow[key as keyof DocumentType]
       );
 
-      console.log("🔹 Before update:", newRow);
-
       if (changedFields.length === 0) {
         return newRow;
       }
@@ -161,7 +160,7 @@ export const Document = () => {
               color: theme.palette.primary.main,
             }}
           >
-            <DownloadForOfflineIcon />
+            <DownloadForOfflineIcon sx={{ color: "green" }} />
           </Button>
           <Button
             onClick={() => handleViewFile(row.fileName)}
@@ -171,7 +170,7 @@ export const Document = () => {
               color: theme.palette.primary.main,
             }}
           >
-            <VisibilityIcon />
+            <VisibilityIcon sx={{ color: "blue" }} />
           </Button>
           <Button
             sx={{
@@ -181,7 +180,7 @@ export const Document = () => {
             }}
             onClick={() => handleEdit(row)}
           >
-            <EditIcon />
+            <EditIcon sx={{ color: "orange" }} />
           </Button>
           {user.role === "ADMIN" ||
             (user.role === "SYSTEM_ADMIN" && (
@@ -194,7 +193,7 @@ export const Document = () => {
                   color: theme.palette.primary.main,
                 }}
               >
-                <DeleteIcon />
+                <DeleteIcon sx={{ color: "red" }} />
               </Button>
             ))}
           <Button
@@ -206,7 +205,7 @@ export const Document = () => {
               color: theme.palette.primary.main,
             }}
           >
-            <HistoryIcon />
+            <HistoryIcon sx={{ color: "purple" }} />
           </Button>
         </Box>
       );
@@ -239,49 +238,6 @@ export const Document = () => {
         columns={[...COLUMNS, ACTION_COLUMN]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
-        sx={{
-          height: "65vh",
-          mb: 2,
-          width: "100%",
-          "& .MuiDataGrid-root": {
-            border: "none",
-            fontSize: "0.75rem",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
-            padding: "2px 4px",
-            lineHeight: "1.1",
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: alpha(theme.palette.primary.main, 0.08),
-            color: theme.palette.primary.main,
-            fontWeight: "bold",
-            fontSize: "0.75rem",
-          },
-          "& .MuiDataGrid-columnHeader": {
-            padding: "2px 4px",
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-          },
-          "& .MuiDataGrid-row:nth-of-type(even)": {
-            backgroundColor: alpha(theme.palette.background.default, 0.4),
-          },
-          "& .MuiDataGrid-row:hover": {
-            backgroundColor: alpha(theme.palette.primary.light, 0.1),
-          },
-          "& .actionColumn": {
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: `1px solid ${theme.palette.divider}`,
-          },
-          "& .MuiTablePagination-root": {
-            fontSize: "0.75rem",
-          },
-        }}
         rowCount={documentsQuery?.data?.total ?? 0}
         rows={filteredDocs}
         getDetailPanelHeight={() => 200}

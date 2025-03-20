@@ -8,6 +8,7 @@ import {
 import Box from "@mui/material/Box";
 import { GenericTableProps } from "./types.ts";
 import { GridRowParams } from "@mui/x-data-grid";
+import { useTheme, alpha } from "@mui/material";
 
 export const GenericTable = ({
   columns,
@@ -37,6 +38,8 @@ export const GenericTable = ({
     }),
     [initialPage, pageSize]
   );
+
+  const theme = useTheme();
 
   const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
     GridRowId[]
@@ -79,10 +82,47 @@ export const GenericTable = ({
           handleDetailPanelExpandedRowIdsChange
         }
         sx={{
-          "& .MuiDataGrid-footerContainer": {
-            justifyContent: "flex-start",
+          height: "65vh",
+          mb: 2,
+          width: "100%",
+          "& .MuiDataGrid-root": {
+            border: "none",
+            fontSize: "0.75rem",
           },
-          ...sx,
+          "& .MuiDataGrid-cell": {
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+            padding: "2px 4px",
+            lineHeight: "1.1",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+            color: theme.palette.primary.main,
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            padding: "2px 4px",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row:nth-of-type(even)": {
+            backgroundColor: alpha(theme.palette.background.default, 0.4),
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: alpha(theme.palette.primary.light, 0.1),
+          },
+          "& .actionColumn": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiTablePagination-root": {
+            fontSize: "0.75rem",
+          },
         }}
         slots={{
           toolbar: () => (

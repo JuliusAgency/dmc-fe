@@ -180,7 +180,12 @@ export function NavBar({
   return (
     <>
       <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ minHeight: { xs: "56px", sm: "64px" } }}>
+        <Toolbar
+          sx={{
+            minHeight: { xs: "56px", sm: "64px" },
+            backgroundColor: theme.palette.grey[200],
+          }}
+        >
           {/* Loading indicator */}
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>
@@ -217,6 +222,7 @@ export function NavBar({
                 <Box
                   key={item.path}
                   sx={{
+                    color: theme.palette.primary.main,
                     position: "relative",
                     mb: 0.5, // Add some margin bottom for wrapped items
                     mt: 0.5, // Add some margin top for wrapped items
@@ -262,18 +268,28 @@ export function NavBar({
                       placement="bottom-start"
                       transition
                       disablePortal
-                      sx={{ zIndex: 1300 }}
+                      sx={{
+                        zIndex: 1300,
+                      }}
                     >
                       {({ TransitionProps }) => (
                         <Grow
                           {...TransitionProps}
                           style={{ transformOrigin: "top left" }}
                         >
-                          <Paper elevation={3} sx={{ mt: 0.5 }}>
+                          <Paper
+                            elevation={3}
+                            sx={{
+                              mt: 0.5,
+                              minWidth: 180,
+                              backgroundColor: theme.palette.grey[200],
+                              borderBottom: `2px solid ${theme.palette.grey[400]}`,
+                            }}
+                          >
                             <ClickAwayListener
                               onClickAway={() => setOpenMenuIndex(null)}
                             >
-                              <List dense sx={{ py: 0.5, minWidth: 150 }}>
+                              <List dense sx={{ py: 0.5 }}>
                                 {item.childItems?.map((child) => (
                                   <ListItem key={child.path} disablePadding>
                                     <ListItemButton
@@ -282,7 +298,16 @@ export function NavBar({
                                       }
                                       dense
                                     >
-                                      <ListItemText primary={child.text} />
+                                      <Typography
+                                        sx={{
+                                          fontSize: "14px",
+                                          fontWeight: "bold",
+                                          color: theme.palette.primary.main,
+                                          padding: "7px",
+                                        }}
+                                      >
+                                        {child.text}
+                                      </Typography>
                                     </ListItemButton>
                                   </ListItem>
                                 ))}
@@ -373,7 +398,9 @@ export function NavBar({
                 horizontal: "right",
               }}
             >
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              <MenuItem sx={{ color: "red" }} onClick={handleLogout}>
+                Logout
+              </MenuItem>
             </Menu>
           </Box>
         </Toolbar>

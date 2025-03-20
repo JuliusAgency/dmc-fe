@@ -6,13 +6,14 @@ import { useGetAllDocuments } from "../../../../hooks/document/documentHooks";
 import { DocumentType } from "../../../../api/documentAPI/types";
 import { PaginationModel } from "../../../../consts/types";
 import {
-  COLUMNS,
   BUTTON_CLOSE,
   ARCHIVED_DOCUMENTS,
   SIGNATURES_COLUMN,
   getActionColumn,
 } from "./constants";
 import { useFileDownload } from "../../../../hooks/utils/useFileDownload";
+import { CONFIG } from "../../../../consts/config.ts";
+import { useColumns } from "../../consts.tsx";
 
 interface DocumentHistoryProps {
   onClose: () => void;
@@ -32,6 +33,15 @@ export const DocumentHistory = ({
   });
 
   const { handleDownloadFile } = useFileDownload();
+
+  const handleViewFile = (fileName: string) => {
+    if (!fileName) {
+      return;
+    }
+
+    const fileUrl = `${CONFIG.BASE_URL}/document/view/${fileName}`;
+    window.open(fileUrl, "_blank");
+  };
 
   const documentsQuery = useGetAllDocuments(
     pagination,
@@ -57,7 +67,8 @@ export const DocumentHistory = ({
     }
   }, [documentsQuery.data]);
 
-  const ACTION_COLUMN = getActionColumn(handleDownloadFile);
+  const ACTION_COLUMN = getActionColumn(handleDownloadFile, handleViewFile);
+  const COLUMNS = useColumns();
 
   return (
     <Box

@@ -4,6 +4,14 @@ import { Classification, FileType } from "../../api/documentAPI/types";
 import { GridEditSingleSelectCell } from "@mui/x-data-grid-pro";
 import { useGetUsers } from "../../hooks/user/userHooks";
 import { useMemo } from "react";
+import { Chip } from "@mui/material";
+
+export enum DocumentStatus {
+  DRAFT = "DRAFT",
+  IN_PROGRESS = "IN_PROGRESS",
+  APPROVED = "APPROVED",
+  ARCHIVED = "ARCHIVED",
+}
 
 export const useColumns = (): GridColDef[] => {
   const { data: users } = useGetUsers();
@@ -15,6 +23,36 @@ export const useColumns = (): GridColDef[] => {
       name: user.email,
     }));
   }, [users]);
+
+  const getStatusColor = (status: DocumentStatus) => {
+    switch (status) {
+      case DocumentStatus.DRAFT:
+        return "warning";
+      case DocumentStatus.IN_PROGRESS:
+        return "info";
+      case DocumentStatus.APPROVED:
+        return "success";
+      case DocumentStatus.ARCHIVED:
+        return "default";
+      default:
+        return "default";
+    }
+  };
+
+  const getClassificationColor = (classification: Classification) => {
+    switch (classification) {
+      case "PUBLIC":
+        return "success";
+      case "INTERNAL":
+        return "info";
+      case "CONFIDENTIAL":
+        return "warning";
+      case "SECRET":
+        return "error";
+      default:
+        return "default";
+    }
+  };
 
   return [
     {
@@ -43,6 +81,12 @@ export const useColumns = (): GridColDef[] => {
       valueOptions: Object.values(Classification),
       renderEditCell: (params: GridRenderEditCellParams) => (
         <GridEditSingleSelectCell {...params} />
+      ),
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={getClassificationColor(params.value)}
+        />
       ),
     },
     {
@@ -119,6 +163,9 @@ export const useColumns = (): GridColDef[] => {
       headerAlign: "center",
       align: "center",
       width: 100,
+      renderCell: (params) => (
+        <Chip label={params.value} color={getStatusColor(params.value)} />
+      ),
     },
     {
       field: "lastUpdate",
