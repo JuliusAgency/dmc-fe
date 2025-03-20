@@ -105,7 +105,7 @@ export const Document = () => {
       return;
     }
 
-    const fileUrl = `${CONFIG.BASE_URL}/document/view/${fileName}`;
+    const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
     window.open(fileUrl, "_blank");
   };
 
