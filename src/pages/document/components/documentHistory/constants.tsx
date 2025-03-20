@@ -1,5 +1,8 @@
 import { GridColDef } from "@mui/x-data-grid";
 import { formatDate } from "../../../../utils/formatDate";
+import { Box, Button } from "@mui/material";
+import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
+import { useTheme } from "@mui/material/styles";
 
 export const BUTTON_CLOSE = "Close";
 export const ARCHIVED_DOCUMENTS = (documentPartNumber: string) =>
@@ -104,3 +107,52 @@ export const COLUMNS: GridColDef[] = [
     valueGetter: (params) => (params.value ? formatDate(params.value) : ""),
   },
 ];
+
+export const getActionColumn = (handleOpenFile: (fileName: string) => void) => {
+  const theme = useTheme();
+
+  return {
+    field: "action",
+    headerName: "Actions",
+    headerAlign: "center",
+    width: 150,
+    align: "center",
+    renderCell: ({ row }) => {
+      return (
+        <Box display={"flex"} gap={1}>
+          <Button
+            onClick={() => handleOpenFile(row.fileName)}
+            sx={{
+              padding: 0,
+              minWidth: 0,
+              color: theme.palette.primary.main,
+            }}
+          >
+            <DownloadForOfflineIcon />
+          </Button>
+        </Box>
+      );
+    },
+  } as GridColDef;
+};
+
+export const SIGNATURES_COLUMN: GridColDef = {
+  field: "signatures",
+  headerName: "Signatures",
+  headerAlign: "center",
+  width: 300,
+  align: "center",
+  renderCell: ({ row }) => {
+    if (!row.signatures || row.signatures.length === 0) return "No signatures";
+
+    return (
+      <Box display="flex" flexDirection="column">
+        {row.signatures.map((sig: any) => (
+          <Box key={sig.id}>
+            {sig.user.email} - {new Date(sig.signedAt).toLocaleDateString()}
+          </Box>
+        ))}
+      </Box>
+    );
+  },
+};
