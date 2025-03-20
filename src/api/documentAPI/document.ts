@@ -11,7 +11,6 @@ export const getAllDocuments = async (
 ): Promise<GetAllDocumentsResponse> => {
   let transformedFilters: Record<string, any> = {};
 
-  console.log("📌 Filters before transformation:", filters);
   const setFilterParams: Map<
     string,
     { description: string; action: () => void }

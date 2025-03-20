@@ -1,5 +1,5 @@
 import { GenericTable } from "../../components/genericTable/genericTable";
-import { COLUMNS } from "./consts.tsx";
+import { useColumns } from "./consts.tsx";
 import {
   useGetAllDocuments,
   useUpdateDocument,
@@ -24,6 +24,7 @@ import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 
 export const Document = () => {
+  const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
   const { handleDownloadFile } = useFileDownload();
 

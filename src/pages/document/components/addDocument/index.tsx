@@ -159,6 +159,7 @@ export const AddDocument = ({
           isFinal: !documentToEdit,
           type: formData.type?.name.toUpperCase(),
           categoryId: Number(categoryId),
+          processOwnerId: user?.id,
         })
       );
 

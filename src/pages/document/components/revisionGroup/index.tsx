@@ -3,11 +3,12 @@ import { useGetAllDocuments } from "../../../../hooks/document/documentHooks.ts"
 import { useState } from "react";
 import { PaginationModel } from "../../../../consts/types.ts";
 import { GenericTable } from "../../../../components/genericTable/genericTable.tsx";
-import { COLUMNS } from "../../consts.tsx";
+import { useColumns } from "../../consts.tsx";
 import { useParams } from "react-router-dom";
 import { REVISION_GROUP_DOCUMENTS } from "./consts.ts";
 
 export const RevisionGroup = ({ documentPartNumber }: Props) => {
+  const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 5,
