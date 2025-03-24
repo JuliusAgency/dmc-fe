@@ -56,7 +56,7 @@ export const Document = () => {
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
 
-  const documentsQuery = useGetAllDocuments(
+  const approvedDocsQuery = useGetAllDocuments(
     pagination,
     {
       status: ["APPROVED"],
@@ -64,6 +64,17 @@ export const Document = () => {
     },
     ["tags", "tags.tag", "category", "processOwner"],
     "getActiveDocuments"
+  );
+
+  const firstRevisionInProgressQuery = useGetAllDocuments(
+    pagination,
+    {
+      status: ["IN_PROGRESS"],
+      revision: 1,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    },
+    ["tags", "tags.tag", "category", "processOwner"],
+    "getInProgressRevision1"
   );
 
   const deleteMutation = useDeleteDocument();
@@ -75,7 +86,8 @@ export const Document = () => {
 
   useEffect(() => {
     if (categoryId) {
-      documentsQuery.refetch();
+      approvedDocsQuery.refetch();
+      firstRevisionInProgressQuery.refetch();
     }
   }, [categoryId]);
 
@@ -87,12 +99,14 @@ export const Document = () => {
   const handleDocumentAdded = (documentId: number) => {
     setDocumentIdForSigners(documentId);
     setIsSignersPopupOpen(true);
-    documentsQuery.refetch();
+    approvedDocsQuery.refetch();
+    firstRevisionInProgressQuery.refetch();
   };
 
   const handleDelete = async (documentId: number) => {
     await deleteMutation.mutateAsync(documentId);
-    documentsQuery.refetch();
+    approvedDocsQuery.refetch();
+    firstRevisionInProgressQuery.refetch();
   };
 
   const handleShowHistory = (documentPartNumber: string) => {
@@ -141,7 +155,10 @@ export const Document = () => {
     }
   };
 
-  const filteredDocs = documentsQuery.data?.data ?? [];
+  const approvedDocs = approvedDocsQuery.data?.data ?? [];
+  const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
+
+  const filteredDocs = [...approvedDocs, ...inProgressDocs];
 
   const ACTION_COLUMN: GridColDef = {
     field: "action",
@@ -234,11 +251,16 @@ export const Document = () => {
       </Grid>
 
       <GenericTable
-        loading={documentsQuery.isLoading ?? false}
+        loading={
+          approvedDocsQuery.isLoading || firstRevisionInProgressQuery.isLoading
+        }
         columns={[...COLUMNS, ACTION_COLUMN]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
-        rowCount={documentsQuery?.data?.total ?? 0}
+        rowCount={
+          (approvedDocsQuery.data?.total ?? 0) +
+          (firstRevisionInProgressQuery.data?.total ?? 0)
+        }
         rows={filteredDocs}
         getDetailPanelHeight={() => 200}
         processRowUpdate={handleRowUpdate}
@@ -258,7 +280,9 @@ export const Document = () => {
           setDocumentToEdit(undefined);
           toggleDocumentModal();
         }}
-        refetch={documentsQuery.refetch}
+        refetch={
+          (approvedDocsQuery.refetch, firstRevisionInProgressQuery.refetch)
+        }
         documentToEdit={documentToEdit}
         onDocumentAdded={handleDocumentAdded}
       />
@@ -267,6 +291,9 @@ export const Document = () => {
         open={isSignersPopupOpen}
         onClose={() => setIsSignersPopupOpen(false)}
         documentId={documentIdForSigners}
+        refetch={
+          (approvedDocsQuery.refetch, firstRevisionInProgressQuery.refetch)
+        }
       />
 
       <Dialog

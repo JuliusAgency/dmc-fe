@@ -17,6 +17,7 @@ export const SelectSignersPopup = ({
   open,
   onClose,
   documentId,
+  refetch,
 }: SelectSignersPopupProps) => {
   const { data: users } = useGetUsers();
   const addSignersMutation = useAddSignersToDocument();
@@ -31,6 +32,7 @@ export const SelectSignersPopup = ({
         name: user.email,
         type: "user" as const,
         typeId: `user-${user.id}`,
+        originalId: user.id,
       })) || [];
 
     const groupOpts =
@@ -77,6 +79,7 @@ export const SelectSignersPopup = ({
 
       snackBarSuccess(MESSAGES.successSendSigners);
       handleClose();
+      refetch();
     } catch (error) {
       snackBarError(MESSAGES.errorSendSigners);
     }
