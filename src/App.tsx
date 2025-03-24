@@ -11,7 +11,7 @@ import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
 import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
-
+import { useAutoLogout } from "./hooks/utils/useAutoLogout.ts";
 import "./styles.css";
 
 // Auth routes component - only for login
@@ -48,6 +48,7 @@ const MainRoutes = () => {
 };
 
 export default function App() {
+  useAutoLogout();
   const storedUser = localStorage.getItem("user");
   const user =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

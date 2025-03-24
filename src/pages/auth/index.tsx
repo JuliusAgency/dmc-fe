@@ -1,10 +1,19 @@
-import { TextField, Button, Container, Typography, Box } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useLogin } from "../../hooks/auth/authsHooks";
 import { AuthFormProps, AuthData } from "../../api/authAPI/types";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../actions/userActions";
+import { useSendMail } from "../../hooks/mail/mailHooks";
 import { useNavigate } from "react-router-dom";
 import {
   AUTH_FORM_TITLE,
@@ -24,12 +33,14 @@ import {
 export default function AuthForm({ onSuccess }: AuthFormProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const sendMailMutation = useSendMail();
   const loginMutation = useLogin();
 
-  const formik = useFormik<AuthData>({
+  const formik = useFormik<AuthData & { rememberMe: boolean }>({
     initialValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
     validationSchema: Yup.object({
       email: Yup.string()
@@ -43,7 +54,11 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       loginMutation.mutate(values, {
         onSuccess: (response: any) => {
           dispatch(setUser(response.user));
-          localStorage.setItem("user", JSON.stringify(response.user));
+          if (values.rememberMe) {
+            localStorage.setItem("user", JSON.stringify(response.user));
+          } else {
+            localStorage.removeItem("user");
+          }
           onSuccess();
           navigate("/home");
         },
@@ -54,10 +69,49 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     },
   });
 
+  const handleForgotPassword = () => {
+    const email = formik.values.email;
+
+    if (!email || !formik.values.email.includes("@")) {
+      alert("Please enter a valid email first.");
+      return;
+    }
+
+    sendMailMutation.mutate(
+      {
+        to: email,
+        subject: "Reset your password",
+        text: `Hi,\nTo reset your password, please click the link below:\nhttp://localhost:5173/reset-password?email=${encodeURIComponent(
+          email
+        )}`,
+        from: "noreply@company.local",
+      },
+      {
+        onSuccess: () => {
+          alert("Password reset email sent!");
+        },
+        onError: (error: any) => {
+          alert(error?.message || "Failed to send reset email.");
+          console.error(error);
+        },
+      }
+    );
+  };
+
   return (
     <Box sx={LOGIN_CONTAINER_STYLES}>
       <Container maxWidth="xs">
         <Box sx={FORM_BOX_STYLES}>
+          <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+            <img
+              src="/src/assets/home.png"
+              alt="Logo"
+              style={{
+                height: "200px",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
           <Typography
             variant="h4"
             align="center"
@@ -86,6 +140,18 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             sx={{ mb: 3 }}
           />
 
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={formik.values.rememberMe}
+                onChange={formik.handleChange}
+                name="rememberMe"
+                color="primary"
+              />
+            }
+            label="Remember me"
+          />
+
           <Button
             variant="contained"
             onClick={() => formik.handleSubmit()}
@@ -94,6 +160,15 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           >
             {LOGIN_BUTTON_TEXT}
           </Button>
+          {/* 
+          <Button
+            variant="text"
+            onClick={handleForgotPassword}
+            fullWidth
+            sx={{ mt: 1, textTransform: "none" }}
+          >
+            Forgot password?
+          </Button> */}
         </Box>
       </Container>
     </Box>

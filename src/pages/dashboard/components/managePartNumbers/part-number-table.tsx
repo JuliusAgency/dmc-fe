@@ -72,7 +72,7 @@ export function PartNumberTable() {
             renderCell: (params) => (
               <>
                 <IconButton onClick={() => deletePartNumber(params.row.id)}>
-                  <DeleteIcon fontSize="small" />
+                  <DeleteIcon fontSize="small" sx={{ color: "red" }} />
                 </IconButton>
               </>
             ),

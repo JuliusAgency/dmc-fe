@@ -186,6 +186,21 @@ export function NavBar({
             backgroundColor: theme.palette.grey[200],
           }}
         >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mr: 2,
+            }}
+          >
+            <img
+              src="/src/assets/home.png"
+              alt="Logo"
+              style={{
+                height: "40px",
+              }}
+            />
+          </Box>
           {/* Loading indicator */}
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>

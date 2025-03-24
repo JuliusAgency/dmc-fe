@@ -1,9 +1,6 @@
 import { useState, useMemo } from "react";
 import { Typography } from "@mui/material";
-import {
-  GridMultipleAutocomplete,
-  Option,
-} from "../../../../components/gridItems/gridMultipleAutocomplete/GridMultipleAutocomplete.tsx";
+import { GridMultipleAutocomplete } from "../../../../components/gridItems/gridMultipleAutocomplete/GridMultipleAutocomplete.tsx";
 import {
   snackBarError,
   snackBarSuccess,
@@ -13,6 +10,8 @@ import { useAddSignersToDocument } from "../../../../hooks/signatures/signatures
 import { GenericPopup } from "../../../../components/genericPopup/genericPopup.tsx";
 import { LABELS, BUTTONS, MESSAGES } from "./constants";
 import { SelectSignersPopupProps } from "./types";
+import { useGetAllSignatureGroups } from "../../../../hooks/signatures/signatureGroupsHook";
+import { Option } from "./types.ts";
 
 export const SelectSignersPopup = ({
   open,
@@ -21,16 +20,30 @@ export const SelectSignersPopup = ({
 }: SelectSignersPopupProps) => {
   const { data: users } = useGetUsers();
   const addSignersMutation = useAddSignersToDocument();
+  const { data: signatureGroups } = useGetAllSignatureGroups();
+
   const [selectedSigners, setSelectedSigners] = useState<Option[]>([]);
 
-  const userOptions = useMemo<Option[]>(
-    () =>
+  const combinedOptions = useMemo<Option[]>(() => {
+    const userOpts =
       users?.map((user: any) => ({
         id: user.id,
         name: user.email,
-      })) || [],
-    [users]
-  );
+        type: "user" as const,
+        typeId: `user-${user.id}`,
+      })) || [];
+
+    const groupOpts =
+      signatureGroups?.map((group: any) => ({
+        id: group.id,
+        name: `[Group] ${group.name}`,
+        type: "group" as const,
+        typeId: `group-${group.id}`,
+        users: group.users,
+      })) || [];
+
+    return [...userOpts, ...groupOpts];
+  }, [users, signatureGroups]);
 
   const handleChange = (value: Option | Option[]) => {
     setSelectedSigners(Array.isArray(value) ? value : [value]);
@@ -42,10 +55,24 @@ export const SelectSignersPopup = ({
       return;
     }
 
+    const userIds = selectedSigners.flatMap((item) => {
+      if (item.type === "user" && typeof item.originalId === "number") {
+        return [item.originalId];
+      }
+
+      if (item.type === "group" && item.users?.length) {
+        return item.users.map((u) => u.id);
+      }
+
+      return [];
+    });
+
+    const uniqueUserIds = Array.from(new Set(userIds));
+
     try {
       await addSignersMutation.mutateAsync({
         documentId,
-        userIds: selectedSigners.map((signer) => signer.id),
+        userIds: uniqueUserIds,
       });
 
       snackBarSuccess(MESSAGES.successSendSigners);
@@ -81,7 +108,7 @@ export const SelectSignersPopup = ({
         selectorData={{
           label: LABELS.autocompleteLabel,
           accessorId: "signers",
-          options: userOptions,
+          options: combinedOptions,
         }}
         sx={{ minWidth: 250 }}
       />

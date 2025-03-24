@@ -82,7 +82,7 @@ export const SubCategoryModal = ({
                       onClick={() => handleDeleteSubCategory(child.id)}
                       size="small"
                     >
-                      <DeleteIcon fontSize="small" />
+                      <DeleteIcon fontSize="small" sx={{ color: "red" }} />
                     </IconButton>
                   </ListItemSecondaryAction>
                 </ListItem>
