@@ -194,7 +194,7 @@ export function NavBar({
             }}
           >
             <img
-              src="/src/assets/home.png"
+              src="/images/home.png"
               alt="Logo"
               style={{
                 height: "40px",

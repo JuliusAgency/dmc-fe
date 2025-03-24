@@ -104,7 +104,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         <Box sx={FORM_BOX_STYLES}>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
             <img
-              src="/src/assets/home.png"
+              src="/images/home.png"
               alt="Logo"
               style={{
                 height: "200px",
