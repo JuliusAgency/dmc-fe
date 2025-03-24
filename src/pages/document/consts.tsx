@@ -60,7 +60,7 @@ export const useColumns = (): GridColDef[] => {
       headerName: "Name",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1.2,
       editable: true,
     },
     {
@@ -68,25 +68,25 @@ export const useColumns = (): GridColDef[] => {
       headerName: "Document PNumber",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1.5,
     },
     {
       field: "classification",
       headerName: "Classification",
       headerAlign: "center",
       align: "center",
-      width: 110,
+      flex: 1,
       editable: true,
       type: "singleSelect",
       valueOptions: Object.values(Classification),
       renderEditCell: (params: GridRenderEditCellParams) => (
         <GridEditSingleSelectCell {...params} />
       ),
-      renderCell: (params) => (
+      renderCell: (params: any) => (
         <Chip
-          label={params.value}
+          label={params?.value}
           sx={{
-            backgroundColor: getClassificationColor(params.value),
+            backgroundColor: getClassificationColor(params?.value),
             color: "white",
             fontWeight: "bold",
           }}
@@ -94,66 +94,75 @@ export const useColumns = (): GridColDef[] => {
       ),
     },
     {
-      field: "department",
+      field: "category",
       headerName: "Department",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1,
       editable: true,
       type: "string",
-      valueGetter: (params) => params.row.category?.name || "Not Assigned",
+      valueGetter: (params: any) => {
+        return params?.name ?? "Not Assigned";
+      },
     },
     {
-      field: "processOwner",
+      field: "processOwnerId",
       headerName: "Process Owner",
       headerAlign: "center",
       align: "center",
-      width: 150,
+      flex: 1.5,
       editable: true,
       type: "singleSelect",
-      valueOptions: userOptions.map((user: any) => user.name),
-      renderEditCell: (params: GridRenderEditCellParams) => {
-        return (
-          <GridEditSingleSelectCell
-            {...params}
-            options={userOptions.map((user: any) => ({
-              value: user.id,
-              label: user.name,
-            }))}
-          />
-        );
-      },
-      valueGetter: (params) => params.row.processOwner?.email || "N/A",
-    },
+      valueOptions: userOptions.map((user: any) => ({
+        value: user.id,
+        label: user.name,
+      })),
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <GridEditSingleSelectCell
+          {...params}
+          options={userOptions.map((user: any) => ({
+            value: user.id,
+            label: user.name,
+          }))}
+        />
+      ),
 
+      valueGetter: (params: any) => params,
+
+      valueFormatter: (params: any) => {
+        console.log("params", params);
+        const user = userOptions.find((u) => u.id === params);
+        return user?.name || "N/A";
+      },
+    },
     {
       field: "revision",
       headerName: "Revision",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 0.7,
     },
     {
       field: "published",
       headerName: "Published",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      valueGetter: (params) => (params.value ? formatDate(params.value) : ""),
+      flex: 1,
+      valueGetter: (params: any) => formatDate(params),
     },
     {
       field: "id",
       headerName: "DCO Number",
       headerAlign: "center",
       align: "center",
-      width: 110,
+      flex: 1,
     },
     {
       field: "type",
       headerName: "Type",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1,
       editable: true,
       type: "singleSelect",
       valueOptions: Object.values(FileType),
@@ -166,7 +175,7 @@ export const useColumns = (): GridColDef[] => {
       headerName: "Status",
       headerAlign: "center",
       align: "center",
-      width: 120,
+      flex: 1,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -184,27 +193,26 @@ export const useColumns = (): GridColDef[] => {
       headerName: "Last Update",
       headerAlign: "center",
       align: "center",
-      width: 100,
-      valueGetter: (params) => (params.value ? formatDate(params.value) : ""),
+      flex: 1,
+      valueGetter: (params: any) => formatDate(params),
     },
     {
       field: "updatedBy",
       headerName: "Updated By",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1,
     },
     {
       field: "nextReview",
       headerName: "Next Review",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      flex: 1,
       editable: true,
       type: "date",
-      valueGetter: (params) => (params.value ? new Date(params.value) : null),
-      valueFormatter: (params) =>
-        params.value ? formatDate(params.value) : "",
+      valueGetter: (params: any) => formatDate(params),
+      valueFormatter: (params: any) => formatDate(params),
     },
   ];
 };

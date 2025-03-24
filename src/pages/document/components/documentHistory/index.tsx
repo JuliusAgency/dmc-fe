@@ -94,7 +94,7 @@ export const DocumentHistory = ({
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
         sx={{
-          width: "100%",
+          width: "98%",
           height: "100%",
           border: "none",
           minWidth: "unset",

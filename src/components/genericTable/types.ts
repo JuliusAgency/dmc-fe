@@ -1,4 +1,4 @@
-import { GridColDef, GridRowParams } from "@mui/x-data-grid";
+import { GridColDef, GridRowParams, GridRowId } from "@mui/x-data-grid";
 import { GridPaginationModel } from "@mui/x-data-grid-pro";
 import { SxProps } from "@mui/material";
 import { Theme } from "@mui/material/styles";
@@ -19,7 +19,10 @@ export interface GenericTableProps {
   initialPage?: number;
   hideFooterPagination?: boolean;
   getDetailPanelHeight?: (params: GridRowParams) => number | "auto";
-  getDetailPanelContent?: ({ row }: GridRowParams) => JSX.Element;
+  getDetailPanelContent?: ({ row }: GridRowParams) => JSX.Element | null;
   rowCount?: number;
   processRowUpdate?: (newRow: any, oldRow: any) => Promise<any>;
+  detailPanelExpandedRowIds?: GridRowId[];
+  setDetailPanelExpandedRowIds?: (ids: GridRowId[]) => void;
+  onTryExpandRow?: (params: { id: number }) => boolean | Promise<boolean>;
 }

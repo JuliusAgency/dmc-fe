@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import {
   DataGridPro,
   GridRowId,
@@ -26,6 +26,9 @@ export const GenericTable = ({
   disableColumnFilter = false,
   disableColumnSelector = false,
   processRowUpdate,
+  detailPanelExpandedRowIds = [],
+  setDetailPanelExpandedRowIds,
+  onTryExpandRow,
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -41,19 +44,25 @@ export const GenericTable = ({
 
   const theme = useTheme();
 
-  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
-    GridRowId[]
-  >([]);
-
   const handleDetailPanelExpandedRowIdsChange = useCallback(
-    (newIds: GridRowId[]) => {
-      setDetailPanelExpandedRowIds([newIds[newIds.length - 1]]);
+    async (newIds: GridRowId[]) => {
+      const lastId = newIds[newIds.length - 1];
+
+      if (onTryExpandRow) {
+        const allow = await onTryExpandRow({ id: Number(lastId) });
+        if (!allow) {
+          setDetailPanelExpandedRowIds?.([]);
+          return;
+        }
+      }
+
+      setDetailPanelExpandedRowIds?.([lastId]);
     },
-    []
+    [onTryExpandRow, setDetailPanelExpandedRowIds]
   );
 
   return (
-    <Box sx={{ width: "95%", height: "70vh", ...sx }}>
+    <Box sx={{ width: "100%", height: "100vh", ...sx }}>
       <DataGridPro
         onPaginationModelChange={onPaginationModelChange}
         loading={loading}
@@ -61,7 +70,7 @@ export const GenericTable = ({
         columns={columns}
         paginationMode="server"
         rowCount={rowCount}
-        pageSizeOptions={[5, 10, 25]}
+        pageSizeOptions={[5, 10, 15, 20]}
         initialState={initialState}
         disableRowSelectionOnClick
         pagination

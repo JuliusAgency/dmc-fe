@@ -42,9 +42,9 @@ export const RevisionGroup = ({ documentPartNumber }: Props) => {
         "& .MuiDataGrid-footerContainer": { display: "none" },
         border: "none",
         backgroundColor: "transparent",
-        width: "auto",
-        height: "auto",
         paddingLeft: "1.5%",
+        width: "90%",
+        maxWidth: "100%",
       }}
     />
   );

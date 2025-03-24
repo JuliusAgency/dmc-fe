@@ -23,24 +23,25 @@ import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../consts/config.ts";
+import { snackBarInfo } from "../../components/toast/Toast";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { GridRowId } from "@mui/x-data-grid-pro";
 
 export const Document = () => {
   const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
   const { handleDownloadFile } = useFileDownload();
-
   const theme = useTheme();
+
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 15,
     page: 0,
   });
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
-
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
-  >(undefined);
+  >();
   const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
   const [documentIdForSigners, setDocumentIdForSigners] = useState<
     number | null
@@ -49,9 +50,11 @@ export const Document = () => {
   const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
     string | null
   >(null);
+  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
+    GridRowId[]
+  >([]);
 
   const storedUser = localStorage.getItem("user");
-
   const user =
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
@@ -126,10 +129,7 @@ export const Document = () => {
   };
 
   const handleViewFile = (fileName: string) => {
-    if (!fileName) {
-      return;
-    }
-
+    if (!fileName) return;
     const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
     window.open(fileUrl, "_blank");
   };
@@ -145,9 +145,7 @@ export const Document = () => {
           oldRow[key as keyof DocumentType]
       );
 
-      if (changedFields.length === 0) {
-        return newRow;
-      }
+      if (changedFields.length === 0) return newRow;
 
       await Promise.all(
         changedFields.map((field) =>
@@ -168,7 +166,6 @@ export const Document = () => {
 
   const approvedDocs = approvedDocsQuery.data?.data ?? [];
   const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
-
   const draftDocs = firstRevisionDraftQuery.data?.data ?? [];
 
   const filteredDocs = [...approvedDocs, ...inProgressDocs, ...draftDocs];
@@ -179,44 +176,42 @@ export const Document = () => {
     headerAlign: "center",
     width: 200,
     align: "center",
-    renderCell: ({ row }) => {
-      return (
-        <Box display={"flex"} gap={1}>
+    renderCell: ({ row }) => (
+      <Box display={"flex"} gap={1}>
+        <Button
+          onClick={() => handleDownloadFile(row.fileName)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
+        </Button>
+        <Button
+          onClick={() => handleViewFile(row.fileName)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <VisibilityIcon sx={{ color: "#42a5f5" }} />
+        </Button>
+        <Button
+          onClick={() => handleEdit(row)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <EditIcon sx={{ color: "#ffa726" }} />
+        </Button>
+        {user.role === "ADMIN" || user.role === "SYSTEM_ADMIN" ? (
           <Button
-            onClick={() => handleDownloadFile(row.fileName)}
+            onClick={() => handleDelete(row.id)}
             sx={{ padding: 0, minWidth: 0 }}
           >
-            <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
+            <DeleteIcon sx={{ color: "#ef5350" }} />
           </Button>
-          <Button
-            onClick={() => handleViewFile(row.fileName)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <VisibilityIcon sx={{ color: "#42a5f5" }} />
-          </Button>
-          <Button
-            onClick={() => handleEdit(row)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <EditIcon sx={{ color: "#ffa726" }} />
-          </Button>
-          {user.role === "ADMIN" || user.role === "SYSTEM_ADMIN" ? (
-            <Button
-              onClick={() => handleDelete(row.id)}
-              sx={{ padding: 0, minWidth: 0 }}
-            >
-              <DeleteIcon sx={{ color: "#ef5350" }} />
-            </Button>
-          ) : null}
-          <Button
-            onClick={() => handleShowHistory(row.documentPartNumber)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <HistoryIcon sx={{ color: "#ab47bc" }} />
-          </Button>
-        </Box>
-      );
-    },
+        ) : null}
+        <Button
+          onClick={() => handleShowHistory(row.documentPartNumber)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <HistoryIcon sx={{ color: "#ab47bc" }} />
+        </Button>
+      </Box>
+    ),
   };
 
   return (
@@ -225,21 +220,13 @@ export const Document = () => {
         display: "flex",
         flexDirection: "column",
         width: "100%",
-        height: "100%",
+        height: "92vh",
         overflow: "hidden",
         boxSizing: "border-box",
         padding: 2,
-        bgcolor: "background.default",
       }}
     >
-      <Grid
-        container
-        display={"flex"}
-        justifyContent={"flex-start"}
-        width={"100%"}
-        mb={2}
-        ml={12}
-      >
+      <Grid container justifyContent={"flex-start"} width={"100%"} mb={2}>
         <Button variant="outlined" onClick={toggleDocumentModal}>
           Add Document
         </Button>
@@ -262,10 +249,30 @@ export const Document = () => {
         rows={filteredDocs}
         getDetailPanelHeight={() => 200}
         processRowUpdate={handleRowUpdate}
-        getDetailPanelContent={(params) => (
+        detailPanelExpandedRowIds={detailPanelExpandedRowIds}
+        setDetailPanelExpandedRowIds={setDetailPanelExpandedRowIds}
+        onTryExpandRow={(rowId) => {
+          const row = filteredDocs.find((doc) => doc.id === rowId.id);
+          if (!row) return false;
+
+          const hasInProgressForSamePart = filteredDocs.some(
+            (doc) =>
+              doc.documentPartNumber === row.documentPartNumber &&
+              //@ts-ignore
+              doc.status === "IN_PROGRESS"
+          );
+
+          if (!hasInProgressForSamePart) {
+            snackBarInfo("No documents are currently in the approval process.");
+            return false;
+          }
+
+          return true;
+        }}
+        getDetailPanelContent={({ row }) => (
           <RevisionGroup
-            key={params.row.id}
-            documentPartNumber={params.row.documentPartNumber}
+            key={row.id}
+            documentPartNumber={row.documentPartNumber}
             rows={filteredDocs}
             setRows={() => {}}
           />

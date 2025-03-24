@@ -123,7 +123,7 @@ export function NavBar({
           display: "flex",
           alignItems: "center",
           padding: theme.spacing(1, 2),
-          backgroundColor: alpha(theme.palette.common.white, 0.15),
+          backgroundColor: "#e3f2fd",
           margin: theme.spacing(1),
           borderRadius: 2,
           border: `1px solid black`,
@@ -183,7 +183,7 @@ export function NavBar({
         <Toolbar
           sx={{
             minHeight: { xs: "56px", sm: "64px" },
-            backgroundColor: theme.palette.grey[200],
+            backgroundColor: "#e3f2fd",
           }}
         >
           <Box
@@ -193,13 +193,13 @@ export function NavBar({
               mr: 2,
             }}
           >
-            {/* <img
+            <img
               src="/images/home.png"
               alt="Logo"
               style={{
                 height: "40px",
               }}
-            /> */}
+            />
           </Box>
           {/* Loading indicator */}
           {loading && (
