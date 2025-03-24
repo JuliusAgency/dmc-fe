@@ -99,9 +99,11 @@ export const GenericTable = ({
             fontSize: "0.75rem",
           },
           "& .MuiDataGrid-cell": {
-            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
             padding: "2px 4px",
-            lineHeight: "1.1",
           },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: alpha(theme.palette.primary.main, 0.08),

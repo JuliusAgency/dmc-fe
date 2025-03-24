@@ -103,14 +103,14 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       <Container maxWidth="xs">
         <Box sx={FORM_BOX_STYLES}>
           <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-            {/* <img
+            <img
               src="/images/home.png"
               alt="Logo"
               style={{
                 height: "200px",
                 objectFit: "contain",
               }}
-            /> */}
+            />
           </Box>
           <Typography
             variant="h4"

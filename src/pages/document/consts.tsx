@@ -130,7 +130,6 @@ export const useColumns = (): GridColDef[] => {
       valueGetter: (params: any) => params,
 
       valueFormatter: (params: any) => {
-        console.log("params", params);
         const user = userOptions.find((u) => u.id === params);
         return user?.name || "N/A";
       },
