@@ -193,13 +193,13 @@ export function NavBar({
               mr: 2,
             }}
           >
-            <img
+            {/* <img
               src="/images/home.png"
               alt="Logo"
               style={{
                 height: "40px",
               }}
-            />
+            /> */}
           </Box>
           {/* Loading indicator */}
           {loading && (
