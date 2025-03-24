@@ -11,6 +11,7 @@ import { GenericPopup } from "../../../../components/genericPopup/genericPopup.t
 import { LABELS, BUTTONS, MESSAGES } from "./constants";
 import { SelectSignersPopupProps } from "./types";
 import { useGetAllSignatureGroups } from "../../../../hooks/signatures/signatureGroupsHook";
+import { useUpdateDocument } from "../../../../hooks/document/documentHooks";
 import { Option } from "./types.ts";
 
 export const SelectSignersPopup = ({
@@ -21,6 +22,7 @@ export const SelectSignersPopup = ({
 }: SelectSignersPopupProps) => {
   const { data: users } = useGetUsers();
   const addSignersMutation = useAddSignersToDocument();
+  const updateDocumentMutation = useUpdateDocument();
   const { data: signatureGroups } = useGetAllSignatureGroups();
 
   const [selectedSigners, setSelectedSigners] = useState<Option[]>([]);
@@ -78,7 +80,7 @@ export const SelectSignersPopup = ({
       });
 
       snackBarSuccess(MESSAGES.successSendSigners);
-      handleClose();
+      onClose();
       refetch();
     } catch (error) {
       snackBarError(MESSAGES.errorSendSigners);
@@ -87,13 +89,34 @@ export const SelectSignersPopup = ({
 
   const handleClose = () => {
     setSelectedSigners([]);
-    onClose();
+
+    if (documentId) {
+      updateDocumentMutation.mutate(
+        {
+          id: documentId,
+          field: "status",
+          value: "APPROVED",
+        },
+        {
+          onSuccess: () => {
+            refetch();
+            onClose();
+          },
+        }
+      );
+    } else {
+      onClose();
+    }
   };
 
   return (
     <GenericPopup
       open={open}
-      onClose={handleClose}
+      onCancel={handleClose}
+      onClose={() => {
+        setSelectedSigners([]);
+        onClose();
+      }}
       title={LABELS.title}
       onConfirm={handleSubmit}
       confirmButtonText={BUTTONS.submit}

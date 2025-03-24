@@ -27,30 +27,30 @@ export const useColumns = (): GridColDef[] => {
   const getStatusColor = (status: DocumentStatus) => {
     switch (status) {
       case DocumentStatus.DRAFT:
-        return "warning";
+        return "#ffa726";
       case DocumentStatus.IN_PROGRESS:
-        return "info";
+        return "#42a5f5";
       case DocumentStatus.APPROVED:
-        return "success";
+        return "#66bb6a";
       case DocumentStatus.ARCHIVED:
-        return "default";
+        return "#bdbdbd";
       default:
-        return "default";
+        return "#e0e0e0";
     }
   };
 
   const getClassificationColor = (classification: Classification) => {
     switch (classification) {
       case "PUBLIC":
-        return "success";
+        return "#66bb6a";
       case "INTERNAL":
-        return "info";
+        return "#42a5f5";
       case "CONFIDENTIAL":
-        return "warning";
+        return "#ffa726";
       case "SECRET":
-        return "error";
+        return "#ef5350";
       default:
-        return "default";
+        return "#e0e0e0";
     }
   };
 
@@ -65,10 +65,10 @@ export const useColumns = (): GridColDef[] => {
     },
     {
       field: "documentPartNumber",
-      headerName: "Document Part Number",
+      headerName: "Document PNumber",
       headerAlign: "center",
       align: "center",
-      width: 200,
+      width: 150,
     },
     {
       field: "classification",
@@ -85,7 +85,11 @@ export const useColumns = (): GridColDef[] => {
       renderCell: (params) => (
         <Chip
           label={params.value}
-          color={getClassificationColor(params.value)}
+          sx={{
+            backgroundColor: getClassificationColor(params.value),
+            color: "white",
+            fontWeight: "bold",
+          }}
         />
       ),
     },
@@ -162,9 +166,17 @@ export const useColumns = (): GridColDef[] => {
       headerName: "Status",
       headerAlign: "center",
       align: "center",
-      width: 100,
+      width: 120,
       renderCell: (params) => (
-        <Chip label={params.value} color={getStatusColor(params.value)} />
+        <Chip
+          label={params.value}
+          sx={{
+            backgroundColor: getStatusColor(params.value),
+            color: "white",
+            fontWeight: "bold",
+            borderRadius: "6px",
+          }}
+        />
       ),
     },
     {
@@ -190,7 +202,9 @@ export const useColumns = (): GridColDef[] => {
       width: 100,
       editable: true,
       type: "date",
-      valueGetter: (params) => (params.value ? formatDate(params.value) : ""),
+      valueGetter: (params) => (params.value ? new Date(params.value) : null),
+      valueFormatter: (params) =>
+        params.value ? formatDate(params.value) : "",
     },
   ];
 };

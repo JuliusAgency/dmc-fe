@@ -152,7 +152,7 @@ export const updateDocumentField = async (
   try {
     const { data } = await API.patch<DocumentType>(
       DocumentEndpoints.updateDocumentField(documentId, field),
-      value
+      { value }
     );
 
     return data;

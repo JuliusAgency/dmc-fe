@@ -31,7 +31,7 @@ export const getActionColumn = (
               color: theme.palette.primary.main,
             }}
           >
-            <DownloadForOfflineIcon sx={{ color: "green" }} />
+            <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
           </Button>
           <Button
             onClick={() => handleViewFile(row.fileName)}
@@ -41,7 +41,7 @@ export const getActionColumn = (
               color: theme.palette.primary.main,
             }}
           >
-            <VisibilityIcon sx={{ color: "blue" }} />
+            <VisibilityIcon sx={{ color: "#42a5f5" }} />
           </Button>
         </Box>
       );

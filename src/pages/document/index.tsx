@@ -77,6 +77,17 @@ export const Document = () => {
     "getInProgressRevision1"
   );
 
+  const firstRevisionDraftQuery = useGetAllDocuments(
+    pagination,
+    {
+      status: ["DRAFT"],
+      revision: 1,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    },
+    ["tags", "tags.tag", "category", "processOwner"],
+    "getDraftRevision1"
+  );
+
   const deleteMutation = useDeleteDocument();
   const updateDocumentMutation = useUpdateDocument();
 
@@ -158,71 +169,50 @@ export const Document = () => {
   const approvedDocs = approvedDocsQuery.data?.data ?? [];
   const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
 
-  const filteredDocs = [...approvedDocs, ...inProgressDocs];
+  const draftDocs = firstRevisionDraftQuery.data?.data ?? [];
+
+  const filteredDocs = [...approvedDocs, ...inProgressDocs, ...draftDocs];
 
   const ACTION_COLUMN: GridColDef = {
     field: "action",
     headerName: "Actions",
     headerAlign: "center",
-    width: 150,
+    width: 200,
     align: "center",
     renderCell: ({ row }) => {
       return (
         <Box display={"flex"} gap={1}>
           <Button
             onClick={() => handleDownloadFile(row.fileName)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
+            sx={{ padding: 0, minWidth: 0 }}
           >
-            <DownloadForOfflineIcon sx={{ color: "green" }} />
+            <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
           </Button>
           <Button
             onClick={() => handleViewFile(row.fileName)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
+            sx={{ padding: 0, minWidth: 0 }}
           >
-            <VisibilityIcon sx={{ color: "blue" }} />
+            <VisibilityIcon sx={{ color: "#42a5f5" }} />
           </Button>
           <Button
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
             onClick={() => handleEdit(row)}
+            sx={{ padding: 0, minWidth: 0 }}
           >
-            <EditIcon sx={{ color: "orange" }} />
+            <EditIcon sx={{ color: "#ffa726" }} />
           </Button>
-          {user.role === "ADMIN" ||
-            (user.role === "SYSTEM_ADMIN" && (
-              <Button
-                color="error"
-                onClick={() => handleDelete(row.id)}
-                sx={{
-                  padding: 0,
-                  minWidth: 0,
-                  color: theme.palette.primary.main,
-                }}
-              >
-                <DeleteIcon sx={{ color: "red" }} />
-              </Button>
-            ))}
+          {user.role === "ADMIN" || user.role === "SYSTEM_ADMIN" ? (
+            <Button
+              onClick={() => handleDelete(row.id)}
+              sx={{ padding: 0, minWidth: 0 }}
+            >
+              <DeleteIcon sx={{ color: "#ef5350" }} />
+            </Button>
+          ) : null}
           <Button
-            color="primary"
             onClick={() => handleShowHistory(row.documentPartNumber)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
+            sx={{ padding: 0, minWidth: 0 }}
           >
-            <HistoryIcon sx={{ color: "purple" }} />
+            <HistoryIcon sx={{ color: "#ab47bc" }} />
           </Button>
         </Box>
       );
@@ -233,9 +223,13 @@ export const Document = () => {
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         flexDirection: "column",
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        padding: 2,
+        bgcolor: "background.default",
       }}
     >
       <Grid
@@ -244,6 +238,7 @@ export const Document = () => {
         justifyContent={"flex-start"}
         width={"100%"}
         mb={2}
+        ml={12}
       >
         <Button variant="outlined" onClick={toggleDocumentModal}>
           Add Document
@@ -252,14 +247,17 @@ export const Document = () => {
 
       <GenericTable
         loading={
-          approvedDocsQuery.isLoading || firstRevisionInProgressQuery.isLoading
+          approvedDocsQuery.isLoading ||
+          firstRevisionInProgressQuery.isLoading ||
+          firstRevisionDraftQuery.isLoading
         }
         columns={[...COLUMNS, ACTION_COLUMN]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
         rowCount={
           (approvedDocsQuery.data?.total ?? 0) +
-          (firstRevisionInProgressQuery.data?.total ?? 0)
+          (firstRevisionInProgressQuery.data?.total ?? 0) +
+          (firstRevisionDraftQuery.data?.total ?? 0)
         }
         rows={filteredDocs}
         getDetailPanelHeight={() => 200}
@@ -281,7 +279,9 @@ export const Document = () => {
           toggleDocumentModal();
         }}
         refetch={
-          (approvedDocsQuery.refetch, firstRevisionInProgressQuery.refetch)
+          (approvedDocsQuery.refetch,
+          firstRevisionInProgressQuery.refetch,
+          firstRevisionDraftQuery.refetch)
         }
         documentToEdit={documentToEdit}
         onDocumentAdded={handleDocumentAdded}
@@ -292,18 +292,27 @@ export const Document = () => {
         onClose={() => setIsSignersPopupOpen(false)}
         documentId={documentIdForSigners}
         refetch={
-          (approvedDocsQuery.refetch, firstRevisionInProgressQuery.refetch)
+          (approvedDocsQuery.refetch,
+          firstRevisionInProgressQuery.refetch,
+          firstRevisionDraftQuery.refetch)
         }
       />
 
       <Dialog
         open={isHistoryDialogOpen}
         onClose={() => setIsHistoryDialogOpen(false)}
-        fullWidth
-        maxWidth="lg"
+        fullScreen
       >
         <DialogTitle>Document History</DialogTitle>
-        <DialogContent>
+        <DialogContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden",
+            p: 0,
+          }}
+        >
           {selectedDocumentPartNumber && (
             <DocumentHistory
               documentPartNumber={selectedDocumentPartNumber}

@@ -7,7 +7,7 @@ export const ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin" },
   { value: "SYSTEM_ADMIN", label: "System Admin" },
 ];
-export const RESET_PASSWORD_BUTTON = "Reset Password";
+export const RESET_PASSWORD_BUTTON = "Change Password";
 export const CREATE_USER_TITLE = "Create User";
 export const CANCEL_BUTTON = "Cancel";
 export const SAVE_USER_BUTTON = "Save";

@@ -114,7 +114,7 @@ export const ManageUsers = () => {
       flex: 1,
       renderCell: (params) => (
         <Button
-          onClick={() => handleOpenResetDialog(params.row.id)} // 🆕 שינוי
+          onClick={() => handleOpenResetDialog(params.row.id)}
           color="warning"
         >
           {RESET_PASSWORD_BUTTON}

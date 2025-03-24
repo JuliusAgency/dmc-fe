@@ -82,7 +82,7 @@ export const GenericTable = ({
           handleDetailPanelExpandedRowIdsChange
         }
         sx={{
-          height: "65vh",
+          height: "100%",
           mb: 2,
           width: "100%",
           "& .MuiDataGrid-root": {

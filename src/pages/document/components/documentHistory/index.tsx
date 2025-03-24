@@ -74,13 +74,12 @@ export const DocumentHistory = ({
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         flexDirection: "column",
+        flex: 1,
         width: "100%",
-        bgcolor: "background.default",
-        p: 3,
-        borderRadius: 2,
+        height: "100%",
+        overflow: "auto",
+        p: 2,
       }}
     >
       <Grid container justifyContent="space-between" sx={{ mb: 2 }}>
@@ -95,10 +94,10 @@ export const DocumentHistory = ({
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
         sx={{
-          bgcolor: "background.default",
-          height: "60vh",
-          mb: 3,
           width: "100%",
+          height: "100%",
+          border: "none",
+          minWidth: "unset",
         }}
         rowCount={documentsQuery?.data?.total ?? 0}
         rows={historyRows}

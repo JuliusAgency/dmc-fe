@@ -1,4 +1,4 @@
-import { useMutation, UseMutationResult } from "react-query";
+import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 import { useQuery, UseQueryResult } from "react-query";
 import {
@@ -107,24 +107,31 @@ export const useDeleteDocument = (): UseMutationResult<
     }
   );
 
-export const useUpdateDocument = (): UseMutationResult<
-  DocumentType,
-  AxiosError,
-  { id: number; field: string; value: any }
-> =>
-  useMutation(
-    async ({ id, field, value }) => {
-      return await updateDocumentField(id, field, value);
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      field,
+      value,
+    }: {
+      id: number;
+      field: string;
+      value: any;
+    }) => updateDocumentField(id, field, value),
+    onSuccess: () => {
+      snackBarSuccess("Document updated successfully");
+
+      // ✅ תוסיפי כאן invalidate לשם הקווארי שלך
+      queryClient.invalidateQueries({ queryKey: ["getActiveDocuments"] });
+      queryClient.invalidateQueries({ queryKey: ["getInProgressRevision1"] });
     },
-    {
-      onSuccess: () => {
-        snackBarSuccess("Document updated successfully");
-      },
-      onError: () => {
-        snackBarError("Error updating document");
-      },
-    }
-  );
+    onError: () => {
+      snackBarError("Error updating document");
+    },
+  });
+};
 
 export const useGenerateDocumentPartNumber = (
   docTypeId: number | null,

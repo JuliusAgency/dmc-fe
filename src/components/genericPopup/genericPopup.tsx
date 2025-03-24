@@ -12,6 +12,7 @@ interface GenericPopupProps {
   title: string;
   children: React.ReactNode;
   onConfirm?: () => void;
+  onCancel?: () => void;
   confirmButtonText?: string;
   cancelButtonText?: string;
 }
@@ -22,6 +23,7 @@ export const GenericPopup = ({
   title,
   children,
   onConfirm,
+  onCancel,
   confirmButtonText = "Confirm",
   cancelButtonText = "Cancel",
 }: GenericPopupProps) => {
@@ -30,7 +32,7 @@ export const GenericPopup = ({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{cancelButtonText}</Button>
+        <Button onClick={onCancel ?? onClose}>{cancelButtonText}</Button>
         {onConfirm && (
           <Button variant="contained" onClick={onConfirm}>
             {confirmButtonText}
