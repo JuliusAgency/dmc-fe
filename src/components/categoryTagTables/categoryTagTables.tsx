@@ -1,6 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { IconButton } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import { IconButton, TextField } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
 import { Category } from "../../api/categoryAPI/types";
@@ -79,21 +81,68 @@ export const TagTable = ({
   tags,
   loading,
   onDelete,
+  onEdit,
 }: {
   tags: Tag[];
   loading: boolean;
   onDelete: (id: number) => void;
+  onEdit: (id: number, name: string) => void;
 }) => {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState("");
+
+  const handleStartEdit = (id: number, currentName: string) => {
+    setEditingId(id);
+    setEditValue(currentName);
+  };
+
+  const handleSave = (id: number) => {
+    onEdit(id, editValue);
+    setEditingId(null);
+    setEditValue("");
+  };
+
   const tagColumns: GridColDef[] = [
-    { field: "name", headerName: "Tag Name", flex: 1 },
+    {
+      field: "name",
+      headerName: "Tag Name",
+      flex: 1,
+      renderCell: (params) =>
+        editingId === params.row.id ? (
+          <TextField
+            size="small"
+            value={editValue}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEditValue(e.target.value)
+            }
+            autoFocus
+            fullWidth
+          />
+        ) : (
+          params.row.name
+        ),
+    },
     {
       field: "actions",
       headerName: "Actions",
       flex: 0.3,
       renderCell: (params) => (
-        <IconButton onClick={() => onDelete(params.row.id)} disabled={true}>
-          <DeleteIcon fontSize="small" />
-        </IconButton>
+        <>
+          {editingId === params.row.id ? (
+            <IconButton onClick={() => handleSave(params.row.id)}>
+              <SaveIcon fontSize="small" />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => handleStartEdit(params.row.id, params.row.name)}
+            >
+              <EditIcon fontSize="small" />
+            </IconButton>
+          )}
+          <IconButton onClick={() => onDelete(params.row.id)}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </>
       ),
     },
   ];

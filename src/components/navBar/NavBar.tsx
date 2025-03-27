@@ -1,35 +1,34 @@
-import React, { useState } from "react";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
   Box,
-  Menu,
-  MenuItem,
-  useMediaQuery,
-  useTheme,
+  Button,
+  CircularProgress,
+  ClickAwayListener,
+  Divider,
   Drawer,
+  Grow,
+  IconButton,
+  InputBase,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  CircularProgress,
-  InputBase,
-  alpha,
-  Popper,
+  Menu,
+  MenuItem,
   Paper,
-  Grow,
-  ClickAwayListener,
+  Popper,
+  Toolbar,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SearchIcon from "@mui/icons-material/Search";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
 
 export type MenuItem = {

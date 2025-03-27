@@ -8,6 +8,7 @@ import {
   useGetAllTags,
   useCreateTag,
   useDeleteTag,
+  useEditTag,
 } from "../../../../hooks/tag/tagHooks";
 import {
   CategoryTable,
@@ -28,6 +29,7 @@ export const ManageCategories = () => {
   const createTagMutation = useCreateTag();
   const deleteCategoryMutation = useDeleteCategory();
   const deleteTagMutation = useDeleteTag();
+  const editTagMutation = useEditTag();
 
   return (
     <Container sx={{ direction: "ltr", textAlign: "left" }}>
@@ -58,6 +60,7 @@ export const ManageCategories = () => {
               tags={tags}
               loading={loadingTags}
               onDelete={deleteTagMutation.mutate}
+              onEdit={(id, name) => editTagMutation.mutate({ id, name })}
             />
           </Paper>
         </Grid>

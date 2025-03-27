@@ -54,11 +54,15 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       loginMutation.mutate(values, {
         onSuccess: (response: any) => {
           dispatch(setUser(response.user));
-          if (values.rememberMe) {
-            localStorage.setItem("user", JSON.stringify(response.user));
-          } else {
-            localStorage.removeItem("user");
-          }
+
+          localStorage.setItem("user", JSON.stringify(response.user));
+
+          // if (values.rememberMe) {
+          //   localStorage.setItem("user", JSON.stringify(response.user));
+          // } else {
+          //   localStorage.removeItem("user");
+          // }
+
           onSuccess();
           navigate("/home");
         },
