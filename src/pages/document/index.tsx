@@ -339,29 +339,13 @@ export const Document = () => {
         }
       />
 
-      <Dialog
-        open={isHistoryDialogOpen}
-        onClose={() => setIsHistoryDialogOpen(false)}
-        fullScreen
-      >
-        <DialogTitle>Document History</DialogTitle>
-        <DialogContent
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            height: "100%",
-            overflow: "hidden",
-            p: 0,
-          }}
-        >
-          {selectedDocumentPartNumber && (
-            <DocumentHistory
-              documentPartNumber={selectedDocumentPartNumber}
-              onClose={() => setIsHistoryDialogOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {isHistoryDialogOpen && selectedDocumentPartNumber && (
+        <DocumentHistory
+          open={isHistoryDialogOpen}
+          onClose={() => setIsHistoryDialogOpen(false)}
+          documentPartNumber={selectedDocumentPartNumber}
+        />
+      )}
 
       {selectedDocument && (
         <DisplaySignatures

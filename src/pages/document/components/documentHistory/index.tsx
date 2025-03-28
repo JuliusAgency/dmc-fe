@@ -5,20 +5,28 @@ import { GenericTable } from "../../../../components/genericTable/genericTable";
 import { useGetAllDocuments } from "../../../../hooks/document/documentHooks";
 import { DocumentType } from "../../../../api/documentAPI/types";
 import { PaginationModel } from "../../../../consts/types";
-import { BUTTON_CLOSE, ARCHIVED_DOCUMENTS, getActionColumn } from "./constants";
+import {
+  BUTTON_CLOSE,
+  ARCHIVED_DOCUMENTS,
+  getActionColumn,
+  DOCUMENT_HISTORY_TITLE,
+} from "./constants";
 import { useFileDownload } from "../../../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../../../consts/config.ts";
 import { useColumns } from "../../useColumns.tsx";
 import { DisplaySignatures } from "../displaySignatures";
+import { GenericPopup } from "../../../../components/genericPopup/genericPopup.tsx";
 
 interface DocumentHistoryProps {
   onClose: () => void;
   documentPartNumber: string;
+  open: boolean;
 }
 
 export const DocumentHistory = ({
   onClose,
   documentPartNumber,
+  open,
 }: DocumentHistoryProps) => {
   const [historyRows, setHistoryRows] = useState<DocumentType[]>([]);
   const { id: categoryId } = useParams();
@@ -35,10 +43,7 @@ export const DocumentHistory = ({
   const { handleDownloadFile } = useFileDownload();
 
   const handleViewFile = (fileName: string) => {
-    if (!fileName) {
-      return;
-    }
-
+    if (!fileName) return;
     const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
     window.open(fileUrl, "_blank");
   };
@@ -79,46 +84,46 @@ export const DocumentHistory = ({
   const COLUMNS = useColumns(handleOpenSignatures);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        flex: 1,
-        width: "100%",
-        height: "100%",
-        overflow: "auto",
-        p: 2,
-      }}
+    <GenericPopup
+      open={open}
+      onClose={onClose}
+      title={DOCUMENT_HISTORY_TITLE}
+      cancelButtonText={BUTTON_CLOSE}
     >
-      <Grid container justifyContent="space-between" sx={{ mb: 2 }}>
-        <Button variant="outlined" onClick={onClose}>
-          {BUTTON_CLOSE}
-        </Button>
-      </Grid>
-
-      <GenericTable
-        loading={documentsQuery.isLoading ?? false}
-        columns={[...COLUMNS, ACTION_COLUMN]}
-        pageSize={pagination.pageSize}
-        onPaginationModelChange={setPagination}
+      <Box
         sx={{
-          width: "98%",
-          height: "100%",
-          border: "none",
-          minWidth: "unset",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          width: "100%",
+          height: "70vh",
+          overflow: "auto",
         }}
-        rowCount={documentsQuery?.data?.total ?? 0}
-        rows={historyRows}
-      />
-
-      {selectedDocument && (
-        <DisplaySignatures
-          open={Boolean(selectedDocument)}
-          onClose={handleCloseSignatures}
-          documentId={selectedDocument.id}
-          signatures={selectedDocument.signatures || []}
+      >
+        <GenericTable
+          loading={documentsQuery.isLoading ?? false}
+          columns={[...COLUMNS, ACTION_COLUMN]}
+          pageSize={pagination.pageSize}
+          onPaginationModelChange={setPagination}
+          sx={{
+            width: "98%",
+            height: "100%",
+            border: "none",
+            minWidth: "unset",
+          }}
+          rowCount={documentsQuery?.data?.total ?? 0}
+          rows={historyRows}
         />
-      )}
-    </Box>
+
+        {selectedDocument && (
+          <DisplaySignatures
+            open={Boolean(selectedDocument)}
+            onClose={handleCloseSignatures}
+            documentId={selectedDocument.id}
+            signatures={selectedDocument.signatures || []}
+          />
+        )}
+      </Box>
+    </GenericPopup>
   );
 };

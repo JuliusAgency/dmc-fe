@@ -8,6 +8,8 @@ export const BUTTON_CLOSE = "Close";
 export const ARCHIVED_DOCUMENTS = (documentPartNumber: string) =>
   `getArchivedDocuments-${documentPartNumber}`;
 
+export const DOCUMENT_HISTORY_TITLE = "Document History";
+
 export const getActionColumn = (
   handleDownloadFile: (fileName: string) => void,
   handleViewFile: (fileName: string) => void
