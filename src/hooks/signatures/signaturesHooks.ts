@@ -68,10 +68,12 @@ export const useRejectSignature = () => {
     mutationFn: ({
       documentId,
       userId,
+      rejectReason,
     }: {
       documentId: number;
       userId: number;
-    }) => rejectSignature(documentId, userId),
+      rejectReason: string;
+    }) => rejectSignature(documentId, userId, rejectReason),
     onSuccess: (_, { documentId }) => {
       queryClient.invalidateQueries({
         queryKey: ["getSignatures", documentId],

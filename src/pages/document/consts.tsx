@@ -102,7 +102,7 @@ export const useColumns = (): GridColDef[] => {
       editable: true,
       type: "string",
       valueGetter: (params: any) => {
-        return params?.name ?? "Not Assigned";
+        return params?.value?.name ?? "Not Assigned";
       },
     },
     {
