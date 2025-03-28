@@ -5,15 +5,11 @@ import { GenericTable } from "../../../../components/genericTable/genericTable";
 import { useGetAllDocuments } from "../../../../hooks/document/documentHooks";
 import { DocumentType } from "../../../../api/documentAPI/types";
 import { PaginationModel } from "../../../../consts/types";
-import {
-  BUTTON_CLOSE,
-  ARCHIVED_DOCUMENTS,
-  SIGNATURES_COLUMN,
-  getActionColumn,
-} from "./constants";
+import { BUTTON_CLOSE, ARCHIVED_DOCUMENTS, getActionColumn } from "./constants";
 import { useFileDownload } from "../../../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../../../consts/config.ts";
-import { useColumns } from "../../consts.tsx";
+import { useColumns } from "../../useColumns.tsx";
+import { DisplaySignatures } from "../displaySignatures";
 
 interface DocumentHistoryProps {
   onClose: () => void;
@@ -31,6 +27,10 @@ export const DocumentHistory = ({
     pageSize: 10,
     page: 0,
   });
+
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(
+    null
+  );
 
   const { handleDownloadFile } = useFileDownload();
 
@@ -61,6 +61,14 @@ export const DocumentHistory = ({
     ARCHIVED_DOCUMENTS(documentPartNumber)
   );
 
+  const handleOpenSignatures = (doc: DocumentType) => {
+    setSelectedDocument(doc);
+  };
+
+  const handleCloseSignatures = () => {
+    setSelectedDocument(null);
+  };
+
   useEffect(() => {
     if (documentsQuery.data?.data) {
       setHistoryRows(documentsQuery.data.data);
@@ -68,7 +76,7 @@ export const DocumentHistory = ({
   }, [documentsQuery.data]);
 
   const ACTION_COLUMN = getActionColumn(handleDownloadFile, handleViewFile);
-  const COLUMNS = useColumns();
+  const COLUMNS = useColumns(handleOpenSignatures);
 
   return (
     <Box
@@ -90,7 +98,7 @@ export const DocumentHistory = ({
 
       <GenericTable
         loading={documentsQuery.isLoading ?? false}
-        columns={[...COLUMNS, SIGNATURES_COLUMN, ACTION_COLUMN]}
+        columns={[...COLUMNS, ACTION_COLUMN]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
         sx={{
@@ -102,6 +110,15 @@ export const DocumentHistory = ({
         rowCount={documentsQuery?.data?.total ?? 0}
         rows={historyRows}
       />
+
+      {selectedDocument && (
+        <DisplaySignatures
+          open={Boolean(selectedDocument)}
+          onClose={handleCloseSignatures}
+          documentId={selectedDocument.id}
+          signatures={selectedDocument.signatures || []}
+        />
+      )}
     </Box>
   );
 };

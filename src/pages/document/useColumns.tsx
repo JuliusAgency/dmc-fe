@@ -4,7 +4,8 @@ import { Classification, FileType } from "../../api/documentAPI/types";
 import { GridEditSingleSelectCell } from "@mui/x-data-grid-pro";
 import { useGetUsers } from "../../hooks/user/userHooks";
 import { useMemo } from "react";
-import { Chip } from "@mui/material";
+import { Chip, Button } from "@mui/material";
+import { DocumentType } from "../../api/documentAPI/types";
 
 export enum DocumentStatus {
   DRAFT = "DRAFT",
@@ -13,7 +14,9 @@ export enum DocumentStatus {
   ARCHIVED = "ARCHIVED",
 }
 
-export const useColumns = (): GridColDef[] => {
+export const useColumns = (
+  onOpenSignatures: (doc: DocumentType) => void
+): GridColDef[] => {
   const { data: users } = useGetUsers();
 
   const userOptions = useMemo(() => {
@@ -156,6 +159,11 @@ export const useColumns = (): GridColDef[] => {
       headerAlign: "center",
       align: "center",
       flex: 1,
+      renderCell: (params) => (
+        <Button variant="text" onClick={() => onOpenSignatures(params.row)}>
+          {params.value}
+        </Button>
+      ),
     },
     {
       field: "type",

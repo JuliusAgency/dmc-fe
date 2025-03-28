@@ -22,6 +22,7 @@ export interface DocumentType {
   tags: DocumentTag[] | Tag[];
   department: string;
   nextReview: Date;
+  signatures: DocumentSignature[];
 }
 
 export enum FileType {
@@ -48,6 +49,12 @@ export enum UserRole {
   SYSTEM_ADMIN = "SYSTEM_ADMIN",
 }
 
+export enum SignatureStatus {
+  USER = "PENDING",
+  ADMIN = "SIGNED",
+  SYSTEM_ADMIN = "REJECTED",
+}
+
 export interface User {
   id: number;
   name: string;
@@ -59,6 +66,16 @@ export interface DocumentTag {
   tagId: number;
   documentId: number;
   tag: Tag;
+}
+
+export interface DocumentSignature {
+  id: number;
+  documentId: number;
+  document: DocumentType;
+  userId: number;
+  user: User;
+  status: SignatureStatus;
+  signedAt: Date;
 }
 
 export type GetAllDocumentsResponse = { data: DocumentType[]; total: number };

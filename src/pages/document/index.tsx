@@ -1,12 +1,12 @@
 import { GenericTable } from "../../components/genericTable/genericTable";
-import { useColumns } from "./consts.tsx";
+import { useColumns } from "./useColumns.tsx";
 import {
   useGetAllDocuments,
   useUpdateDocument,
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
 import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
@@ -26,12 +26,11 @@ import { CONFIG } from "../../consts/config.ts";
 import { snackBarInfo } from "../../components/toast/Toast";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { GridRowId } from "@mui/x-data-grid-pro";
+import { DisplaySignatures } from "./components/displaySignatures";
 
 export const Document = () => {
-  const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
   const { handleDownloadFile } = useFileDownload();
-  const theme = useTheme();
 
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 15,
@@ -54,6 +53,10 @@ export const Document = () => {
     GridRowId[]
   >([]);
 
+  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(
+    null
+  );
+
   const storedUser = localStorage.getItem("user");
   const user =
     useSelector((state: any) => state.user.user) ||
@@ -65,7 +68,14 @@ export const Document = () => {
       status: ["APPROVED"],
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "processOwner"],
+    [
+      "tags",
+      "tags.tag",
+      "category",
+      "processOwner",
+      "signatures",
+      "signatures.user",
+    ],
     "getActiveDocuments"
   );
 
@@ -76,7 +86,14 @@ export const Document = () => {
       revision: 1,
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "processOwner"],
+    [
+      "tags",
+      "tags.tag",
+      "category",
+      "processOwner",
+      "signatures",
+      "signatures.user",
+    ],
     "getInProgressRevision1"
   );
 
@@ -87,7 +104,14 @@ export const Document = () => {
       revision: 1,
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "processOwner"],
+    [
+      "tags",
+      "tags.tag",
+      "category",
+      "processOwner",
+      "signatures",
+      "signatures.user",
+    ],
     "getDraftRevision1"
   );
 
@@ -163,6 +187,16 @@ export const Document = () => {
       return oldRow;
     }
   };
+
+  const handleOpenSignatures = (doc: DocumentType) => {
+    setSelectedDocument(doc);
+  };
+
+  const handleCloseSignatures = () => {
+    setSelectedDocument(null);
+  };
+
+  const COLUMNS = useColumns(handleOpenSignatures);
 
   const approvedDocs = approvedDocsQuery.data?.data ?? [];
   const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
@@ -328,6 +362,15 @@ export const Document = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {selectedDocument && (
+        <DisplaySignatures
+          open={Boolean(selectedDocument)}
+          onClose={handleCloseSignatures}
+          documentId={selectedDocument.id}
+          signatures={selectedDocument.signatures || []}
+        />
+      )}
     </Box>
   );
 };

@@ -18,6 +18,7 @@ import {
   snackBarError,
   snackBarSuccess,
 } from "../../components/toast/Toast.tsx";
+import { DocumentType } from "../../api/documentAPI/types.ts";
 
 export const useGetAllDocuments = (
   headers: PaginationModel,

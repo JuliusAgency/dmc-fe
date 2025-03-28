@@ -3,6 +3,7 @@ import { API } from "../API.ts";
 import { DocumentEndpoints } from "./consts.ts";
 import { GetAllDocumentsResponse } from "./types.ts";
 import { DocumentFilters } from "../../pages/document/types.ts";
+import { DocumentType } from "./types.ts";
 
 export const getAllDocuments = async (
   headers: PaginationModel,

@@ -48,24 +48,3 @@ export const getActionColumn = (
     },
   } as GridColDef;
 };
-
-export const SIGNATURES_COLUMN: GridColDef = {
-  field: "signatures",
-  headerName: "Signatures",
-  headerAlign: "center",
-  width: 300,
-  align: "center",
-  renderCell: ({ row }) => {
-    if (!row.signatures || row.signatures.length === 0) return "No signatures";
-
-    return (
-      <Box display="flex" flexDirection="column">
-        {row.signatures.map((sig: any) => (
-          <Box key={sig.id}>
-            {sig.user.email} - {new Date(sig.signedAt).toLocaleDateString()}
-          </Box>
-        ))}
-      </Box>
-    );
-  },
-};
