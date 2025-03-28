@@ -140,6 +140,7 @@ export const useColumns = (): GridColDef[] => {
       headerAlign: "center",
       align: "center",
       flex: 0.7,
+      editable: true,
     },
     {
       field: "published",
