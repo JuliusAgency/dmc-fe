@@ -20,8 +20,8 @@ export const signDocument = async (documentId: number, userId: number) => {
   return API.post(SignatureEndpoints.signDocument(documentId, userId));
 };
 
-export const rejectSignature = async (documentId: number, userId: number) => {
-  return API.post(SignatureEndpoints.rejectSignature(documentId, userId));
+export const rejectSignature = async (documentId: number, userId: number, rejectReason: string) => {
+  return API.post(SignatureEndpoints.rejectSignature(documentId, userId), { rejectReason });
 };
 
 export const getPendingSignatures = async (
