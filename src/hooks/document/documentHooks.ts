@@ -43,7 +43,7 @@ export const useGetFile = (fileName?: string): UseQueryResult<Blob, Error> => {
     refetchOnWindowFocus: false,
     enabled: Boolean(fileName),
     onError: () => {
-      snackBarError("❌ Document download failed!");
+      snackBarError("Document download failed!");
     },
   });
 };
@@ -123,9 +123,9 @@ export const useUpdateDocument = () => {
     onSuccess: () => {
       snackBarSuccess("Document updated successfully");
 
-      // ✅ תוסיפי כאן invalidate לשם הקווארי שלך
-      queryClient.invalidateQueries({ queryKey: ["getActiveDocuments"] });
-      queryClient.invalidateQueries({ queryKey: ["getInProgressRevision1"] });
+      queryClient.refetchQueries(["getActiveDocuments"]);
+      queryClient.refetchQueries(["getInProgressRevision1"]);
+      queryClient.refetchQueries(["getDraftRevision1"]);
     },
     onError: () => {
       snackBarError("Error updating document");
