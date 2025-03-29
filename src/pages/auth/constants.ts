@@ -7,6 +7,11 @@ export const PASSWORD_REQUIRED_ERROR = "Password is required";
 export const PASSWORD_MIN_LENGTH_ERROR = "At least 6 characters";
 export const LOGIN_BUTTON_TEXT = "Login";
 export const LOGIN_ERROR_MESSAGE = "An error occurred";
+export const FORGOT_PASSWORD_TEXT = "Forgot password?";
+export const FORGOT_PASSWORD_INVALID_EMAIL =
+  "Please enter a valid email first.";
+export const FORGOT_PASSWORD_SUCCESS = "Password reset email sent!";
+export const FORGOT_PASSWORD_FAILURE = "Failed to send reset email.";
 export const LOGIN_CONTAINER_STYLES = {
   display: "flex",
   justifyContent: "center",

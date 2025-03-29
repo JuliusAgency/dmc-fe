@@ -11,6 +11,7 @@ import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
 import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
+import ResetPasswordPage from "./pages/auth/components/resetPassword";
 import { useAutoLogout } from "./hooks/utils/useAutoLogout.ts";
 import "./styles.css";
 
@@ -24,6 +25,7 @@ const AuthRoutes = () => {
         path="/login"
         element={<AuthForm type="login" onSuccess={() => navigate("/home")} />}
       />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

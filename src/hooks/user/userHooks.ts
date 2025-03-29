@@ -48,17 +48,25 @@ export const useUpdateUserRole = () => {
   });
 };
 
+type ResetPasswordInput = {
+  email: string;
+  newPassword: string;
+};
+
 export const useResetPassword = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: resetPassword,
+    mutationFn: ({ email, newPassword }: ResetPasswordInput) =>
+      resetPassword({ email, newPassword }),
     onSuccess: () => {
       snackBarSuccess(TOAST_MESSAGES.resetPasswordSuccess);
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
-    onError: () => {
-      snackBarError(TOAST_MESSAGES.resetPasswordError);
+    onError: (error: any) => {
+      snackBarError(
+        error?.response?.data?.message || TOAST_MESSAGES.resetPasswordError
+      );
     },
   });
 };

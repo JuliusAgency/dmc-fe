@@ -25,10 +25,22 @@ import {
   PASSWORD_MIN_LENGTH_ERROR,
   LOGIN_BUTTON_TEXT,
   LOGIN_ERROR_MESSAGE,
+  FORGOT_PASSWORD_TEXT,
+  FORGOT_PASSWORD_INVALID_EMAIL,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_FAILURE,
   LOGIN_CONTAINER_STYLES,
   FORM_BOX_STYLES,
   BUTTON_STYLES,
 } from "./constants";
+import {
+  snackBarError,
+  snackBarSuccess,
+} from "../../components/toast/Toast.tsx";
+import {
+  RESET_PASSWORD_SUBJECT,
+  getResetPasswordText,
+} from "../../templates/mail.templates";
 
 export default function AuthForm({ onSuccess }: AuthFormProps) {
   const dispatch = useDispatch();
@@ -54,20 +66,12 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       loginMutation.mutate(values, {
         onSuccess: (response: any) => {
           dispatch(setUser(response.user));
-
           localStorage.setItem("user", JSON.stringify(response.user));
-
-          // if (values.rememberMe) {
-          //   localStorage.setItem("user", JSON.stringify(response.user));
-          // } else {
-          //   localStorage.removeItem("user");
-          // }
-
           onSuccess();
           navigate("/home");
         },
         onError: (error: any) => {
-          alert(error.response?.data?.message || LOGIN_ERROR_MESSAGE);
+          snackBarError(error?.response?.data?.message || LOGIN_ERROR_MESSAGE);
         },
       });
     },
@@ -77,25 +81,23 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     const email = formik.values.email;
 
     if (!email || !formik.values.email.includes("@")) {
-      alert("Please enter a valid email first.");
+      snackBarError(FORGOT_PASSWORD_INVALID_EMAIL);
       return;
     }
 
     sendMailMutation.mutate(
       {
         to: email,
-        subject: "Reset your password",
-        text: `Hi,\nTo reset your password, please click the link below:\nhttp://localhost:5173/reset-password?email=${encodeURIComponent(
-          email
-        )}`,
+        subject: RESET_PASSWORD_SUBJECT,
+        text: getResetPasswordText(email),
         from: "noreply@company.local",
       },
       {
         onSuccess: () => {
-          alert("Password reset email sent!");
+          snackBarSuccess(FORGOT_PASSWORD_SUCCESS);
         },
         onError: (error: any) => {
-          alert(error?.message || "Failed to send reset email.");
+          snackBarError(error?.message || FORGOT_PASSWORD_FAILURE);
           console.error(error);
         },
       }
@@ -116,6 +118,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
               }}
             />
           </Box>
+
           <Typography
             variant="h4"
             align="center"
@@ -133,6 +136,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
             fullWidth
             sx={{ mb: 2 }}
           />
+
           <TextField
             label={PASSWORD_LABEL}
             type="password"
@@ -164,15 +168,15 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           >
             {LOGIN_BUTTON_TEXT}
           </Button>
-          {/* 
+
           <Button
             variant="text"
             onClick={handleForgotPassword}
             fullWidth
             sx={{ mt: 1, textTransform: "none" }}
           >
-            Forgot password?
-          </Button> */}
+            {FORGOT_PASSWORD_TEXT}
+          </Button>
         </Box>
       </Container>
     </Box>
