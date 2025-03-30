@@ -61,16 +61,15 @@ export const CategoryTable = ({
         rows={categories}
         rowCount={categories.length}
         pageSize={10}
+        hideFooterPagination
         onPaginationModelChange={() => {}}
         sx={{ height: "auto", mt: 2 }}
-        hideFooterPagination={true}
       />
-
       {selectedCategory && (
         <SubCategoryModal
           open={modalOpen}
           onClose={handleCloseModal}
-          category={selectedCategory}
+          initialCategory={selectedCategory}
         />
       )}
     </>

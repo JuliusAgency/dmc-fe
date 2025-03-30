@@ -119,9 +119,9 @@ export const useDeleteDocument = (): UseMutationResult<
       onSuccess: () => {
         snackBarSuccess(DOCUMENT_DELETE_SUCCESS);
 
-        queryClient.refetchQueries({ queryKey: ["getActiveDocuments"] });
-        queryClient.refetchQueries({ queryKey: ["getInProgressRevision1"] });
-        queryClient.refetchQueries({ queryKey: ["getDraftRevision1"] });
+        queryClient.refetchQueries({ queryKey: ["approvedDocs"] });
+        queryClient.refetchQueries({ queryKey: ["inProgressDocs"] });
+        queryClient.refetchQueries({ queryKey: ["draftDocs"] });
       },
       onError: () => {
         snackBarError(DOCUMENT_DELETE_ERROR);
@@ -145,9 +145,9 @@ export const useUpdateDocument = () => {
     }) => updateDocumentField(id, field, value),
     onSuccess: () => {
       snackBarSuccess(DOCUMENT_UPDATE_SUCCESS);
-      queryClient.refetchQueries(["getActiveDocuments"]);
-      queryClient.refetchQueries(["getInProgressRevision1"]);
-      queryClient.refetchQueries(["getDraftRevision1"]);
+      queryClient.refetchQueries({ queryKey: ["approvedDocs"] });
+      queryClient.refetchQueries({ queryKey: ["inProgressDocs"] });
+      queryClient.refetchQueries({ queryKey: ["draftDocs"] });
     },
     onError: () => {
       snackBarError(DOCUMENT_UPDATE_ERROR);

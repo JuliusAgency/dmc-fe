@@ -16,7 +16,7 @@ import {
   snackBarError,
   snackBarSuccess,
 } from "../../../../components/toast/Toast.tsx";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   CLASSIFICATION_OPTIONS,
   FILE_TYPE_OPTIONS,
@@ -70,7 +70,14 @@ export const AddDocument = ({
     formData.docType?.name || null
   );
 
-  const { id: categoryId } = useParams();
+  const location = useLocation();
+  const pathSegments = location.pathname
+    .replace("/category/", "")
+    .split("/")
+    .filter(Boolean);
+
+  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditingRef = useRef(!!documentToEdit);
 

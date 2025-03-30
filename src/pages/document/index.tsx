@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { GridRowId } from "@mui/x-data-grid-pro";
@@ -31,7 +31,14 @@ import { DocumentType } from "../../api/documentAPI/types";
 
 export const Document = () => {
   const theme = useTheme();
-  const { id: categoryId } = useParams();
+  const location = useLocation();
+  const pathSegments = location.pathname
+    .replace("/category/", "")
+    .split("/")
+    .filter(Boolean);
+
+  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+
   const { handleDownloadFile } = useFileDownload();
 
   const [pagination, setPagination] = useState<PaginationModel>({

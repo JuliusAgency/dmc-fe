@@ -14,6 +14,7 @@ import { HomePage } from "./pages/home";
 import { ResetPasswordPage } from "./pages/auth/components/resetPassword";
 import { ReportsPage } from "./pages/report";
 import { AuditTrailPage } from "./pages/auditTrail";
+import { CategoryLevelPage } from "./pages/categoryLevelPage";
 import { useAutoLogout } from "./hooks/utils/useAutoLogout.ts";
 import "./styles.css";
 
@@ -45,7 +46,7 @@ const MainRoutes = () => {
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/audit-trail" element={<AuditTrailPage />} />
         {/* TODO: implement category page */}
-        <Route path="/category/:id" element={<Document key="category" />} />
+        <Route path="/category/*" element={<CategoryLevelPage />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="*" element={<Navigate to="/home" replace />} />
       </Route>
