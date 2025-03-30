@@ -37,7 +37,8 @@ export const Document = () => {
     .split("/")
     .filter(Boolean);
 
-  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+  const categoryId =
+    pathSegments.length <= 6 ? pathSegments[pathSegments.length - 1] : null;
 
   const { handleDownloadFile } = useFileDownload();
 
@@ -209,8 +210,6 @@ export const Document = () => {
     (approvedQuery.data?.total ?? 0) +
     (inProgressQuery.data?.total ?? 0) +
     (draftQuery.data?.total ?? 0);
-
-  console.log(allDocs);
 
   return (
     <Box sx={{ width: "100%", height: "92vh", padding: 2 }}>

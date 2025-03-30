@@ -47,7 +47,7 @@ export function NavBar({
 }: {
   menuItems: MenuItem[];
   loading?: boolean;
-  onSearch?: (query: string) => void;
+  onSearch?: (query: string, categoryId?: number | null) => void;
 }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -93,17 +93,6 @@ export function NavBar({
     setMobileOpen(!mobileOpen);
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (onSearch && searchQuery.trim()) {
-      onSearch(searchQuery.trim());
-    }
-  };
-
   // Mobile drawer content
   // Mobile drawer content
   const drawer = (
@@ -120,7 +109,6 @@ export function NavBar({
       </Box>
       <Box
         component="form"
-        onSubmit={handleSearchSubmit}
         sx={{
           display: "flex",
           alignItems: "center",
@@ -136,7 +124,6 @@ export function NavBar({
           placeholder="Search…"
           inputProps={{ "aria-label": "search" }}
           value={searchQuery}
-          onChange={handleSearchChange}
         />
         <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
           <SearchIcon />

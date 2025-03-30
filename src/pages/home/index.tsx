@@ -9,6 +9,8 @@ import {
   useGetHomeAnnouncements,
 } from "../../hooks/home/homeHooks";
 import { BulletinBoard } from "./components/BulletinBoard";
+import { SearchBar } from "../../components/search/SearchBar";
+import { useNavigate } from "react-router-dom";
 
 export const HomePage = () => {
   const {
@@ -21,6 +23,11 @@ export const HomePage = () => {
     useGetHomeAnnouncements();
 
   const imageUrl = homeImages?.imageUrl || "";
+  const navigate = useNavigate();
+
+  const handleSearch = (query: string) => {
+    navigate(`/documents?query=${encodeURIComponent(query)}`);
+  };
 
   if (loadingImages || loadingAnnouncements) {
     return <Typography>{LOADING_TEXT}</Typography>;
@@ -38,11 +45,21 @@ export const HomePage = () => {
             width: 300,
             ml: 4,
             flexShrink: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
           }}
         >
+          <SearchBar onSearch={handleSearch} />
           <BulletinBoard />
         </Box>
-        <Box flex={1} display="flex" justifyContent="center">
+
+        <Box
+          flex={1}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
           {imageUrl ? (
             <Box
               component="img"

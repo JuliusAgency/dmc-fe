@@ -22,7 +22,7 @@ import { useSearch } from "../../hooks/search/searchHooks";
 import { getNameFromSearchResult, getUrlFromSearchResult } from "./utils";
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, categoryId?: number | null) => void;
   placeholder?: string;
   fullWidth?: boolean;
 }
@@ -38,16 +38,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const [isResultsOpen, setIsResultsOpen] = useState(false);
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  // Use the search hook with the debounced query
+  const pathSegments = location.pathname
+    .replace("/category/", "")
+    .split("/")
+    .filter(Boolean);
+
+  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+
   const {
     data: searchResultsData,
     isLoading,
     isError,
-  } = useSearch(debouncedQuery);
+  } = useSearch(debouncedQuery, Number(categoryId));
 
   const searchResults = searchResultsData?.data;
 
-  // Debounce the search query
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery.trim()) {
@@ -57,12 +62,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         setDebouncedQuery("");
         setIsResultsOpen(false);
       }
-    }, 1000); // 1 second debounce
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Close results when clicking outside
   const handleClickAway = () => {
     setIsResultsOpen(false);
   };
@@ -77,7 +81,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchQuery.trim()) {
-      onSearch(searchQuery.trim());
+      onSearch(searchQuery.trim(), Number(categoryId));
       setIsResultsOpen(false);
     }
   };
@@ -146,7 +150,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           )}
         </Box>
 
-        {/* Search Results Popper */}
         <Popper
           open={isResultsOpen && !!debouncedQuery}
           anchorEl={anchorRef.current}

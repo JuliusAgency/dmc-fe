@@ -4,4 +4,5 @@ export interface DocumentFilters {
   documentPartNumber: string;
   status: string[];
   revision: number;
+  query: string;
 }

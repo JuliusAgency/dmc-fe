@@ -75,6 +75,21 @@ export const getAllDocuments = async (
         },
       },
     ],
+    [
+      "query",
+      {
+        description: "query",
+        action: () => {
+          const query = filters["query"];
+          if (query) {
+            transformedFilters = {
+              ...transformedFilters,
+              query,
+            };
+          }
+        },
+      },
+    ],
   ]);
 
   Object.keys(filters).forEach((field) => {
