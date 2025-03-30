@@ -20,6 +20,8 @@ export interface DocumentType {
   category: Category;
   secretLevel: SecretLevel;
   tags: DocumentTag[] | Tag[];
+  department: string;
+  nextReview: Date;
 }
 
 export enum FileType {
@@ -29,13 +31,15 @@ export enum FileType {
   PPTX = "PPTX",
   PNG = "PNG",
   JPG = "JPG",
+  EXCEL = "EXCEL",
+  WORD = "WORD",
 }
 
 export enum Classification {
-  PUBLIC = "Public",
-  INTERNAL = "Internal",
-  CONFIDENTIAL = "Confidential",
-  SECRET = "Secret",
+  PUBLIC = "PUBLIC",
+  INTERNAL = "INTERNAL",
+  CONFIDENTIAL = "CONFIDENTIAL",
+  SECRET = "SECRET",
 }
 
 export enum UserRole {

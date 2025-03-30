@@ -18,10 +18,16 @@ export const updateUserRole = async (userId: string, role: string) => {
   return API.put(userEndpoints.updateUserRole(userId), { role });
 };
 
-export const resetPassword = async (userId: string) => {
-  return API.post(
-    userEndpoints.resetPassword(userId),
-    {},
+export const resetPassword = async ({
+  userId,
+  newPassword,
+}: {
+  userId: string;
+  newPassword: string;
+}) => {
+  return API.put(
+    userEndpoints.resetPassword,
+    { userId: Number(userId), newPassword },
     { withCredentials: true }
   );
 };

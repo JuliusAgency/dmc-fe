@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import {
   DataGridPro,
   GridRowId,
@@ -8,6 +8,7 @@ import {
 import Box from "@mui/material/Box";
 import { GenericTableProps } from "./types.ts";
 import { GridRowParams } from "@mui/x-data-grid";
+import { useTheme, alpha } from "@mui/material";
 
 export const GenericTable = ({
   columns,
@@ -24,6 +25,10 @@ export const GenericTable = ({
   disableColumnMenu = false,
   disableColumnFilter = false,
   disableColumnSelector = false,
+  processRowUpdate,
+  detailPanelExpandedRowIds = [],
+  setDetailPanelExpandedRowIds,
+  onTryExpandRow,
 }: GenericTableProps) => {
   const initialState = useMemo(
     () => ({
@@ -37,19 +42,27 @@ export const GenericTable = ({
     [initialPage, pageSize]
   );
 
-  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
-    GridRowId[]
-  >([]);
+  const theme = useTheme();
 
   const handleDetailPanelExpandedRowIdsChange = useCallback(
-    (newIds: GridRowId[]) => {
-      setDetailPanelExpandedRowIds([newIds[newIds.length - 1]]);
+    async (newIds: GridRowId[]) => {
+      const lastId = newIds[newIds.length - 1];
+
+      if (onTryExpandRow) {
+        const allow = await onTryExpandRow({ id: Number(lastId) });
+        if (!allow) {
+          setDetailPanelExpandedRowIds?.([]);
+          return;
+        }
+      }
+
+      setDetailPanelExpandedRowIds?.([lastId]);
     },
-    []
+    [onTryExpandRow, setDetailPanelExpandedRowIds]
   );
 
   return (
-    <Box sx={{ width: "95%", height: "70vh", ...sx }}>
+    <Box sx={{ width: "100%", height: "100vh", ...sx }}>
       <DataGridPro
         onPaginationModelChange={onPaginationModelChange}
         loading={loading}
@@ -57,11 +70,12 @@ export const GenericTable = ({
         columns={columns}
         paginationMode="server"
         rowCount={rowCount}
-        pageSizeOptions={[5, 10, 25]}
+        pageSizeOptions={[5, 10, 15, 20]}
         initialState={initialState}
         disableRowSelectionOnClick
         pagination
         hideFooterPagination={hideFooterPagination}
+        processRowUpdate={processRowUpdate}
         getDetailPanelHeight={
           getDetailPanelHeight
             ? (params: GridRowParams) => getDetailPanelHeight(params)
@@ -77,10 +91,49 @@ export const GenericTable = ({
           handleDetailPanelExpandedRowIdsChange
         }
         sx={{
-          "& .MuiDataGrid-footerContainer": {
-            justifyContent: "flex-start",
+          height: "100%",
+          mb: 2,
+          width: "100%",
+          "& .MuiDataGrid-root": {
+            border: "none",
+            fontSize: "0.75rem",
           },
-          ...sx,
+          "& .MuiDataGrid-cell": {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "2px 4px",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+            color: theme.palette.primary.main,
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            padding: "2px 4px",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row:nth-of-type(even)": {
+            backgroundColor: alpha(theme.palette.background.default, 0.4),
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: alpha(theme.palette.primary.light, 0.1),
+          },
+          "& .actionColumn": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiTablePagination-root": {
+            fontSize: "0.75rem",
+          },
         }}
         slots={{
           toolbar: () => (

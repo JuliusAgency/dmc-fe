@@ -63,7 +63,7 @@ export default function ManageHomePage() {
         <IconButton
           onClick={() => deleteAnnouncementMutation.mutate(params.row.id)}
         >
-          <DeleteIcon fontSize="small" />
+          <DeleteIcon fontSize="small" sx={{ color: "red" }} />
         </IconButton>
       ),
     },

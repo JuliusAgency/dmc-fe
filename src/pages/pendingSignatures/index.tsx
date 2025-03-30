@@ -6,6 +6,11 @@ import {
   Typography,
   Grid,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
@@ -42,6 +47,11 @@ export const PendingSignatures = () => {
   const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
     null
   );
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [pendingRejectDocumentId, setPendingRejectDocumentId] = useState<
+    number | null
+  >(null);
 
   const fileQuery = useGetFile(fileNameToDownload ?? "");
 
@@ -63,9 +73,29 @@ export const PendingSignatures = () => {
     refetch();
   };
 
-  const handleReject = async (documentId: number) => {
-    await rejectMutation.mutateAsync({ documentId, userId: user?.id });
-    refetch();
+  const handleRejectClick = (documentId: number) => {
+    setPendingRejectDocumentId(documentId);
+    setRejectDialogOpen(true);
+  };
+
+  const handleRejectConfirm = async () => {
+    if (pendingRejectDocumentId && rejectReason.trim()) {
+      await rejectMutation.mutateAsync({
+        documentId: pendingRejectDocumentId,
+        userId: user?.id,
+        rejectReason: rejectReason.trim(),
+      });
+      setRejectDialogOpen(false);
+      setRejectReason("");
+      setPendingRejectDocumentId(null);
+      refetch();
+    }
+  };
+
+  const handleRejectCancel = () => {
+    setRejectDialogOpen(false);
+    setRejectReason("");
+    setPendingRejectDocumentId(null);
   };
 
   const handleDownload = (fileName: string) => {
@@ -115,7 +145,7 @@ export const PendingSignatures = () => {
                     <Button
                       variant="outlined"
                       color="error"
-                      onClick={() => handleReject(signature.documentId)}
+                      onClick={() => handleRejectClick(signature.documentId)}
                       // @ts-ignore
                       disabled={rejectMutation.isLoading}
                     >
@@ -141,6 +171,34 @@ export const PendingSignatures = () => {
           ))}
         </Grid>
       )}
+      <Dialog fullWidth open={rejectDialogOpen} onClose={handleRejectCancel}>
+        <DialogTitle>Reject Document</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Reject Reason"
+            type="text"
+            fullWidth
+            multiline
+            rows={4}
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleRejectCancel} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRejectConfirm}
+            color="error"
+            disabled={!rejectReason.trim()}
+          >
+            Reject
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

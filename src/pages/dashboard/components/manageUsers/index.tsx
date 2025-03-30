@@ -41,10 +41,15 @@ export const ManageUsers = () => {
     role: "USER",
   });
 
+  // 🆕 סטייטים חדשים לסיסמה חדשה
+  const [resetDialog, setResetDialog] = useState(false); // 🆕
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null); // 🆕
+  const [newPassword, setNewPassword] = useState(""); // 🆕
+
   const { data: users = [], isLoading } = useGetUsers();
   const createUserMutation = useCreateUser();
   const updateUserRoleMutation = useUpdateUserRole();
-  const resetPasswordMutation = useResetPassword();
+  const resetPasswordMutation = useResetPassword(); // יש לוודא ש-hook זה תומך בפרמטר סיסמה חדשה
 
   const handleOpenDialog = () => {
     setUserData({ email: "", password: "", role: "USER" });
@@ -61,8 +66,24 @@ export const ManageUsers = () => {
     updateUserRoleMutation.mutate({ userId, newRole });
   };
 
-  const handleResetPassword = (userId: string) => {
-    resetPasswordMutation.mutate(userId);
+  const handleOpenResetDialog = (userId: string) => {
+    setSelectedUserId(userId);
+    setNewPassword("");
+    setResetDialog(true);
+  };
+
+  const handleCloseResetDialog = () => {
+    setSelectedUserId(null);
+    setNewPassword("");
+    setResetDialog(false);
+  };
+
+  const handleResetPassword = () => {
+    if (!selectedUserId || !newPassword) return;
+    resetPasswordMutation.mutate(
+      { userId: selectedUserId, newPassword },
+      { onSuccess: handleCloseResetDialog }
+    );
   };
 
   const columns: GridColDef[] = [
@@ -93,7 +114,7 @@ export const ManageUsers = () => {
       flex: 1,
       renderCell: (params) => (
         <Button
-          onClick={() => handleResetPassword(params.row.id)}
+          onClick={() => handleOpenResetDialog(params.row.id)}
           color="warning"
         >
           {RESET_PASSWORD_BUTTON}
@@ -165,6 +186,24 @@ export const ManageUsers = () => {
             ))}
           </Select>
         </FormControl>
+      </GenericPopup>
+
+      <GenericPopup
+        open={resetDialog}
+        onClose={handleCloseResetDialog}
+        title="Set New Password"
+        onConfirm={handleResetPassword}
+        confirmButtonText="Save"
+        cancelButtonText="Cancel"
+      >
+        <TextField
+          label="New Password"
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          fullWidth
+          margin="dense"
+        />
       </GenericPopup>
     </Container>
   );

@@ -1,4 +1,4 @@
-import { useMutation, UseMutationResult } from "react-query";
+import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import { AxiosError } from "axios";
 import { useQuery, UseQueryResult } from "react-query";
 import {
@@ -9,6 +9,7 @@ import {
   uploadDocument,
   getLastDocumentPartNumber,
   deleteDocument,
+  updateDocumentField,
 } from "../../api/documentAPI/document.ts";
 import { PaginationModel } from "../../consts/types.ts";
 import { GetAllDocumentsResponse } from "../../api/documentAPI/types.ts";
@@ -105,6 +106,32 @@ export const useDeleteDocument = (): UseMutationResult<
       },
     }
   );
+
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      field,
+      value,
+    }: {
+      id: number;
+      field: string;
+      value: any;
+    }) => updateDocumentField(id, field, value),
+    onSuccess: () => {
+      snackBarSuccess("Document updated successfully");
+
+      // ✅ תוסיפי כאן invalidate לשם הקווארי שלך
+      queryClient.invalidateQueries({ queryKey: ["getActiveDocuments"] });
+      queryClient.invalidateQueries({ queryKey: ["getInProgressRevision1"] });
+    },
+    onError: () => {
+      snackBarError("Error updating document");
+    },
+  });
+};
 
 export const useGenerateDocumentPartNumber = (
   docTypeId: number | null,

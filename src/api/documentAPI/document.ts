@@ -11,7 +11,6 @@ export const getAllDocuments = async (
 ): Promise<GetAllDocumentsResponse> => {
   let transformedFilters: Record<string, any> = {};
 
-  console.log("📌 Filters before transformation:", filters);
   const setFilterParams: Map<
     string,
     { description: string; action: () => void }
@@ -142,5 +141,22 @@ export const deleteDocument = async (documentId: number): Promise<void> => {
     await API.delete(DocumentEndpoints.deleteDocument(documentId));
   } catch (error) {
     throw new Error("Failed to delete document");
+  }
+};
+
+export const updateDocumentField = async (
+  documentId: number,
+  field: string,
+  value: Partial<DocumentType>
+): Promise<DocumentType> => {
+  try {
+    const { data } = await API.patch<DocumentType>(
+      DocumentEndpoints.updateDocumentField(documentId, field),
+      { value }
+    );
+
+    return data;
+  } catch (error) {
+    throw new Error("Failed to update document");
   }
 };

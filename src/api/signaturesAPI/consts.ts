@@ -11,3 +11,11 @@ export const SignatureEndpoints = {
   getPendingSignatures: (userId: number) =>
     `/document-signatures/user/${userId}/pending`,
 };
+
+export const SignatureGroupEndpoints = {
+  getAll: "/signature-groups",
+  getById: (id: number) => `/signature-groups/${id}`,
+  create: "/signature-groups",
+  update: (id: number) => `/signature-groups/${id}`,
+  delete: (id: number) => `/signature-groups/${id}`,
+};

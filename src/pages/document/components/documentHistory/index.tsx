@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Grid, Button } from "@mui/material";
-
 import { GenericTable } from "../../../../components/genericTable/genericTable";
 import { useGetAllDocuments } from "../../../../hooks/document/documentHooks";
 import { DocumentType } from "../../../../api/documentAPI/types";
 import { PaginationModel } from "../../../../consts/types";
-
-import { COLUMNS, BUTTON_CLOSE, ARCHIVED_DOCUMENTS } from "./constants";
+import {
+  BUTTON_CLOSE,
+  ARCHIVED_DOCUMENTS,
+  SIGNATURES_COLUMN,
+  getActionColumn,
+} from "./constants";
+import { useFileDownload } from "../../../../hooks/utils/useFileDownload";
+import { CONFIG } from "../../../../consts/config.ts";
+import { useColumns } from "../../consts.tsx";
 
 interface DocumentHistoryProps {
   onClose: () => void;
@@ -26,6 +32,17 @@ export const DocumentHistory = ({
     page: 0,
   });
 
+  const { handleDownloadFile } = useFileDownload();
+
+  const handleViewFile = (fileName: string) => {
+    if (!fileName) {
+      return;
+    }
+
+    const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
+    window.open(fileUrl, "_blank");
+  };
+
   const documentsQuery = useGetAllDocuments(
     pagination,
     {
@@ -33,7 +50,14 @@ export const DocumentHistory = ({
       documentPartNumber,
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    ["tags", "tags.tag", "category", "processOwner"],
+    [
+      "tags",
+      "tags.tag",
+      "category",
+      "processOwner",
+      "signatures",
+      "signatures.user",
+    ],
     ARCHIVED_DOCUMENTS(documentPartNumber)
   );
 
@@ -43,17 +67,19 @@ export const DocumentHistory = ({
     }
   }, [documentsQuery.data]);
 
+  const ACTION_COLUMN = getActionColumn(handleDownloadFile, handleViewFile);
+  const COLUMNS = useColumns();
+
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         flexDirection: "column",
+        flex: 1,
         width: "100%",
-        bgcolor: "background.default",
-        p: 3,
-        borderRadius: 2,
+        height: "100%",
+        overflow: "auto",
+        p: 2,
       }}
     >
       <Grid container justifyContent="space-between" sx={{ mb: 2 }}>
@@ -64,14 +90,14 @@ export const DocumentHistory = ({
 
       <GenericTable
         loading={documentsQuery.isLoading ?? false}
-        columns={COLUMNS}
+        columns={[...COLUMNS, SIGNATURES_COLUMN, ACTION_COLUMN]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
         sx={{
-          bgcolor: "background.default",
-          height: "60vh",
-          mb: 3,
-          width: "100%",
+          width: "98%",
+          height: "100%",
+          border: "none",
+          minWidth: "unset",
         }}
         rowCount={documentsQuery?.data?.total ?? 0}
         rows={historyRows}

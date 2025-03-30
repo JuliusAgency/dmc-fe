@@ -3,4 +3,5 @@ export interface DocumentFilters {
   categoryId: number;
   documentPartNumber: string;
   status: string[];
+  revision: number;
 }

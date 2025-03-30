@@ -12,6 +12,10 @@ export const createTag = async (name: string) => {
   return API.post(TagEndpoints.createTag, { name });
 };
 
+export const updateTag = async (id: number, name: string) => {
+  return API.put(TagEndpoints.updateTag(id), { name });
+};
+
 export async function deleteTag(id: number) {
   await API.delete(TagEndpoints.deleteTag(id));
 }

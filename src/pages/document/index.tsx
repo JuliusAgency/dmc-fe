@@ -1,8 +1,8 @@
 import { GenericTable } from "../../components/genericTable/genericTable";
-import { COLUMNS } from "./consts.tsx";
+import { useColumns } from "./consts.tsx";
 import {
   useGetAllDocuments,
-  useGetFile,
+  useUpdateDocument,
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
-import { Box, Button, Grid, Tooltip, Paper, alpha } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,10 +28,18 @@ import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useGetCategoryById } from "../../hooks/category/categoryHooks.ts";
+import { useFileDownload } from "../../hooks/utils/useFileDownload";
+import { CONFIG } from "../../consts/config.ts";
+import { snackBarInfo } from "../../components/toast/Toast";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import { GridRowId } from "@mui/x-data-grid-pro";
 
 export const Document = () => {
+  const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
+  const { handleDownloadFile } = useFileDownload();
   const theme = useTheme();
+
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 15,
     page: 0,
@@ -43,12 +51,9 @@ export const Document = () => {
   );
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
-  const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
-    null
-  );
   const [documentToEdit, setDocumentToEdit] = useState<
     DocumentType | undefined
-  >(undefined);
+  >();
   const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
   const [documentIdForSigners, setDocumentIdForSigners] = useState<
     number | null
@@ -57,14 +62,16 @@ export const Document = () => {
   const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
     string | null
   >(null);
+  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
+    GridRowId[]
+  >([]);
 
   const storedUser = localStorage.getItem("user");
-
   const user =
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
 
-  const documentsQuery = useGetAllDocuments(
+  const approvedDocsQuery = useGetAllDocuments(
     pagination,
     {
       status: ["APPROVED"],
@@ -74,8 +81,30 @@ export const Document = () => {
     "getActiveDocuments"
   );
 
-  const fileQuery = useGetFile(fileNameToDownload ?? "");
+  const firstRevisionInProgressQuery = useGetAllDocuments(
+    pagination,
+    {
+      status: ["IN_PROGRESS"],
+      revision: 1,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    },
+    ["tags", "tags.tag", "category", "processOwner"],
+    "getInProgressRevision1"
+  );
+
+  const firstRevisionDraftQuery = useGetAllDocuments(
+    pagination,
+    {
+      status: ["DRAFT"],
+      revision: 1,
+      categoryId: categoryId ? Number(categoryId) : undefined,
+    },
+    ["tags", "tags.tag", "category", "processOwner"],
+    "getDraftRevision1"
+  );
+
   const deleteMutation = useDeleteDocument();
+  const updateDocumentMutation = useUpdateDocument();
 
   const toggleDocumentModal = useCallback(() => {
     setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
@@ -83,26 +112,10 @@ export const Document = () => {
 
   useEffect(() => {
     if (categoryId) {
-      documentsQuery.refetch();
+      approvedDocsQuery.refetch();
+      firstRevisionInProgressQuery.refetch();
     }
   }, [categoryId]);
-
-  useEffect(() => {
-    if (fileQuery.data) {
-      const url = window.URL.createObjectURL(new Blob([fileQuery.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileNameToDownload ?? "");
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setFileNameToDownload(null);
-    }
-  }, [fileQuery.data, fileNameToDownload]);
-
-  const handleOpenFile = (fileName: string) => {
-    setFileNameToDownload(fileName);
-  };
 
   const handleEdit = (document: DocumentType) => {
     setDocumentToEdit(document);
@@ -112,12 +125,14 @@ export const Document = () => {
   const handleDocumentAdded = (documentId: number) => {
     setDocumentIdForSigners(documentId);
     setIsSignersPopupOpen(true);
-    documentsQuery.refetch();
+    approvedDocsQuery.refetch();
+    firstRevisionInProgressQuery.refetch();
   };
 
   const handleDelete = async (documentId: number) => {
     await deleteMutation.mutateAsync(documentId);
-    documentsQuery.refetch();
+    approvedDocsQuery.refetch();
+    firstRevisionInProgressQuery.refetch();
   };
 
   const handleShowHistory = (documentPartNumber: string) => {
@@ -125,74 +140,102 @@ export const Document = () => {
     setIsHistoryDialogOpen(true);
   };
 
-  const filteredDocs = documentsQuery.data?.data ?? [];
+  const handleViewFile = (fileName: string) => {
+    if (!fileName) return;
+    const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
+    window.open(fileUrl, "_blank");
+  };
+
+  const handleRowUpdate = async (
+    newRow: DocumentType,
+    oldRow: DocumentType
+  ) => {
+    try {
+      const changedFields = Object.keys(newRow).filter(
+        (key) =>
+          newRow[key as keyof DocumentType] !==
+          oldRow[key as keyof DocumentType]
+      );
+
+      if (changedFields.length === 0) return newRow;
+
+      await Promise.all(
+        changedFields.map((field) =>
+          updateDocumentMutation.mutateAsync({
+            id: newRow.id,
+            field,
+            value: newRow[field as keyof DocumentType],
+          })
+        )
+      );
+
+      return newRow;
+    } catch (error) {
+      console.error("Failed to update document:", error);
+      return oldRow;
+    }
+  };
+
+  const approvedDocs = approvedDocsQuery.data?.data ?? [];
+  const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
+  const draftDocs = firstRevisionDraftQuery.data?.data ?? [];
+
+  const filteredDocs = [...approvedDocs, ...inProgressDocs, ...draftDocs];
 
   const ACTION_COLUMN: GridColDef = {
     field: "action",
     headerName: "Actions",
     headerAlign: "center",
-    width: 150,
+    width: 200,
     align: "center",
-    renderCell: ({ row }) => {
-      return (
-        <Box display={"flex"} gap={1}>
+    renderCell: ({ row }) => (
+      <Box display={"flex"} gap={1}>
+        <Button
+          onClick={() => handleDownloadFile(row.fileName)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
+        </Button>
+        <Button
+          onClick={() => handleViewFile(row.fileName)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <VisibilityIcon sx={{ color: "#42a5f5" }} />
+        </Button>
+        <Button
+          onClick={() => handleEdit(row)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <EditIcon sx={{ color: "#ffa726" }} />
+        </Button>
+        {user.role === "ADMIN" || user.role === "SYSTEM_ADMIN" ? (
           <Button
-            onClick={() => handleOpenFile(row.fileName)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
+            onClick={() => handleDelete(row.id)}
+            sx={{ padding: 0, minWidth: 0 }}
           >
-            <DownloadForOfflineIcon />
+            <DeleteIcon sx={{ color: "#ef5350" }} />
           </Button>
-          <Button
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
-            onClick={() => handleEdit(row)}
-          >
-            <EditIcon />
-          </Button>
-          {user.role === "ADMIN" ||
-            (user.role === "SYSTEM_ADMIN" && (
-              <Button
-                color="error"
-                onClick={() => handleDelete(row.id)}
-                sx={{
-                  padding: 0,
-                  minWidth: 0,
-                  color: theme.palette.primary.main,
-                }}
-              >
-                <DeleteIcon />
-              </Button>
-            ))}
-          <Button
-            color="primary"
-            onClick={() => handleShowHistory(row.documentPartNumber)}
-            sx={{
-              padding: 0,
-              minWidth: 0,
-              color: theme.palette.primary.main,
-            }}
-          >
-            <HistoryIcon />
-          </Button>
-        </Box>
-      );
-    },
+        ) : null}
+        <Button
+          onClick={() => handleShowHistory(row.documentPartNumber)}
+          sx={{ padding: 0, minWidth: 0 }}
+        >
+          <HistoryIcon sx={{ color: "#ab47bc" }} />
+        </Button>
+      </Box>
+    ),
   };
 
   return (
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         flexDirection: "column",
+        width: "100%",
+        height: "92vh",
+        overflow: "hidden",
+        boxSizing: "border-box",
+        padding: 2,
       }}
     >
       {/* Category Name Header */}
@@ -284,6 +327,59 @@ export const Document = () => {
           />
         )}
       />
+      
+      <Grid container justifyContent={"flex-start"} width={"100%"} mb={2}>
+        <Button variant="outlined" onClick={toggleDocumentModal}>
+          Add Document
+        </Button>
+      </Grid>
+
+      <GenericTable
+        loading={
+          approvedDocsQuery.isLoading ||
+          firstRevisionInProgressQuery.isLoading ||
+          firstRevisionDraftQuery.isLoading
+        }
+        columns={[...COLUMNS, ACTION_COLUMN]}
+        pageSize={pagination.pageSize}
+        onPaginationModelChange={setPagination}
+        rowCount={
+          (approvedDocsQuery.data?.total ?? 0) +
+          (firstRevisionInProgressQuery.data?.total ?? 0) +
+          (firstRevisionDraftQuery.data?.total ?? 0)
+        }
+        rows={filteredDocs}
+        getDetailPanelHeight={() => 200}
+        processRowUpdate={handleRowUpdate}
+        detailPanelExpandedRowIds={detailPanelExpandedRowIds}
+        setDetailPanelExpandedRowIds={setDetailPanelExpandedRowIds}
+        onTryExpandRow={(rowId) => {
+          const row = filteredDocs.find((doc) => doc.id === rowId.id);
+          if (!row) return false;
+
+          const hasInProgressForSamePart = filteredDocs.some(
+            (doc) =>
+              doc.documentPartNumber === row.documentPartNumber &&
+              //@ts-ignore
+              doc.status === "IN_PROGRESS"
+          );
+
+          if (!hasInProgressForSamePart) {
+            snackBarInfo("No documents are currently in the approval process.");
+            return false;
+          }
+
+          return true;
+        }}
+        getDetailPanelContent={({ row }) => (
+          <RevisionGroup
+            key={row.id}
+            documentPartNumber={row.documentPartNumber}
+            rows={filteredDocs}
+            setRows={() => {}}
+          />
+        )}
+      />
 
       <AddDocument
         open={isAddDocumentModalOpen}
@@ -292,6 +388,11 @@ export const Document = () => {
           toggleDocumentModal();
         }}
         refetch={documentsQuery.refetch}
+        refetch={
+          (approvedDocsQuery.refetch,
+          firstRevisionInProgressQuery.refetch,
+          firstRevisionDraftQuery.refetch)
+        }
         documentToEdit={documentToEdit}
         onDocumentAdded={handleDocumentAdded}
       />
@@ -300,6 +401,11 @@ export const Document = () => {
         open={isSignersPopupOpen}
         onClose={() => setIsSignersPopupOpen(false)}
         documentId={documentIdForSigners}
+        refetch={
+          (approvedDocsQuery.refetch,
+          firstRevisionInProgressQuery.refetch,
+          firstRevisionDraftQuery.refetch)
+        }
       />
 
       <Dialog
@@ -310,6 +416,18 @@ export const Document = () => {
       >
         <DialogTitle>Document History</DialogTitle>
         <DialogContent>
+        fullScreen
+      >
+        <DialogTitle>Document History</DialogTitle>
+        <DialogContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden",
+            p: 0,
+          }}
+        >
           {selectedDocumentPartNumber && (
             <DocumentHistory
               documentPartNumber={selectedDocumentPartNumber}

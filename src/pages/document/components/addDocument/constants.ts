@@ -24,6 +24,8 @@ export const FILE_TYPE_OPTIONS: Option[] = [
   { id: 3, name: "XLSX" },
   { id: 4, name: "PPTX" },
   { id: 5, name: "PNG" },
+  { id: 6, name: "WORD" },
+  { id: 7, name: "EXCEL" },
 ];
 
 export const ALLOWED_FILE_TYPES = [
