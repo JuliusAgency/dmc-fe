@@ -6,7 +6,13 @@ import {
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, useTheme } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  useTheme,
+  Typography,
+} from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
 import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
@@ -21,6 +27,7 @@ import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
+import { useGetCategoryById } from "../../hooks/category/categoryHooks.ts";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../consts/config.ts";
 import { snackBarInfo } from "../../components/toast/Toast";
@@ -37,6 +44,11 @@ export const Document = () => {
     pageSize: 15,
     page: 0,
   });
+
+  // Fetch category data
+  const categoryQuery = useGetCategoryById(
+    categoryId ? Number(categoryId) : undefined
+  );
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
   const [documentToEdit, setDocumentToEdit] = useState<
@@ -226,6 +238,96 @@ export const Document = () => {
         padding: 2,
       }}
     >
+      {/* Category Name Header */}
+      {categoryQuery.data && (
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            mb: 3,
+            fontWeight: 600,
+            color: theme.palette.primary.main,
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+            paddingBottom: 1,
+          }}
+        >
+          {categoryQuery.data.name}
+        </Typography>
+      )}
+
+      <Grid
+        container
+        display={"flex"}
+        justifyContent={"flex-start"}
+        width={"100%"}
+        mb={2}
+      >
+        <Button variant="outlined" onClick={toggleDocumentModal}>
+          Add Document
+        </Button>
+      </Grid>
+
+      <GenericTable
+        loading={documentsQuery.isLoading ?? false}
+        columns={[...COLUMNS, ACTION_COLUMN]}
+        pageSize={pagination.pageSize}
+        onPaginationModelChange={setPagination}
+        sx={{
+          height: "65vh",
+          mb: 2,
+          width: "100%",
+          "& .MuiDataGrid-root": {
+            border: "none",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+            padding: "2px 4px",
+            lineHeight: "1.1",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: alpha(theme.palette.primary.main, 0.08),
+            color: theme.palette.primary.main,
+            fontWeight: "bold",
+            fontSize: "0.75rem",
+          },
+          "& .MuiDataGrid-columnHeader": {
+            padding: "2px 4px",
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-row:nth-of-type(even)": {
+            backgroundColor: alpha(theme.palette.background.default, 0.4),
+          },
+          "& .MuiDataGrid-row:hover": {
+            backgroundColor: alpha(theme.palette.primary.light, 0.1),
+          },
+          "& .actionColumn": {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: `1px solid ${theme.palette.divider}`,
+          },
+          "& .MuiTablePagination-root": {
+            fontSize: "0.75rem",
+          },
+        }}
+        rowCount={documentsQuery?.data?.total ?? 0}
+        rows={filteredDocs}
+        getDetailPanelHeight={() => 200}
+        getDetailPanelContent={(params) => (
+          <RevisionGroup
+            key={params.row.id}
+            documentPartNumber={params.row.documentPartNumber}
+            rows={filteredDocs}
+            setRows={() => {}}
+          />
+        )}
+      />
+      
       <Grid container justifyContent={"flex-start"} width={"100%"} mb={2}>
         <Button variant="outlined" onClick={toggleDocumentModal}>
           Add Document
@@ -285,6 +387,7 @@ export const Document = () => {
           setDocumentToEdit(undefined);
           toggleDocumentModal();
         }}
+        refetch={documentsQuery.refetch}
         refetch={
           (approvedDocsQuery.refetch,
           firstRevisionInProgressQuery.refetch,
@@ -308,6 +411,11 @@ export const Document = () => {
       <Dialog
         open={isHistoryDialogOpen}
         onClose={() => setIsHistoryDialogOpen(false)}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle>Document History</DialogTitle>
+        <DialogContent>
         fullScreen
       >
         <DialogTitle>Document History</DialogTitle>

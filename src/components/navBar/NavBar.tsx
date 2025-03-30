@@ -18,6 +18,9 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Divider,
+  CircularProgress,
+  Popper,
   Menu,
   MenuItem,
   Paper,
@@ -27,9 +30,14 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
+import { SearchBar } from "../search/SearchBar";
 
 export type MenuItem = {
   path: string;
@@ -66,9 +74,6 @@ export function NavBar({
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
 
-  // Search state
-  const [searchQuery, setSearchQuery] = useState("");
-
   const handleNavigation = (path: string) => {
     navigate(path);
     if (isMobile) {
@@ -90,17 +95,6 @@ export function NavBar({
     handleUserMenuClose();
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    if (onSearch && searchQuery.trim()) {
-      onSearch(searchQuery.trim());
-    }
-  };
-
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -115,6 +109,8 @@ export function NavBar({
       </Box>
       <Divider />
       {/* Mobile search */}
+      <Box sx={{ margin: theme.spacing(1) }}>
+        <SearchBar onSearch={onSearch || (() => {})} fullWidth />
       <Box
         component="form"
         onSubmit={handleSearchSubmit}
@@ -338,49 +334,9 @@ export function NavBar({
           )}
 
           {/* Search box */}
-          {/* <Box
-            component="form"
-            onSubmit={handleSearchSubmit}
-            sx={{
-              position: "relative",
-              borderRadius: 2,
-              border: `1px solid black`,
-              backgroundColor: alpha(theme.palette.common.white, 0.15),
-              "&:hover": {
-                backgroundColor: alpha(theme.palette.common.white, 0.25),
-              },
-              marginRight: 2,
-              marginLeft: 0,
-              width: "auto",
-              flexShrink: 0, // Prevent search box from shrinking
-              [theme.breakpoints.up("sm")]: {
-                marginLeft: theme.spacing(1),
-                width: "auto",
-              },
-              display: { xs: isMobile ? "none" : "flex", md: "flex" },
-            }}
-          >
-            <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              sx={{
-                color: "inherit",
-                "& .MuiInputBase-input": {
-                  padding: theme.spacing(1, 1, 1, 0),
-                  paddingLeft: 0,
-                  width: "100%",
-                  [theme.breakpoints.up("md")]: {
-                    width: "150px",
-                  },
-                },
-              }}
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-          </Box> */}
+          <Box sx={{ display: { xs: isMobile ? "none" : "flex", md: "flex" } }}>
+            <SearchBar onSearch={onSearch || (() => {})} />
+          </Box>
 
           {/* User menu */}
           <Box sx={{ flexShrink: 0 }}>
