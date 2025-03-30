@@ -1,32 +1,26 @@
 import { GenericTable } from "../../components/genericTable/genericTable";
 import { useColumns } from "./useColumns.tsx";
+import { getActionColumn } from "./constants.tsx";
 import {
   useGetAllDocuments,
   useUpdateDocument,
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
 import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
-import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
-import DeleteIcon from "@mui/icons-material/Delete";
-import HistoryIcon from "@mui/icons-material/History";
-import { GridColDef } from "@mui/x-data-grid";
 import { RevisionGroup } from "./components/revisionGroup";
-import EditIcon from "@mui/icons-material/Edit";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
-import { useSelector } from "react-redux";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../consts/config.ts";
 import { snackBarInfo } from "../../components/toast/Toast";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import { GridRowId } from "@mui/x-data-grid-pro";
 import { DisplaySignatures } from "./components/displaySignatures";
+import { ReportIssuePopup } from "./components/reportIssuePopup";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
@@ -57,10 +51,9 @@ export const Document = () => {
     null
   );
 
-  const storedUser = localStorage.getItem("user");
-  const user =
-    useSelector((state: any) => state.user.user) ||
-    (storedUser ? JSON.parse(storedUser) : null);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [selectedDocumentForReport, setSelectedDocumentForReport] =
+    useState<DocumentType | null>(null);
 
   const approvedDocsQuery = useGetAllDocuments(
     pagination,
@@ -75,6 +68,7 @@ export const Document = () => {
       "processOwner",
       "signatures",
       "signatures.user",
+      "reports",
     ],
     "getActiveDocuments"
   );
@@ -93,6 +87,7 @@ export const Document = () => {
       "processOwner",
       "signatures",
       "signatures.user",
+      "reports",
     ],
     "getInProgressRevision1"
   );
@@ -111,6 +106,7 @@ export const Document = () => {
       "processOwner",
       "signatures",
       "signatures.user",
+      "reports",
     ],
     "getDraftRevision1"
   );
@@ -158,6 +154,11 @@ export const Document = () => {
     window.open(fileUrl, "_blank");
   };
 
+  const handleReport = (doc: DocumentType) => {
+    setSelectedDocumentForReport(doc);
+    setIsReportDialogOpen(true);
+  };
+
   const handleRowUpdate = async (
     newRow: DocumentType,
     oldRow: DocumentType
@@ -197,56 +198,20 @@ export const Document = () => {
   };
 
   const COLUMNS = useColumns(handleOpenSignatures);
+  const ACTION_COLUMN = getActionColumn(
+    handleDownloadFile,
+    handleViewFile,
+    handleEdit,
+    handleDelete,
+    handleShowHistory,
+    handleReport
+  );
 
   const approvedDocs = approvedDocsQuery.data?.data ?? [];
   const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
   const draftDocs = firstRevisionDraftQuery.data?.data ?? [];
 
   const filteredDocs = [...approvedDocs, ...inProgressDocs, ...draftDocs];
-
-  const ACTION_COLUMN: GridColDef = {
-    field: "action",
-    headerName: "Actions",
-    headerAlign: "center",
-    width: 200,
-    align: "center",
-    renderCell: ({ row }) => (
-      <Box display={"flex"} gap={1}>
-        <Button
-          onClick={() => handleDownloadFile(row.fileName)}
-          sx={{ padding: 0, minWidth: 0 }}
-        >
-          <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
-        </Button>
-        <Button
-          onClick={() => handleViewFile(row.fileName)}
-          sx={{ padding: 0, minWidth: 0 }}
-        >
-          <VisibilityIcon sx={{ color: "#42a5f5" }} />
-        </Button>
-        <Button
-          onClick={() => handleEdit(row)}
-          sx={{ padding: 0, minWidth: 0 }}
-        >
-          <EditIcon sx={{ color: "#ffa726" }} />
-        </Button>
-        {user.role === "ADMIN" || user.role === "SYSTEM_ADMIN" ? (
-          <Button
-            onClick={() => handleDelete(row.id)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <DeleteIcon sx={{ color: "#ef5350" }} />
-          </Button>
-        ) : null}
-        <Button
-          onClick={() => handleShowHistory(row.documentPartNumber)}
-          sx={{ padding: 0, minWidth: 0 }}
-        >
-          <HistoryIcon sx={{ color: "#ab47bc" }} />
-        </Button>
-      </Box>
-    ),
-  };
 
   return (
     <Box
@@ -355,6 +320,12 @@ export const Document = () => {
           signatures={selectedDocument.signatures || []}
         />
       )}
+
+      <ReportIssuePopup
+        open={isReportDialogOpen}
+        onClose={() => setIsReportDialogOpen(false)}
+        document={selectedDocumentForReport}
+      />
     </Box>
   );
 };

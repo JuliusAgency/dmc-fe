@@ -33,6 +33,12 @@ export const MainLayout = () => {
         text: "Pending signature",
         disabled: false,
       },
+      {
+        path: "/reports",
+        icon: <DescriptionIcon />,
+        text: "Reports",
+        disabled: false,
+      },
     ];
   }, [isSystemAdmin]);
 

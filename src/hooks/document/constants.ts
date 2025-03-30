@@ -1,0 +1,11 @@
+export const DOCUMENT_LOAD_ERROR = "Failed to load documents";
+export const DOCUMENT_DOWNLOAD_ERROR = "Document download failed!";
+export const DOCUMENT_UPLOAD_SUCCESS = "Document uploaded successfully";
+export const DOCUMENT_UPLOAD_ERROR = "Document upload failed";
+export const DOCUMENT_RESTORE_SUCCESS = "Document restored successfully";
+export const DOCUMENT_RESTORE_ERROR = "Error restoring document";
+export const DOCUMENT_DELETE_SUCCESS = "Document deleted successfully";
+export const DOCUMENT_DELETE_ERROR = "Error deleting document";
+export const DOCUMENT_UPDATE_SUCCESS = "Document updated successfully";
+export const DOCUMENT_UPDATE_ERROR = "Error updating document";
+export const DOCUMENT_PART_NUMBER_ERROR = "Error generating documentPartNumber";

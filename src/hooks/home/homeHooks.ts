@@ -10,7 +10,17 @@ import {
   getHomeAnnouncements,
   addHomeAnnouncement,
   deleteHomeAnnouncement,
-} from "../../api/homeAPI/home.ts";
+} from "../../api/homeAPI/home";
+import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
+import {
+  HOME_IMAGE_UPLOAD_SUCCESS,
+  HOME_IMAGE_UPLOAD_ERROR,
+  HOME_ANNOUNCEMENT_ADD_SUCCESS,
+  HOME_ANNOUNCEMENT_ADD_ERROR,
+  HOME_ANNOUNCEMENT_REQUIRED,
+  HOME_ANNOUNCEMENT_DELETE_SUCCESS,
+  HOME_ANNOUNCEMENT_DELETE_ERROR,
+} from "./constants";
 
 export const useGetHomeImages = (): UseQueryResult<
   { imageUrl: string },
@@ -34,8 +44,11 @@ export const useUploadHomeImage = () => {
       return addHomeImage(formData);
     },
     onSuccess: () => {
-      alert("Homepage image uploaded successfully!");
+      snackBarSuccess(HOME_IMAGE_UPLOAD_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["homeImages"] });
+    },
+    onError: () => {
+      snackBarError(HOME_IMAGE_UPLOAD_ERROR);
     },
   });
 };
@@ -56,12 +69,15 @@ export const useAddHomeAnnouncement = () => {
 
   return useMutation({
     mutationFn: async (text: string) => {
-      if (!text) throw new Error("Announcement text is required.");
+      if (!text) throw new Error(HOME_ANNOUNCEMENT_REQUIRED);
       return addHomeAnnouncement({ text });
     },
     onSuccess: () => {
-      alert("Announcement added successfully!");
+      snackBarSuccess(HOME_ANNOUNCEMENT_ADD_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["homeAnnouncements"] });
+    },
+    onError: () => {
+      snackBarError(HOME_ANNOUNCEMENT_ADD_ERROR);
     },
   });
 };
@@ -72,7 +88,11 @@ export const useDeleteHomeAnnouncement = () => {
   return useMutation({
     mutationFn: async (id: number) => deleteHomeAnnouncement(id),
     onSuccess: () => {
+      snackBarSuccess(HOME_ANNOUNCEMENT_DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["homeAnnouncements"] });
+    },
+    onError: () => {
+      snackBarError(HOME_ANNOUNCEMENT_DELETE_ERROR);
     },
   });
 };

@@ -12,6 +12,7 @@ import { Document } from "./pages/document";
 import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
 import ResetPasswordPage from "./pages/auth/components/resetPassword";
+import { ReportsPage } from "./pages/report";
 import { useAutoLogout } from "./hooks/utils/useAutoLogout.ts";
 import "./styles.css";
 
@@ -40,6 +41,7 @@ const MainRoutes = () => {
         <Route path="/documents" element={<Document key="documents" />} />
         <Route path="/pending-signature" element={<PendingSignatures />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/reports" element={<ReportsPage />} />
         {/* TODO: implement category page */}
         <Route path="/category/:id" element={<Document key="category" />} />
         <Route path="/" element={<Navigate to="/home" replace />} />

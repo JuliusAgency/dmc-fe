@@ -4,13 +4,20 @@ import {
   useQueryClient,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { Category } from "../../api/categoryAPI/types.ts";
+import { Category } from "../../api/categoryAPI/types";
 import {
   getAllCategories,
   createCategory,
   deleteCategory,
   CreateCategoryDto,
-} from "../../api/categoryAPI/category.ts";
+} from "../../api/categoryAPI/category";
+import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
+import {
+  CATEGORY_CREATE_SUCCESS,
+  CATEGORY_CREATE_ERROR,
+  CATEGORY_DELETE_SUCCESS,
+  CATEGORY_DELETE_ERROR,
+} from "./constants";
 
 export const useParentCategories = () => {
   const queryData = useGetAllCategories();
@@ -45,7 +52,11 @@ export const useCreateCategory = () => {
     mutationFn: (categoryData: CreateCategoryDto) =>
       createCategory(categoryData),
     onSuccess: () => {
+      snackBarSuccess(CATEGORY_CREATE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["getAllCategories"] });
+    },
+    onError: () => {
+      snackBarError(CATEGORY_CREATE_ERROR);
     },
   });
 };
@@ -56,7 +67,11 @@ export const useDeleteCategory = () => {
   return useMutation({
     mutationFn: (categoryId: number) => deleteCategory(categoryId),
     onSuccess: () => {
+      snackBarSuccess(CATEGORY_DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["getAllCategories"] });
+    },
+    onError: () => {
+      snackBarError(CATEGORY_DELETE_ERROR);
     },
   });
 };

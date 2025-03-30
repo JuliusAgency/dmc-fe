@@ -23,6 +23,7 @@ export interface DocumentType {
   department: string;
   nextReview: Date;
   signatures: DocumentSignature[];
+  updatedBy: string;
 }
 
 export enum FileType {

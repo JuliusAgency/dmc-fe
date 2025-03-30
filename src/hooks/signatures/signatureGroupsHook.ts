@@ -10,8 +10,17 @@ import {
   createSignatureGroup,
   updateSignatureGroup,
   deleteSignatureGroup,
-} from "../../api/signaturesAPI/signatureGroups.ts";
-import { SignatureGroup } from "../../api/signaturesAPI/types.ts";
+} from "../../api/signaturesAPI/signatureGroups";
+import { SignatureGroup } from "../../api/signaturesAPI/types";
+import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
+import {
+  SIGNATURE_GROUP_CREATE_SUCCESS,
+  SIGNATURE_GROUP_CREATE_ERROR,
+  SIGNATURE_GROUP_UPDATE_SUCCESS,
+  SIGNATURE_GROUP_UPDATE_ERROR,
+  SIGNATURE_GROUP_DELETE_SUCCESS,
+  SIGNATURE_GROUP_DELETE_ERROR,
+} from "./constants";
 
 export const useGetAllSignatureGroups = (): UseQueryResult<
   SignatureGroup[],
@@ -41,7 +50,11 @@ export const useCreateSignatureGroup = () => {
   return useMutation({
     mutationFn: createSignatureGroup,
     onSuccess: () => {
+      snackBarSuccess(SIGNATURE_GROUP_CREATE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["signatureGroups"] });
+    },
+    onError: () => {
+      snackBarError(SIGNATURE_GROUP_CREATE_ERROR);
     },
   });
 };
@@ -58,8 +71,12 @@ export const useUpdateSignatureGroup = () => {
       group: { name: string; userIds: number[] };
     }) => updateSignatureGroup(id, group),
     onSuccess: (_, { id }) => {
+      snackBarSuccess(SIGNATURE_GROUP_UPDATE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["signatureGroups"] });
       queryClient.invalidateQueries({ queryKey: ["signatureGroup", id] });
+    },
+    onError: () => {
+      snackBarError(SIGNATURE_GROUP_UPDATE_ERROR);
     },
   });
 };
@@ -70,7 +87,11 @@ export const useDeleteSignatureGroup = () => {
   return useMutation({
     mutationFn: deleteSignatureGroup,
     onSuccess: () => {
+      snackBarSuccess(SIGNATURE_GROUP_DELETE_SUCCESS);
       queryClient.invalidateQueries({ queryKey: ["signatureGroups"] });
+    },
+    onError: () => {
+      snackBarError(SIGNATURE_GROUP_DELETE_ERROR);
     },
   });
 };

@@ -10,8 +10,17 @@ import {
   signDocument,
   rejectSignature,
   getPendingSignatures,
-} from "../../api/signaturesAPI/signatures.ts";
-import { Signature } from "../../api/signaturesAPI/types.ts";
+} from "../../api/signaturesAPI/signatures";
+import { Signature } from "../../api/signaturesAPI/types";
+import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
+import {
+  SIGNATURES_ADD_SUCCESS,
+  SIGNATURES_ADD_ERROR,
+  SIGNATURES_SIGN_SUCCESS,
+  SIGNATURES_SIGN_ERROR,
+  SIGNATURES_REJECT_SUCCESS,
+  SIGNATURES_REJECT_ERROR,
+} from "./constants";
 
 export const useGetSignaturesForDocument = (
   documentId: number
@@ -35,9 +44,13 @@ export const useAddSignersToDocument = () => {
       userIds: number[];
     }) => addSignersToDocument(documentId, userIds),
     onSuccess: (_, { documentId }) => {
+      snackBarSuccess(SIGNATURES_ADD_SUCCESS);
       queryClient.invalidateQueries({
         queryKey: ["getSignatures", documentId],
       });
+    },
+    onError: () => {
+      snackBarError(SIGNATURES_ADD_ERROR);
     },
   });
 };
@@ -54,9 +67,13 @@ export const useSignDocument = () => {
       userId: number;
     }) => signDocument(documentId, userId),
     onSuccess: (_, { documentId }) => {
+      snackBarSuccess(SIGNATURES_SIGN_SUCCESS);
       queryClient.invalidateQueries({
         queryKey: ["getSignatures", documentId],
       });
+    },
+    onError: () => {
+      snackBarError(SIGNATURES_SIGN_ERROR);
     },
   });
 };
@@ -73,14 +90,20 @@ export const useRejectSignature = () => {
       userId: number;
     }) => rejectSignature(documentId, userId),
     onSuccess: (_, { documentId }) => {
+      snackBarSuccess(SIGNATURES_REJECT_SUCCESS);
       queryClient.invalidateQueries({
         queryKey: ["getSignatures", documentId],
       });
     },
+    onError: () => {
+      snackBarError(SIGNATURES_REJECT_ERROR);
+    },
   });
 };
 
-export const useGetPendingSignatures = (userId: number) => {
+export const useGetPendingSignatures = (
+  userId: number
+): UseQueryResult<Signature[], Error> => {
   return useQuery({
     queryKey: ["pendingSignatures", userId],
     queryFn: () => getPendingSignatures(userId),

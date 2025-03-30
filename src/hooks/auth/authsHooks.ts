@@ -4,10 +4,29 @@ import { AuthData } from "../../api/authAPI/types";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../actions/userActions";
 import { useNavigate } from "react-router-dom";
+import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
+import {
+  LOGIN_SUCCESS,
+  LOGIN_ERROR,
+  LOGOUT_SUCCESS,
+  LOGOUT_ERROR,
+} from "./constants";
 
 export const useLogin = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   return useMutation({
     mutationFn: (credentials: AuthData) => login(credentials),
+    onSuccess: (response: any) => {
+      dispatch(setUser(response.user));
+      localStorage.setItem("user", JSON.stringify(response.user));
+      snackBarSuccess(LOGIN_SUCCESS);
+      navigate("/home");
+    },
+    onError: (error: any) => {
+      snackBarError(error?.response?.data?.message || LOGIN_ERROR);
+    },
   });
 };
 
@@ -30,11 +49,15 @@ export const useLogout = () => {
 
   return useMutation({
     mutationFn: async () => {
-      localStorage.removeItem("user");
-      dispatch(setUser(null));
-      navigate("/login");
-
-      await logout();
+      try {
+        localStorage.removeItem("user");
+        dispatch(setUser(null));
+        await logout();
+        snackBarSuccess(LOGOUT_SUCCESS);
+        navigate("/login");
+      } catch {
+        snackBarError(LOGOUT_ERROR);
+      }
     },
   });
 };

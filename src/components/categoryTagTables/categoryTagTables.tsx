@@ -136,11 +136,11 @@ export const TagTable = ({
             <IconButton
               onClick={() => handleStartEdit(params.row.id, params.row.name)}
             >
-              <EditIcon fontSize="small" />
+              <EditIcon fontSize="small" sx={{ color: "#ffa726" }} />
             </IconButton>
           )}
           <IconButton onClick={() => onDelete(params.row.id)}>
-            <DeleteIcon fontSize="small" />
+            <DeleteIcon fontSize="small" sx={{ color: "#ef5350" }} />
           </IconButton>
         </>
       ),

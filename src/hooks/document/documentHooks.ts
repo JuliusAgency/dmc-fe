@@ -1,6 +1,11 @@
-import { useMutation, UseMutationResult, useQueryClient } from "react-query";
+import {
+  useMutation,
+  UseMutationResult,
+  useQueryClient,
+  useQuery,
+  UseQueryResult,
+} from "react-query";
 import { AxiosError } from "axios";
-import { useQuery, UseQueryResult } from "react-query";
 import {
   createDocument,
   getAllDocuments,
@@ -10,15 +15,25 @@ import {
   getLastDocumentPartNumber,
   deleteDocument,
   updateDocumentField,
-} from "../../api/documentAPI/document.ts";
-import { PaginationModel } from "../../consts/types.ts";
-import { GetAllDocumentsResponse } from "../../api/documentAPI/types.ts";
-import { DocumentFilters } from "../../pages/document/types.ts";
+} from "../../api/documentAPI/document";
+import { PaginationModel } from "../../consts/types";
+import { GetAllDocumentsResponse } from "../../api/documentAPI/types";
+import { DocumentFilters } from "../../pages/document/types";
+import { snackBarError, snackBarSuccess } from "../../components/toast/Toast";
+import { DocumentType } from "../../api/documentAPI/types";
 import {
-  snackBarError,
-  snackBarSuccess,
-} from "../../components/toast/Toast.tsx";
-import { DocumentType } from "../../api/documentAPI/types.ts";
+  DOCUMENT_LOAD_ERROR,
+  DOCUMENT_DOWNLOAD_ERROR,
+  DOCUMENT_UPLOAD_SUCCESS,
+  DOCUMENT_UPLOAD_ERROR,
+  DOCUMENT_RESTORE_SUCCESS,
+  DOCUMENT_RESTORE_ERROR,
+  DOCUMENT_DELETE_SUCCESS,
+  DOCUMENT_DELETE_ERROR,
+  DOCUMENT_UPDATE_SUCCESS,
+  DOCUMENT_UPDATE_ERROR,
+  DOCUMENT_PART_NUMBER_ERROR,
+} from "./constants";
 
 export const useGetAllDocuments = (
   headers: PaginationModel,
@@ -33,7 +48,7 @@ export const useGetAllDocuments = (
       refetchOnWindowFocus: false,
       keepPreviousData: true,
       onError: () => {
-        snackBarError("שגיאה בטעינת המסמכים");
+        snackBarError(DOCUMENT_LOAD_ERROR);
       },
     }
   );
@@ -44,7 +59,7 @@ export const useGetFile = (fileName?: string): UseQueryResult<Blob, Error> => {
     refetchOnWindowFocus: false,
     enabled: Boolean(fileName),
     onError: () => {
-      snackBarError("Document download failed!");
+      snackBarError(DOCUMENT_DOWNLOAD_ERROR);
     },
   });
 };
@@ -60,10 +75,10 @@ export const useUploadDocument = (): UseMutationResult<
     },
     {
       onSuccess: () => {
-        snackBarSuccess("Document uploaded successfully");
+        snackBarSuccess(DOCUMENT_UPLOAD_SUCCESS);
       },
       onError: () => {
-        snackBarError("Document upload failed");
+        snackBarError(DOCUMENT_UPLOAD_ERROR);
       },
     }
   );
@@ -82,10 +97,10 @@ export const useRestoreRevision = (): UseMutationResult<
 > =>
   useMutation<DocumentType, AxiosError, string>(restoreRevision, {
     onSuccess: () => {
-      snackBarSuccess("Document restored successfully");
+      snackBarSuccess(DOCUMENT_RESTORE_SUCCESS);
     },
     onError: () => {
-      snackBarError("Error restoring document");
+      snackBarError(DOCUMENT_RESTORE_ERROR);
     },
   });
 
@@ -93,20 +108,27 @@ export const useDeleteDocument = (): UseMutationResult<
   void,
   AxiosError,
   number
-> =>
-  useMutation<void, AxiosError, number>(
+> => {
+  const queryClient = useQueryClient();
+
+  return useMutation<void, AxiosError, number>(
     async (documentId: number) => {
-      await deleteDocument(documentId);
+      return await deleteDocument(documentId);
     },
     {
       onSuccess: () => {
-        snackBarSuccess("Document deleted successfully");
+        snackBarSuccess(DOCUMENT_DELETE_SUCCESS);
+
+        queryClient.refetchQueries({ queryKey: ["getActiveDocuments"] });
+        queryClient.refetchQueries({ queryKey: ["getInProgressRevision1"] });
+        queryClient.refetchQueries({ queryKey: ["getDraftRevision1"] });
       },
       onError: () => {
-        snackBarError("Error deleting document");
+        snackBarError(DOCUMENT_DELETE_ERROR);
       },
     }
   );
+};
 
 export const useUpdateDocument = () => {
   const queryClient = useQueryClient();
@@ -122,14 +144,13 @@ export const useUpdateDocument = () => {
       value: any;
     }) => updateDocumentField(id, field, value),
     onSuccess: () => {
-      snackBarSuccess("Document updated successfully");
-
+      snackBarSuccess(DOCUMENT_UPDATE_SUCCESS);
       queryClient.refetchQueries(["getActiveDocuments"]);
       queryClient.refetchQueries(["getInProgressRevision1"]);
       queryClient.refetchQueries(["getDraftRevision1"]);
     },
     onError: () => {
-      snackBarError("Error updating document");
+      snackBarError(DOCUMENT_UPDATE_ERROR);
     },
   });
 };
@@ -159,7 +180,7 @@ export const useGenerateDocumentPartNumber = (
 
         return `${prefix}-${String(nextNumber).padStart(4, "0")}-${suffix}`;
       } catch (error) {
-        console.error("Error generating documentPartNumber:", error);
+        console.error(DOCUMENT_PART_NUMBER_ERROR, error);
         return `${prefix}-0001-${suffix}`;
       }
     },
