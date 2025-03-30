@@ -54,7 +54,7 @@ export const useUploadHomeImage = () => {
 };
 
 export const useGetHomeAnnouncements = (): UseQueryResult<
-  { id: number; text: string }[],
+  { id: number; text: string; createdAt: string }[],
   Error
 > => {
   return useQuery({

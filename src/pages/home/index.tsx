@@ -1,48 +1,26 @@
-import { useState, useEffect } from "react";
 import { Container, Typography, Box } from "@mui/material";
 import {
-  HOME_PAGE_TITLE,
   NO_IMAGE_AVAILABLE,
   ERROR_LOADING_HOMEPAGE,
   LOADING_TEXT,
-  ANNOUNCEMENT_POSITION_STYLES,
-  IMAGE_STYLES,
 } from "./constants";
 import {
   useGetHomeImages,
   useGetHomeAnnouncements,
 } from "../../hooks/home/homeHooks";
+import { BulletinBoard } from "./components/BulletinBoard";
 
 export const HomePage = () => {
-  const [currentAnnouncement, setCurrentAnnouncement] = useState(0);
-
   const {
     data: homeImages,
     isLoading: loadingImages,
     error: errorImages,
   } = useGetHomeImages();
-  const {
-    data: homeAnnouncements,
-    isLoading: loadingAnnouncements,
-    error: errorAnnouncements,
-  } = useGetHomeAnnouncements();
 
-  const homeContent = {
-    imageUrl: homeImages?.imageUrl || "",
-    announcements: homeAnnouncements?.map((item) => item.text) || [],
-  };
+  const { isLoading: loadingAnnouncements, error: errorAnnouncements } =
+    useGetHomeAnnouncements();
 
-  useEffect(() => {
-    if (homeContent.announcements.length > 0) {
-      const interval = setInterval(() => {
-        setCurrentAnnouncement(
-          (prev) => (prev + 1) % homeContent.announcements.length
-        );
-      }, 3000);
-
-      return () => clearInterval(interval);
-    }
-  }, [homeContent.announcements]);
+  const imageUrl = homeImages?.imageUrl || "";
 
   if (loadingImages || loadingAnnouncements) {
     return <Typography>{LOADING_TEXT}</Typography>;
@@ -53,34 +31,32 @@ export const HomePage = () => {
   }
 
   return (
-    <Container>
-      <Box
-        sx={{
-          position: "relative",
-          width: "100%",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        {homeContent?.imageUrl ? (
-          <Box
-            component="img"
-            src={homeContent.imageUrl}
-            alt="Homepage Image"
-            sx={{
-              width: "60vw",
-            }}
-          />
-        ) : (
-          <Typography color="gray">{NO_IMAGE_AVAILABLE}</Typography>
-        )}
-
-        {homeContent.announcements.length > 0 && (
-          <Typography variant="h6" sx={ANNOUNCEMENT_POSITION_STYLES}>
-            {homeContent.announcements[currentAnnouncement]}
-          </Typography>
-        )}
+    <Container maxWidth="xl">
+      <Box display="flex" flexDirection="row-reverse" width="100%" p={2}>
+        <Box
+          sx={{
+            width: 300,
+            ml: 4,
+            flexShrink: 0,
+          }}
+        >
+          <BulletinBoard />
+        </Box>
+        <Box flex={1} display="flex" justifyContent="center">
+          {imageUrl ? (
+            <Box
+              component="img"
+              src={imageUrl}
+              alt="Homepage"
+              sx={{
+                width: "60vw",
+                borderRadius: 2,
+              }}
+            />
+          ) : (
+            <Typography color="gray">{NO_IMAGE_AVAILABLE}</Typography>
+          )}
+        </Box>
       </Box>
     </Container>
   );
