@@ -10,9 +10,7 @@ import { Tag } from "../../../../api/tagsAPI/types.ts";
 export interface Props {
   open: boolean;
   onClose: () => void;
-  refetch: <TPageData>(
-    options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined
-  ) => Promise<QueryObserverResult<GetAllDocumentsResponse, Error>>;
+  refetch: () => Promise<void>;
   documentToEdit?: DocumentType | undefined;
   onDocumentAdded: (documentId: number) => void;
 }

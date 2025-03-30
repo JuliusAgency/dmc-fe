@@ -14,20 +14,13 @@ export const createUser = async (data: {
   return API.post(userEndpoints.createUser, data);
 };
 
-export const updateUserRole = async (userId: string, role: string) => {
-  return API.put(userEndpoints.updateUserRole(userId), { role });
-};
-
-export const resetPassword = async ({
-  email,
-  newPassword,
-}: {
-  email: string;
-  newPassword: string;
+export const updateUser = async (data: {
+  userId?: number;
+  email?: string;
+  role?: string;
+  classification?: string;
+  newPassword?: string;
 }) => {
-  return API.put(
-    userEndpoints.resetPassword,
-    { email, newPassword },
-    { withCredentials: true }
-  );
+  const idOrEmail = data.userId ?? data.email;
+  return API.put(`/user/${idOrEmail}`, data);
 };

@@ -1,10 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  getUsers,
-  createUser,
-  updateUserRole,
-  resetPassword,
-} from "../../api/userAPI/user";
+import { getUsers, createUser, updateUser } from "../../api/userAPI/user";
 import { User } from "../../api/authAPI/types";
 import { snackBarError, snackBarSuccess } from "../../components/toast/Toast";
 import { TOAST_MESSAGES } from "./constants";
@@ -32,41 +27,30 @@ export const useCreateUser = () => {
   });
 };
 
-export const useUpdateUserRole = () => {
+type UpdateUserParams = {
+  userId?: number;
+  email?: string;
+  role?: string;
+  classification?: string;
+  newPassword?: string;
+};
+
+export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, newRole }: { userId: string; newRole: string }) =>
-      updateUserRole(userId, newRole),
+    mutationFn: (data: UpdateUserParams) => {
+      if (!data.userId && !data.email) {
+        throw new Error("Either userId or email is required");
+      }
+      return updateUser(data);
+    },
     onSuccess: () => {
-      snackBarSuccess(TOAST_MESSAGES.updateRoleSuccess);
+      snackBarSuccess(TOAST_MESSAGES.updateUserSuccess);
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: () => {
-      snackBarError(TOAST_MESSAGES.updateRoleError);
-    },
-  });
-};
-
-type ResetPasswordInput = {
-  email: string;
-  newPassword: string;
-};
-
-export const useResetPassword = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ email, newPassword }: ResetPasswordInput) =>
-      resetPassword({ email, newPassword }),
-    onSuccess: () => {
-      snackBarSuccess(TOAST_MESSAGES.resetPasswordSuccess);
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-    },
-    onError: (error: any) => {
-      snackBarError(
-        error?.response?.data?.message || TOAST_MESSAGES.resetPasswordError
-      );
+      snackBarError(TOAST_MESSAGES.updateUserError);
     },
   });
 };

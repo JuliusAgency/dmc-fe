@@ -1,76 +1,67 @@
-import { GenericTable } from "../../components/genericTable/genericTable";
-import { useColumns } from "./useColumns.tsx";
-import { getActionColumn } from "./constants.tsx";
+import { useState, useEffect, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import { alpha } from "@mui/material/styles";
+import { GridRowId } from "@mui/x-data-grid-pro";
+
+import { PaginationModel } from "../../consts/types";
+import { CONFIG } from "../../consts/config";
+import { snackBarInfo } from "../../components/toast/Toast";
+
 import {
   useGetAllDocuments,
   useUpdateDocument,
   useDeleteDocument,
-} from "../../hooks/document/documentHooks.ts";
-import { useCallback, useState, useEffect } from "react";
-import { useTheme, Typography } from "@mui/material";
-import { PaginationModel } from "../../consts/types.ts";
-import { Box, Button, Grid } from "@mui/material";
-import { AddDocument } from "./components/addDocument/index.tsx";
+} from "../../hooks/document/documentHooks";
+import { useGetCategoryById } from "../../hooks/category/categoryHooks";
+import { useFileDownload } from "../../hooks/utils/useFileDownload";
+
+import { GenericTable } from "../../components/genericTable/genericTable";
+import { useColumns } from "./useColumns";
+import { getActionColumn } from "./constants";
+
+import { AddDocument } from "./components/addDocument";
 import { RevisionGroup } from "./components/revisionGroup";
-import { DocumentType } from "../../api/documentAPI/types.ts";
-import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
-import { useGetCategoryById } from "../../hooks/category/categoryHooks.ts";
-import { useFileDownload } from "../../hooks/utils/useFileDownload";
-import { CONFIG } from "../../consts/config.ts";
-import { snackBarInfo } from "../../components/toast/Toast";
-import { GridRowId } from "@mui/x-data-grid-pro";
 import { DisplaySignatures } from "./components/displaySignatures";
 import { ReportIssuePopup } from "./components/reportIssuePopup";
-import { alpha } from "@mui/material/styles";
+
+import { DocumentType } from "../../api/documentAPI/types";
 
 export const Document = () => {
+  const theme = useTheme();
   const { id: categoryId } = useParams();
   const { handleDownloadFile } = useFileDownload();
-  const theme = useTheme();
 
   const [pagination, setPagination] = useState<PaginationModel>({
-    pageSize: 15,
     page: 0,
+    pageSize: 15,
   });
 
-  // Fetch category data
+  const [isAddOpen, setAddOpen] = useState(false);
+  const [documentToEdit, setDocumentToEdit] = useState<DocumentType>();
+  const [isSignersOpen, setSignersOpen] = useState(false);
+  const [signersDocId, setSignersDocId] = useState<number | null>(null);
+  const [isHistoryOpen, setHistoryOpen] = useState(false);
+  const [selectedPartNumber, setSelectedPartNumber] = useState<string | null>(
+    null
+  );
+  const [expandedRowIds, setExpandedRowIds] = useState<GridRowId[]>([]);
+  const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
+  const [isReportOpen, setReportOpen] = useState(false);
+  const [reportDoc, setReportDoc] = useState<DocumentType | null>(null);
+
   const categoryQuery = useGetCategoryById(
     categoryId ? Number(categoryId) : undefined
   );
 
-  const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
-  const [documentToEdit, setDocumentToEdit] = useState<
-    DocumentType | undefined
-  >();
-  const [isSignersPopupOpen, setIsSignersPopupOpen] = useState(false);
-  const [documentIdForSigners, setDocumentIdForSigners] = useState<
-    number | null
-  >(null);
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
-  const [selectedDocumentPartNumber, setSelectedDocumentPartNumber] = useState<
-    string | null
-  >(null);
-  const [detailPanelExpandedRowIds, setDetailPanelExpandedRowIds] = useState<
-    GridRowId[]
-  >([]);
-
-  const [selectedDocument, setSelectedDocument] = useState<DocumentType | null>(
-    null
-  );
-
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [selectedDocumentForReport, setSelectedDocumentForReport] =
-    useState<DocumentType | null>(null);
-
-  const approvedDocsQuery = useGetAllDocuments(
+  const refetchParams = {
     pagination,
-    {
-      status: ["APPROVED"],
+    filters: {
       categoryId: categoryId ? Number(categoryId) : undefined,
     },
-    [
+    relations: [
       "tags",
       "tags.tag",
       "category",
@@ -79,93 +70,67 @@ export const Document = () => {
       "signatures.user",
       "reports",
     ],
-    "getActiveDocuments"
-  );
+  };
 
-  const firstRevisionInProgressQuery = useGetAllDocuments(
+  const approvedQuery = useGetAllDocuments(
     pagination,
-    {
-      status: ["IN_PROGRESS"],
-      revision: 1,
-      categoryId: categoryId ? Number(categoryId) : undefined,
-    },
-    [
-      "tags",
-      "tags.tag",
-      "category",
-      "processOwner",
-      "signatures",
-      "signatures.user",
-      "reports",
-    ],
-    "getInProgressRevision1"
+    { ...refetchParams.filters, status: ["APPROVED"] },
+    refetchParams.relations,
+    "approvedDocs"
   );
 
-  const firstRevisionDraftQuery = useGetAllDocuments(
+  const inProgressQuery = useGetAllDocuments(
     pagination,
-    {
-      status: ["DRAFT"],
-      revision: 1,
-      categoryId: categoryId ? Number(categoryId) : undefined,
-    },
-    [
-      "tags",
-      "tags.tag",
-      "category",
-      "processOwner",
-      "signatures",
-      "signatures.user",
-      "reports",
-    ],
-    "getDraftRevision1"
+    { ...refetchParams.filters, status: ["IN_PROGRESS"], revision: 1 },
+    refetchParams.relations,
+    "inProgressDocs"
   );
 
-  const deleteMutation = useDeleteDocument();
-  const updateDocumentMutation = useUpdateDocument();
+  const draftQuery = useGetAllDocuments(
+    pagination,
+    { ...refetchParams.filters, status: ["DRAFT"], revision: 1 },
+    refetchParams.relations,
+    "draftDocs"
+  );
 
-  const toggleDocumentModal = useCallback(() => {
-    setIsAddDocumentModalOpen(!isAddDocumentModalOpen);
-  }, [isAddDocumentModalOpen]);
+  const deleteDoc = useDeleteDocument();
+  const updateDoc = useUpdateDocument();
 
-  useEffect(() => {
-    if (categoryId) {
-      approvedDocsQuery.refetch();
-      firstRevisionInProgressQuery.refetch();
-    }
-  }, [categoryId]);
-
-  const handleEdit = (document: DocumentType) => {
-    setDocumentToEdit(document);
-    toggleDocumentModal();
+  const toggleAddModal = () => {
+    setAddOpen(!isAddOpen);
+    setDocumentToEdit(undefined);
   };
 
-  const handleDocumentAdded = (documentId: number) => {
-    setDocumentIdForSigners(documentId);
-    setIsSignersPopupOpen(true);
-    approvedDocsQuery.refetch();
-    firstRevisionInProgressQuery.refetch();
+  const handleEdit = (doc: DocumentType) => {
+    setDocumentToEdit(doc);
+    setAddOpen(true);
   };
 
-  const handleDelete = async (documentId: number) => {
-    await deleteMutation.mutateAsync(documentId);
-    approvedDocsQuery.refetch();
-    firstRevisionInProgressQuery.refetch();
+  const handleDelete = async (id: number) => {
+    await deleteDoc.mutateAsync(id);
+    refetchAll();
   };
 
-  const handleShowHistory = (documentPartNumber: string) => {
-    setSelectedDocumentPartNumber(documentPartNumber);
-    setIsHistoryDialogOpen(true);
+  const handleAdd = (id: number) => {
+    setSignersDocId(id);
+    setSignersOpen(true);
+    refetchAll();
+  };
+
+  const handleHistory = (partNumber: string) => {
+    setSelectedPartNumber(partNumber);
+    setHistoryOpen(true);
+  };
+
+  const handleReport = (doc: DocumentType) => {
+    setReportDoc(doc);
+    setReportOpen(true);
   };
 
   const handleViewFile = (fileName: string) => {
     if (!fileName) return;
     const fileUrl = new URL(`document/view/${fileName}`, CONFIG.BASE_URL).href;
     window.open(fileUrl, "_blank");
-  };
-
-  const handleReport = (doc: DocumentType) => {
-    setSelectedDocumentForReport(doc);
-    setIsReportDialogOpen(true);
   };
 
   const handleRowUpdate = async (
@@ -179,11 +144,11 @@ export const Document = () => {
           oldRow[key as keyof DocumentType]
       );
 
-      if (changedFields.length === 0) return newRow;
+      if (!changedFields.length) return newRow;
 
       await Promise.all(
         changedFields.map((field) =>
-          updateDocumentMutation.mutateAsync({
+          updateDoc.mutateAsync({
             id: newRow.id,
             field,
             value: newRow[field as keyof DocumentType],
@@ -192,102 +157,103 @@ export const Document = () => {
       );
 
       return newRow;
-    } catch (error) {
-      console.error("Failed to update document:", error);
+    } catch (e) {
+      console.error("Failed to update document:", e);
       return oldRow;
     }
   };
 
   const handleOpenSignatures = (doc: DocumentType) => {
-    setSelectedDocument(doc);
+    setSelectedDoc(doc);
   };
 
   const handleCloseSignatures = () => {
-    setSelectedDocument(null);
+    setSelectedDoc(null);
   };
 
-  const COLUMNS = useColumns(handleOpenSignatures);
-  const ACTION_COLUMN = getActionColumn(
+  const refetchAll = async () => {
+    await Promise.all([
+      approvedQuery.refetch(),
+      inProgressQuery.refetch(),
+      draftQuery.refetch(),
+    ]);
+  };
+
+  useEffect(() => {
+    if (categoryId) refetchAll();
+  }, [categoryId]);
+
+  const columns = useColumns(handleOpenSignatures);
+  const actionColumn = getActionColumn(
     handleDownloadFile,
     handleViewFile,
     handleEdit,
     handleDelete,
-    handleShowHistory,
+    handleHistory,
     handleReport
   );
 
-  const approvedDocs = approvedDocsQuery.data?.data ?? [];
-  const inProgressDocs = firstRevisionInProgressQuery.data?.data ?? [];
-  const draftDocs = firstRevisionDraftQuery.data?.data ?? [];
+  const approved = approvedQuery.data?.data ?? [];
+  const inProgress = inProgressQuery.data?.data ?? [];
+  const drafts = draftQuery.data?.data ?? [];
 
-  const filteredDocs = [...approvedDocs, ...inProgressDocs, ...draftDocs];
+  const allDocs = [...approved, ...inProgress, ...drafts];
+  const totalDocs =
+    (approvedQuery.data?.total ?? 0) +
+    (inProgressQuery.data?.total ?? 0) +
+    (draftQuery.data?.total ?? 0);
+
+  console.log(allDocs);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "92vh",
-        overflow: "hidden",
-        boxSizing: "border-box",
-        padding: 2,
-      }}
-    >
-      {/* Category Name Header */}
+    <Box sx={{ width: "100%", height: "92vh", padding: 2 }}>
       {categoryQuery.data && (
         <Typography
           variant="h5"
-          component="h1"
           sx={{
             mb: 3,
             fontWeight: 600,
             color: theme.palette.primary.main,
             borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
-            paddingBottom: 1,
+            pb: 1,
           }}
         >
           {categoryQuery.data.name}
         </Typography>
       )}
 
-      <Grid container justifyContent={"flex-start"} width={"100%"} mb={2}>
-        <Button variant="outlined" onClick={toggleDocumentModal}>
+      <Grid container justifyContent="flex-start" mb={2}>
+        <Button variant="outlined" onClick={toggleAddModal}>
           Add Document
         </Button>
       </Grid>
 
       <GenericTable
+        rows={allDocs}
+        rowCount={totalDocs}
         loading={
-          approvedDocsQuery.isLoading ||
-          firstRevisionInProgressQuery.isLoading ||
-          firstRevisionDraftQuery.isLoading
+          approvedQuery.isLoading ||
+          inProgressQuery.isLoading ||
+          draftQuery.isLoading
         }
-        columns={[...COLUMNS, ACTION_COLUMN]}
+        columns={[...columns, actionColumn]}
         pageSize={pagination.pageSize}
         onPaginationModelChange={setPagination}
-        rowCount={
-          (approvedDocsQuery.data?.total ?? 0) +
-          (firstRevisionInProgressQuery.data?.total ?? 0) +
-          (firstRevisionDraftQuery.data?.total ?? 0)
-        }
-        rows={filteredDocs}
         getDetailPanelHeight={() => 200}
         processRowUpdate={handleRowUpdate}
-        detailPanelExpandedRowIds={detailPanelExpandedRowIds}
-        setDetailPanelExpandedRowIds={setDetailPanelExpandedRowIds}
+        detailPanelExpandedRowIds={expandedRowIds}
+        setDetailPanelExpandedRowIds={setExpandedRowIds}
         onTryExpandRow={(rowId) => {
-          const row = filteredDocs.find((doc) => doc.id === rowId.id);
-          if (!row) return false;
+          const doc = allDocs.find((d) => d.id === rowId.id);
+          if (!doc) return false;
 
-          const hasInProgressForSamePart = filteredDocs.some(
-            (doc) =>
-              doc.documentPartNumber === row.documentPartNumber &&
-              //@ts-ignore
-              doc.status === "IN_PROGRESS"
+          const hasInProgress = allDocs.some(
+            (d) =>
+              d.documentPartNumber === doc.documentPartNumber &&
+              d.status === "IN_PROGRESS"
           );
 
-          if (!hasInProgressForSamePart) {
+          if (!hasInProgress) {
             snackBarInfo("No documents are currently in the approval process.");
             return false;
           }
@@ -298,59 +264,48 @@ export const Document = () => {
           <RevisionGroup
             key={row.id}
             documentPartNumber={row.documentPartNumber}
-            rows={filteredDocs}
+            rows={allDocs}
             setRows={() => {}}
           />
         )}
       />
 
       <AddDocument
-        open={isAddDocumentModalOpen}
-        onClose={() => {
-          setDocumentToEdit(undefined);
-          toggleDocumentModal();
-        }}
-        refetch={
-          (approvedDocsQuery.refetch,
-          firstRevisionInProgressQuery.refetch,
-          firstRevisionDraftQuery.refetch)
-        }
+        open={isAddOpen}
+        onClose={toggleAddModal}
         documentToEdit={documentToEdit}
-        onDocumentAdded={handleDocumentAdded}
+        onDocumentAdded={handleAdd}
+        refetch={refetchAll}
       />
 
       <SelectSignersPopup
-        open={isSignersPopupOpen}
-        onClose={() => setIsSignersPopupOpen(false)}
-        documentId={documentIdForSigners}
-        refetch={
-          (approvedDocsQuery.refetch,
-          firstRevisionInProgressQuery.refetch,
-          firstRevisionDraftQuery.refetch)
-        }
+        open={isSignersOpen}
+        onClose={() => setSignersOpen(false)}
+        documentId={signersDocId}
+        refetch={refetchAll}
       />
 
-      {isHistoryDialogOpen && selectedDocumentPartNumber && (
+      {isHistoryOpen && selectedPartNumber && (
         <DocumentHistory
-          open={isHistoryDialogOpen}
-          onClose={() => setIsHistoryDialogOpen(false)}
-          documentPartNumber={selectedDocumentPartNumber}
+          open={isHistoryOpen}
+          onClose={() => setHistoryOpen(false)}
+          documentPartNumber={selectedPartNumber}
         />
       )}
 
-      {selectedDocument && (
+      {selectedDoc && (
         <DisplaySignatures
-          open={Boolean(selectedDocument)}
+          open={Boolean(selectedDoc)}
           onClose={handleCloseSignatures}
-          documentId={selectedDocument.id}
-          signatures={selectedDocument.signatures || []}
+          documentId={selectedDoc.id}
+          signatures={selectedDoc.signatures || []}
         />
       )}
 
       <ReportIssuePopup
-        open={isReportDialogOpen}
-        onClose={() => setIsReportDialogOpen(false)}
-        document={selectedDocumentForReport}
+        open={isReportOpen}
+        onClose={() => setReportOpen(false)}
+        document={reportDoc}
       />
     </Box>
   );

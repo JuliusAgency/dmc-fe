@@ -8,6 +8,14 @@ import HistoryIcon from "@mui/icons-material/History";
 import { useSelector } from "react-redux";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 
+const hasClassificationAccess = (
+  userLevel: string,
+  docLevel: string
+): boolean => {
+  const levels = ["PUBLIC", "INTERNAL", "CONFIDENTIAL", "SECRET"];
+  return levels.indexOf(userLevel) >= levels.indexOf(docLevel);
+};
+
 export const getActionColumn = (
   handleDownloadFile: (fileName: string) => void,
   handleViewFile: (fileName: string) => void,
@@ -25,79 +33,101 @@ export const getActionColumn = (
     field: "action",
     headerName: "Actions",
     headerAlign: "center",
-    width: 250,
+    width: 300,
     align: "center",
     renderCell: ({ row }) => {
       const hasReports = row.reports?.length > 0;
       const allAnswered = row.reports?.every((r: any) => !!r.response);
       const status = row.status;
 
+      const userClassification = user?.classification || "PUBLIC";
+      const docClassification = row.classification || "PUBLIC";
+
+      const canViewDownload = hasClassificationAccess(
+        userClassification,
+        docClassification
+      );
+
       let reportColor = "#ef5350";
-      if (hasReports && allAnswered) {
-        reportColor = "#66bb6a";
-      } else if (hasReports && !allAnswered) {
-        reportColor = "#ffa726";
-      }
+      if (hasReports && allAnswered) reportColor = "#66bb6a";
+      else if (hasReports && !allAnswered) reportColor = "#ffa726";
 
       let hoverColor = "#e53935";
-      if (hasReports && allAnswered) {
-        hoverColor = "#4caf50";
-      } else if (hasReports && !allAnswered) {
-        hoverColor = "#fb8c00";
-      }
+      if (hasReports && allAnswered) hoverColor = "#4caf50";
+      else if (hasReports && !allAnswered) hoverColor = "#fb8c00";
 
       return (
-        <Box display={"flex"} gap={1}>
-          <Button
-            onClick={() => handleDownloadFile(row.fileName)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
-          </Button>
-          <Button
-            onClick={() => handleViewFile(row.fileName)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <VisibilityIcon sx={{ color: "#42a5f5" }} />
-          </Button>
-          <Button
-            onClick={() => handleEdit(row)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <EditIcon sx={{ color: "#ffa726" }} />
-          </Button>
-          {(user.role === "ADMIN" || user.role === "SYSTEM_ADMIN") && (
+        <Box display="flex" gap={1} justifyContent="center" width="100%">
+          <Box minWidth={32}>
+            {canViewDownload && (
+              <Button
+                onClick={() => handleViewFile(row.fileName)}
+                sx={{ padding: 0, minWidth: 0 }}
+              >
+                <VisibilityIcon sx={{ color: "#42a5f5" }} />
+              </Button>
+            )}
+          </Box>
+
+          <Box minWidth={32}>
+            {canViewDownload && (
+              <Button
+                onClick={() => handleDownloadFile(row.fileName)}
+                sx={{ padding: 0, minWidth: 0 }}
+              >
+                <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
+              </Button>
+            )}
+          </Box>
+
+          <Box minWidth={32}>
             <Button
-              onClick={() => handleDelete(row.id)}
+              onClick={() => handleEdit(row)}
               sx={{ padding: 0, minWidth: 0 }}
             >
-              <DeleteIcon sx={{ color: "#ef5350" }} />
+              <EditIcon sx={{ color: "#ffa726" }} />
             </Button>
-          )}
-          <Button
-            onClick={() => handleShowHistory(row.documentPartNumber)}
-            sx={{ padding: 0, minWidth: 0 }}
-          >
-            <HistoryIcon sx={{ color: "#ab47bc" }} />
-          </Button>
+          </Box>
 
-          {status === "APPROVED" && (
+          <Box minWidth={32}>
+            {(user.role === "ADMIN" || user.role === "SYSTEM_ADMIN") && (
+              <Button
+                onClick={() => handleDelete(row.id)}
+                sx={{ padding: 0, minWidth: 0 }}
+              >
+                <DeleteIcon sx={{ color: "#ef5350" }} />
+              </Button>
+            )}
+          </Box>
+
+          <Box minWidth={32}>
             <Button
-              onClick={() => handleReport(row)}
-              variant="contained"
-              sx={{
-                minWidth: "80px",
-                textTransform: "none",
-                backgroundColor: reportColor,
-                color: "white",
-                "&:hover": {
-                  backgroundColor: hoverColor,
-                },
-              }}
+              onClick={() => handleShowHistory(row.documentPartNumber)}
+              sx={{ padding: 0, minWidth: 0 }}
             >
-              Report
+              <HistoryIcon sx={{ color: "#ab47bc" }} />
             </Button>
-          )}
+          </Box>
+
+          <Box minWidth={80}>
+            {status === "APPROVED" && (
+              <Button
+                onClick={() => handleReport(row)}
+                variant="contained"
+                sx={{
+                  minWidth: "80px",
+                  textTransform: "none",
+                  backgroundColor: reportColor,
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: hoverColor,
+                  },
+                }}
+              >
+                Report
+              </Button>
+            )}
+          </Box>
         </Box>
       );
     },

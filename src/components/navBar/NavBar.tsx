@@ -18,24 +18,17 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  CircularProgress,
   Popper,
   Menu,
   MenuItem,
   Paper,
-  Popper,
   Toolbar,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useLogout } from "../../hooks/auth/authsHooks";
 import { SearchBar } from "../search/SearchBar";
 
@@ -73,6 +66,7 @@ export function NavBar({
   // Hover menu state for child items
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -99,6 +93,18 @@ export function NavBar({
     setMobileOpen(!mobileOpen);
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery.trim());
+    }
+  };
+
+  // Mobile drawer content
   // Mobile drawer content
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
@@ -111,6 +117,7 @@ export function NavBar({
       {/* Mobile search */}
       <Box sx={{ margin: theme.spacing(1) }}>
         <SearchBar onSearch={onSearch || (() => {})} fullWidth />
+      </Box>
       <Box
         component="form"
         onSubmit={handleSearchSubmit}
@@ -135,6 +142,7 @@ export function NavBar({
           <SearchIcon />
         </IconButton>
       </Box>
+
       <List>
         {menuItems.map((item) => (
           <React.Fragment key={item.path}>

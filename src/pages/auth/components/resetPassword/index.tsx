@@ -8,14 +8,14 @@ import {
   RESET_PASSWORD_ERROR,
 } from "./constants";
 import { snackBarError } from "../../../../components/toast/Toast.tsx";
-import { useResetPassword } from "../../../../hooks/user/userHooks.ts";
+import { useUpdateUser } from "../../../../hooks/user/userHooks.ts";
 
 export const ResetPasswordPage = () => {
   const [params] = useSearchParams();
   const email = params.get("email") || "";
   const [password, setPassword] = useState("");
 
-  const resetPasswordMutation = useResetPassword();
+  const resetPasswordMutation = useUpdateUser();
 
   const handleSubmit = () => {
     if (!email) {

@@ -11,3 +11,11 @@ export const RESET_PASSWORD_BUTTON = "Change Password";
 export const CREATE_USER_TITLE = "Create User";
 export const CANCEL_BUTTON = "Cancel";
 export const SAVE_USER_BUTTON = "Save";
+export const CLASSIFICATION_LABEL = "Classification";
+
+export const CLASSIFICATION_OPTIONS = [
+  { value: "PUBLIC", label: "Public" },
+  { value: "INTERNAL", label: "Internal" },
+  { value: "CONFIDENTIAL", label: "Confidential" },
+  { value: "SECRET", label: "Secret" },
+];

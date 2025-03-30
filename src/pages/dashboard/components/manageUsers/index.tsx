@@ -15,10 +15,8 @@ import { GridColDef } from "@mui/x-data-grid";
 import {
   useGetUsers,
   useCreateUser,
-  useUpdateUserRole,
-  useResetPassword,
+  useUpdateUser,
 } from "../../../../hooks/user/userHooks";
-
 import { GenericTable } from "../../../../components/genericTable/genericTable";
 import { GenericPopup } from "../../../../components/genericPopup/genericPopup";
 import {
@@ -31,30 +29,37 @@ import {
   CREATE_USER_TITLE,
   CANCEL_BUTTON,
   SAVE_USER_BUTTON,
+  CLASSIFICATION_LABEL,
+  CLASSIFICATION_OPTIONS,
 } from "./constants";
 
 export const ManageUsers = () => {
   const [openDialog, setOpenDialog] = useState(false);
+  const [resetDialog, setResetDialog] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+
   const [userData, setUserData] = useState({
     email: "",
     password: "",
     role: "USER",
+    classification: "PUBLIC",
   });
-
-  // 🆕 סטייטים חדשים לסיסמה חדשה
-  const [resetDialog, setResetDialog] = useState(false); // 🆕
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null); // 🆕
-  const [newPassword, setNewPassword] = useState(""); // 🆕
 
   const { data: users = [], isLoading } = useGetUsers();
   const createUserMutation = useCreateUser();
-  const updateUserRoleMutation = useUpdateUserRole();
-  const resetPasswordMutation = useResetPassword(); // יש לוודא ש-hook זה תומך בפרמטר סיסמה חדשה
+  const updateUserMutation = useUpdateUser();
 
   const handleOpenDialog = () => {
-    setUserData({ email: "", password: "", role: "USER" });
+    setUserData({
+      email: "",
+      password: "",
+      role: "USER",
+      classification: "PUBLIC",
+    });
     setOpenDialog(true);
   };
+
   const handleCloseDialog = () => setOpenDialog(false);
 
   const handleSaveUser = () => {
@@ -62,8 +67,22 @@ export const ManageUsers = () => {
     createUserMutation.mutate(userData, { onSuccess: handleCloseDialog });
   };
 
-  const handleRoleChange = (userId: string, newRole: string) => {
-    updateUserRoleMutation.mutate({ userId, newRole });
+  const handleUpdate = (
+    userId: number,
+    data: { role?: string; classification?: string; newPassword?: string }
+  ) => {
+    updateUserMutation.mutate({ userId, ...data });
+  };
+
+  const handleRoleChange = (userId: number, role: string) => {
+    handleUpdate(userId, { role });
+  };
+
+  const handleClassificationChange = (
+    userId: number,
+    classification: string
+  ) => {
+    handleUpdate(userId, { classification });
   };
 
   const handleOpenResetDialog = (userId: string) => {
@@ -80,10 +99,8 @@ export const ManageUsers = () => {
 
   const handleResetPassword = () => {
     if (!selectedUserId || !newPassword) return;
-    resetPasswordMutation.mutate(
-      { userId: selectedUserId, newPassword },
-      { onSuccess: handleCloseResetDialog }
-    );
+    handleUpdate(Number(selectedUserId), { newPassword });
+    handleCloseResetDialog();
   };
 
   const columns: GridColDef[] = [
@@ -93,15 +110,45 @@ export const ManageUsers = () => {
       headerName: ROLE_LABEL,
       flex: 1,
       renderCell: (params) => (
-        <FormControl fullWidth>
+        <FormControl
+          fullWidth
+          size="small"
+          variant="outlined"
+          sx={{ "& fieldset": { border: "none" } }}
+        >
           <Select
             value={params.value}
             onChange={(e) => handleRoleChange(params.row.id, e.target.value)}
-            sx={{ width: "100%" }}
           >
             {ROLE_OPTIONS.map((role) => (
               <MenuItem key={role.value} value={role.value}>
                 {role.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ),
+    },
+    {
+      field: "classification",
+      headerName: CLASSIFICATION_LABEL,
+      flex: 1,
+      renderCell: (params) => (
+        <FormControl
+          fullWidth
+          size="small"
+          variant="outlined"
+          sx={{ "& fieldset": { border: "none" } }}
+        >
+          <Select
+            value={params.value || "PUBLIC"}
+            onChange={(e) =>
+              handleClassificationChange(params.row.id, e.target.value)
+            }
+          >
+            {CLASSIFICATION_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
               </MenuItem>
             ))}
           </Select>
@@ -143,9 +190,14 @@ export const ManageUsers = () => {
         rows={users}
         rowCount={users.length}
         pageSize={10}
-        hideFooterPagination={true}
         onPaginationModelChange={() => {}}
-        sx={{ height: "auto", width: "70%" }}
+        hideFooterPagination
+        sx={{
+          width: "85%",
+          height: "auto",
+          border: "none",
+          "& .MuiDataGrid-virtualScroller": { overflow: "visible" },
+        }}
       />
 
       <GenericPopup
@@ -182,6 +234,21 @@ export const ManageUsers = () => {
             {ROLE_OPTIONS.map((role) => (
               <MenuItem key={role.value} value={role.value}>
                 {role.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl fullWidth margin="dense">
+          <InputLabel>{CLASSIFICATION_LABEL}</InputLabel>
+          <Select
+            value={userData.classification}
+            onChange={(e) =>
+              setUserData({ ...userData, classification: e.target.value })
+            }
+          >
+            {CLASSIFICATION_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
               </MenuItem>
             ))}
           </Select>
