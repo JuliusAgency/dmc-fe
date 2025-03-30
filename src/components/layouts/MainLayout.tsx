@@ -52,7 +52,10 @@ export const MainLayout = () => {
   const categoryMenuItems: MenuItem[] = useMemo(() => {
     return (
       categoriesData?.map((category) => ({
-        path: `/`,
+        path:
+          category.childCategories?.length > 0
+            ? `/category/${category.childCategories[0].id}`
+            : "/",
         icon: null,
         text: category.name,
         disabled: false,

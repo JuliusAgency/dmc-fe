@@ -75,3 +75,17 @@ export const useDeleteCategory = () => {
     },
   });
 };
+
+export const useGetCategoryById = (categoryId?: number): UseQueryResult<Category | undefined, Error> => {
+  const categoriesQuery = useGetAllCategories();
+  
+  return useQuery({
+    queryKey: ["getCategory", categoryId],
+    queryFn: () => {
+      // Find the category with the matching ID from all categories
+      return categoriesQuery.data?.find(category => category.id === categoryId);
+    },
+    enabled: !!categoryId && !!categoriesQuery.data,
+    refetchOnWindowFocus: false,
+  });
+};

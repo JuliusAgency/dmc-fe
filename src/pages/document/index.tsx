@@ -7,6 +7,7 @@ import {
   useDeleteDocument,
 } from "../../hooks/document/documentHooks.ts";
 import { useCallback, useState, useEffect } from "react";
+import { useTheme, Typography } from "@mui/material";
 import { PaginationModel } from "../../consts/types.ts";
 import { Box, Button, Grid } from "@mui/material";
 import { AddDocument } from "./components/addDocument/index.tsx";
@@ -15,21 +16,29 @@ import { DocumentType } from "../../api/documentAPI/types.ts";
 import { useParams } from "react-router-dom";
 import { DocumentHistory } from "./components/documentHistory";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
+import { useGetCategoryById } from "../../hooks/category/categoryHooks.ts";
 import { useFileDownload } from "../../hooks/utils/useFileDownload";
 import { CONFIG } from "../../consts/config.ts";
 import { snackBarInfo } from "../../components/toast/Toast";
 import { GridRowId } from "@mui/x-data-grid-pro";
 import { DisplaySignatures } from "./components/displaySignatures";
 import { ReportIssuePopup } from "./components/reportIssuePopup";
+import { alpha } from "@mui/material/styles";
 
 export const Document = () => {
   const { id: categoryId } = useParams();
   const { handleDownloadFile } = useFileDownload();
+  const theme = useTheme();
 
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 15,
     page: 0,
   });
+
+  // Fetch category data
+  const categoryQuery = useGetCategoryById(
+    categoryId ? Number(categoryId) : undefined
+  );
 
   const [isAddDocumentModalOpen, setIsAddDocumentModalOpen] = useState(false);
   const [documentToEdit, setDocumentToEdit] = useState<
@@ -225,6 +234,23 @@ export const Document = () => {
         padding: 2,
       }}
     >
+      {/* Category Name Header */}
+      {categoryQuery.data && (
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            mb: 3,
+            fontWeight: 600,
+            color: theme.palette.primary.main,
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+            paddingBottom: 1,
+          }}
+        >
+          {categoryQuery.data.name}
+        </Typography>
+      )}
+
       <Grid container justifyContent={"flex-start"} width={"100%"} mb={2}>
         <Button variant="outlined" onClick={toggleDocumentModal}>
           Add Document

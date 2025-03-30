@@ -85,10 +85,12 @@ export const useRejectSignature = () => {
     mutationFn: ({
       documentId,
       userId,
+      rejectReason,
     }: {
       documentId: number;
       userId: number;
-    }) => rejectSignature(documentId, userId),
+      rejectReason: string;
+    }) => rejectSignature(documentId, userId, rejectReason),
     onSuccess: (_, { documentId }) => {
       snackBarSuccess(SIGNATURES_REJECT_SUCCESS);
       queryClient.invalidateQueries({
