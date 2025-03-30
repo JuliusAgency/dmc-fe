@@ -12,9 +12,6 @@ import {
   QueryClientProvider as TanStackQueryClientProvider,
 } from "@tanstack/react-query";
 
-LicenseInfo.setLicenseKey(
-  "c484f5b7ccc06428b20f971c4eff136Tz03MTQyMixFPTE3MjE5MjA1MjMwMDAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI"
-);
 const queryClient = new QueryClient();
 
 const tanstackQueryClient = new TanStackQueryClient({
@@ -25,6 +22,8 @@ const tanstackQueryClient = new TanStackQueryClient({
     },
   },
 });
+
+LicenseInfo.setLicenseKey(CONFIG.MUI_LICENSE_KEY);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
