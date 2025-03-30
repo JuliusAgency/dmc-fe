@@ -85,14 +85,23 @@ export const useReportColumns = (
       row.response ? (
         <Chip
           label={row.response}
-          color="success"
-          sx={{ whiteSpace: "pre-line", borderRadius: "6px" }}
+          sx={{
+            backgroundColor: "#66bb6a",
+            color: "white",
+            borderRadius: "6px",
+            fontWeight: "bold",
+            whiteSpace: "pre-line",
+          }}
         />
       ) : (
         <Chip
           label="Awaiting Response"
-          color="warning"
-          sx={{ borderRadius: "6px" }}
+          sx={{
+            backgroundColor: "#ffa726",
+            color: "white",
+            borderRadius: "6px",
+            fontWeight: "bold",
+          }}
         />
       ),
   },
@@ -104,9 +113,17 @@ export const useReportColumns = (
     align: "center",
     renderCell: ({ row }) => (
       <Button
-        variant="contained"
-        color={row.response ? "success" : "warning"}
         onClick={() => onClick(row.id, row.response)}
+        variant="contained"
+        sx={{
+          textTransform: "none",
+          borderRadius: "6px",
+          backgroundColor: row.response ? "#66bb6a" : "#ffa726",
+          color: "white",
+          "&:hover": {
+            backgroundColor: row.response ? "#4caf50" : "#fb8c00",
+          },
+        }}
       >
         {row.response ? "Edit Response" : REPORTS_TABLE_ACTION}
       </Button>

@@ -10,7 +10,7 @@ import {
 import { snackBarError } from "../../../../components/toast/Toast.tsx";
 import { useResetPassword } from "../../../../hooks/user/userHooks.ts";
 
-export default function ResetPassword() {
+export const ResetPasswordPage = () => {
   const [params] = useSearchParams();
   const email = params.get("email") || "";
   const [password, setPassword] = useState("");
@@ -48,4 +48,4 @@ export default function ResetPassword() {
       </Button>
     </Box>
   );
-}
+};

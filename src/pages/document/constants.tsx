@@ -15,7 +15,7 @@ export const getActionColumn = (
   handleDelete: (documentId: number) => void,
   handleShowHistory: (documentPartNumber: string) => void,
   handleReport: (document: DocumentType) => void
-) => {
+): GridColDef => {
   const storedUser = localStorage.getItem("user");
   const user =
     useSelector((state: any) => state.user.user) ||
@@ -28,14 +28,23 @@ export const getActionColumn = (
     width: 250,
     align: "center",
     renderCell: ({ row }) => {
-      console.log(row);
       const hasReports = row.reports?.length > 0;
       const allAnswered = row.reports?.every((r: any) => !!r.response);
-      const buttonColor = hasReports
-        ? allAnswered
-          ? "success"
-          : "warning"
-        : "warning";
+      const status = row.status;
+
+      let reportColor = "#ef5350";
+      if (hasReports && allAnswered) {
+        reportColor = "#66bb6a";
+      } else if (hasReports && !allAnswered) {
+        reportColor = "#ffa726";
+      }
+
+      let hoverColor = "#e53935";
+      if (hasReports && allAnswered) {
+        hoverColor = "#4caf50";
+      } else if (hasReports && !allAnswered) {
+        hoverColor = "#fb8c00";
+      }
 
       return (
         <Box display={"flex"} gap={1}>
@@ -71,17 +80,20 @@ export const getActionColumn = (
           >
             <HistoryIcon sx={{ color: "#ab47bc" }} />
           </Button>
-          {row.status === "APPROVED" && (
+
+          {status === "APPROVED" && (
             <Button
               onClick={() => handleReport(row)}
-              color={
-                row.reports?.length > 0 &&
-                row.reports.some((r: any) => !r.response)
-                  ? "warning"
-                  : "success"
-              }
               variant="contained"
-              sx={{ minWidth: "80px", textTransform: "none" }}
+              sx={{
+                minWidth: "80px",
+                textTransform: "none",
+                backgroundColor: reportColor,
+                color: "white",
+                "&:hover": {
+                  backgroundColor: hoverColor,
+                },
+              }}
             >
               Report
             </Button>
@@ -89,5 +101,5 @@ export const getActionColumn = (
         </Box>
       );
     },
-  } as GridColDef;
+  };
 };

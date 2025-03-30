@@ -8,6 +8,7 @@ import { useUser } from "../../hooks/auth/authsHooks";
 import { useParentCategories } from "../../hooks/category/categoryHooks";
 import { NavBar } from "../navBar";
 import { MenuItem } from "../navBar/NavBar";
+import HistoryIcon from "@mui/icons-material/History";
 
 // Layout component for authenticated routes with NavBar
 export const MainLayout = () => {
@@ -23,6 +24,12 @@ export const MainLayout = () => {
               path: "/dashboard",
               icon: <DashboardIcon />,
               text: "Dashboard",
+              disabled: false,
+            },
+            {
+              path: "/audit-trail",
+              icon: <HistoryIcon />,
+              text: "Audit Trail",
               disabled: false,
             },
           ]

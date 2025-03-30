@@ -11,8 +11,9 @@ import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
 import { PendingSignatures } from "./pages/pendingSignatures";
 import { HomePage } from "./pages/home";
-import ResetPasswordPage from "./pages/auth/components/resetPassword";
+import { ResetPasswordPage } from "./pages/auth/components/resetPassword";
 import { ReportsPage } from "./pages/report";
+import { AuditTrailPage } from "./pages/auditTrail";
 import { useAutoLogout } from "./hooks/utils/useAutoLogout.ts";
 import "./styles.css";
 
@@ -42,6 +43,7 @@ const MainRoutes = () => {
         <Route path="/pending-signature" element={<PendingSignatures />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/audit-trail" element={<AuditTrailPage />} />
         {/* TODO: implement category page */}
         <Route path="/category/:id" element={<Document key="category" />} />
         <Route path="/" element={<Navigate to="/home" replace />} />
