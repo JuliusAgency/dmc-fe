@@ -8,7 +8,7 @@ export interface DocumentType {
   fileName: string;
   type: FileType;
   documentPartNumber: string;
-  docType: Tag;
+  docPartNumberType: Tag;
   classification: Classification;
   revision: string;
   isFinal: boolean;
@@ -20,7 +20,7 @@ export interface DocumentType {
   category: Category;
   secretLevel: SecretLevel;
   tags: DocumentTag[] | Tag[];
-  department: string;
+  docType: DocumentTypeEnum;
   nextReview: Date;
   signatures: DocumentSignature[];
   updatedBy: string;
@@ -80,3 +80,22 @@ export interface DocumentSignature {
 }
 
 export type GetAllDocumentsResponse = { data: DocumentType[]; total: number };
+
+export enum DocumentTypeEnum {
+  QUALITY_PROCEDURE = "QUALITY_PROCEDURE",
+  MANUAL = "MANUAL",
+  ACCEPTANCE_TEST_PROCEDURE = "ACCEPTANCE_TEST_PROCEDURE",
+  ACCEPTANCE_TEST_REPORT = "ACCEPTANCE_TEST_REPORT",
+  PRODUCT_TEST_REPORT = "PRODUCT_TEST_REPORT",
+  GENERAL_DOCUMENT = "GENERAL_DOCUMENT",
+  INVESTIGATION = "INVESTIGATION",
+  TEMPLATE = "TEMPLATE",
+  WAIVER = "WAIVER",
+  WORK_INSTRUCTION = "WORK_INSTRUCTION",
+  RFC = "RFC",
+  PRODUCT_PROCEDURE = "PRODUCT_PROCEDURE",
+  SPECIFICATION = "SPECIFICATION",
+  MSDS = "MSDS",
+  SAFETY = "SAFETY",
+  TRAINING = "TRAINING",
+}

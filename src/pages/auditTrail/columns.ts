@@ -4,14 +4,16 @@ import {
   AuditAction,
   AUDIT_ACTION_LABELS,
 } from "../../api/auditTrailAPI.ts/types";
+import { formatDate } from "../../utils/formatDate";
 
 export const COLUMNS: GridColDef<AuditTrail>[] = [
   {
     field: "timestamp",
-    headerName: "Timestamp",
+    headerName: " date",
     flex: 1,
     headerAlign: "center",
     align: "center",
+    valueGetter: (params: any) => formatDate(params),
   },
   {
     field: "user",

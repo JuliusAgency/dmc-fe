@@ -4,8 +4,9 @@ import { Classification, FileType } from "../../api/documentAPI/types";
 import { GridEditSingleSelectCell } from "@mui/x-data-grid-pro";
 import { useGetUsers } from "../../hooks/user/userHooks";
 import { useMemo } from "react";
-import { Chip, Button } from "@mui/material";
+import { Chip, Button, Typography } from "@mui/material";
 import { DocumentType } from "../../api/documentAPI/types";
+import { DocumentTypeDisplayNameMap } from "./components/addDocument/constants";
 
 export enum DocumentStatus {
   DRAFT = "DRAFT",
@@ -13,6 +14,23 @@ export enum DocumentStatus {
   APPROVED = "APPROVED",
   ARCHIVED = "ARCHIVED",
 }
+
+const cellStyle = {
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  fontSize: "0.75rem",
+};
+
+export const DOC_TYPE_OPTIONS = Object.values(DocumentTypeDisplayNameMap).map(
+  (value) => ({
+    value,
+    label: value
+      .toLowerCase()
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase()),
+  })
+);
 
 export const useColumns = (
   onOpenSignatures: (doc: DocumentType) => void
@@ -64,14 +82,22 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1.2,
+      minWidth: 100,
       editable: true,
+      renderCell: (params) => (
+        <Typography sx={cellStyle}>{params.value}</Typography>
+      ),
     },
     {
       field: "documentPartNumber",
-      headerName: "Document PNumber",
+      headerName: "Document P.N",
       headerAlign: "center",
       align: "center",
       flex: 1.5,
+      minWidth: 130,
+      renderCell: (params) => (
+        <Typography sx={cellStyle}>{params.value}</Typography>
+      ),
     },
     {
       field: "classification",
@@ -79,34 +105,45 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 110,
       editable: true,
       type: "singleSelect",
       valueOptions: Object.values(Classification),
       renderEditCell: (params: GridRenderEditCellParams) => (
         <GridEditSingleSelectCell {...params} />
       ),
-      renderCell: (params: any) => (
+      renderCell: (params) => (
         <Chip
-          label={params?.value}
+          label={params.value}
           sx={{
-            backgroundColor: getClassificationColor(params?.value),
+            backgroundColor: getClassificationColor(params.value),
             color: "white",
-            fontWeight: "bold",
+            fontSize: "0.7rem",
+            height: 24,
           }}
         />
       ),
     },
     {
-      field: "category",
-      headerName: "Department",
+      field: "docType",
+      headerName: "Doc Type",
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       editable: true,
-      type: "string",
-      valueGetter: (params: any) => {
-        return params?.value?.name ?? "Not Assigned";
-      },
+      type: "singleSelect",
+      valueOptions: Object.keys(DocumentTypeDisplayNameMap),
+      renderEditCell: (params: GridRenderEditCellParams) => (
+        <GridEditSingleSelectCell {...params} />
+      ),
+      valueFormatter: (params: any) =>
+        DocumentTypeDisplayNameMap[params.value] || params.value,
+      renderCell: (params: any) => (
+        <Typography sx={cellStyle}>
+          {DocumentTypeDisplayNameMap[params.value] || params.value}
+        </Typography>
+      ),
     },
     {
       field: "processOwnerId",
@@ -114,24 +151,16 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1.5,
+      minWidth: 150,
       editable: true,
       type: "singleSelect",
-      valueOptions: userOptions.map((user: any) => ({
-        value: user.id,
-        label: user.name,
+      valueOptions: userOptions.map((u) => ({
+        value: u.id,
+        label: u.name,
       })),
       renderEditCell: (params: GridRenderEditCellParams) => (
-        <GridEditSingleSelectCell
-          {...params}
-          options={userOptions.map((user: any) => ({
-            value: user.id,
-            label: user.name,
-          }))}
-        />
+        <GridEditSingleSelectCell {...params} />
       ),
-
-      valueGetter: (params: any) => params,
-
       valueFormatter: (params: any) => {
         const user = userOptions.find((u) => u.id === params);
         return user?.name || "N/A";
@@ -143,6 +172,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 0.7,
+      minWidth: 70,
       editable: true,
     },
     {
@@ -151,7 +181,8 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      valueGetter: (params: any) => formatDate(params),
+      minWidth: 100,
+      valueGetter: (params) => formatDate(params),
     },
     {
       field: "id",
@@ -159,8 +190,14 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       renderCell: (params) => (
-        <Button variant="text" onClick={() => onOpenSignatures(params.row)}>
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => onOpenSignatures(params.row)}
+          sx={{ fontSize: "0.7rem", textTransform: "none" }}
+        >
           {params.value}
         </Button>
       ),
@@ -171,6 +208,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 100,
       editable: true,
       type: "singleSelect",
       valueOptions: Object.values(FileType),
@@ -184,14 +222,15 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 100,
       renderCell: (params) => (
         <Chip
           label={params.value}
           sx={{
             backgroundColor: getStatusColor(params.value),
             color: "white",
-            fontWeight: "bold",
-            borderRadius: "6px",
+            fontSize: "0.7rem",
+            height: 24,
           }}
         />
       ),
@@ -202,7 +241,8 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      valueGetter: (params: any) => formatDate(params),
+      minWidth: 100,
+      valueGetter: (params) => formatDate(params),
     },
     {
       field: "updatedBy",
@@ -210,6 +250,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 100,
     },
     {
       field: "nextReview",
@@ -217,10 +258,11 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
+      minWidth: 120,
       editable: true,
       type: "date",
-      valueGetter: (params: any) => formatDate(params),
-      valueFormatter: (params: any) => formatDate(params),
+      valueGetter: (params) => formatDate(params),
+      valueFormatter: (params) => formatDate(params),
     },
   ];
 };

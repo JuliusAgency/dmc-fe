@@ -29,6 +29,7 @@ import {
   BUTTON_SAVE,
   BUTTON_CANCEL,
   ERROR_UPLOAD,
+  DOC_TYPE_OPTIONS,
 } from "./constants.ts";
 import { Props } from "./types.ts";
 import { GenericPopup } from "../../../../components/genericPopup/genericPopup";
@@ -50,7 +51,7 @@ export const AddDocument = ({
     (storedUser ? JSON.parse(storedUser) : null);
 
   const [formData, setFormData] = useState({
-    docType: null as Option | null,
+    docPartNumberType: null as Option | null,
     documentPartNumber: "",
     name: "",
     classification: { id: 1, name: "Public" } as Option,
@@ -61,13 +62,14 @@ export const AddDocument = ({
     processOwner: user?.id || "Unknown",
     type: null as Option | null,
     categoryId: "",
+    docType: null as Option | null,
   });
 
   const [file, setFile] = useState<File | null>(null);
 
   const { data: generatedPartNumber } = useGenerateDocumentPartNumber(
-    formData.docType?.id || null,
-    formData.docType?.name || null
+    formData.docPartNumberType?.id || null,
+    formData.docPartNumberType?.name || null
   );
 
   const location = useLocation();
@@ -100,8 +102,11 @@ export const AddDocument = ({
         revision: String(Number(documentToEdit.revision) + 1).padStart(2, "0"),
         fileName: documentToEdit.fileName || "",
         isFinal: false,
-        docType: documentToEdit.docType
-          ? { id: documentToEdit.docType.id, name: documentToEdit.docType.name }
+        docPartNumberType: documentToEdit.docPartNumberType
+          ? {
+              id: documentToEdit.docPartNumberType.id,
+              name: documentToEdit.docPartNumberType.name,
+            }
           : null,
         type: documentToEdit.type ? { id: 1, name: documentToEdit.type } : null,
       }));
@@ -143,7 +148,8 @@ export const AddDocument = ({
       !formData.documentPartNumber ||
       !formData.name ||
       !formData.classification ||
-      !file
+      !file ||
+      formData.type
     ) {
       snackBarError(ERROR_REQUIRED_FIELDS);
       return;
@@ -155,7 +161,7 @@ export const AddDocument = ({
       formDataToSend.append(
         "entityData",
         JSON.stringify({
-          docTypeId: formData.docType?.id,
+          docPartNumberTypeId: formData.docPartNumberType?.id,
           classification: formData.classification.name.toUpperCase(),
           updatedBy: user?.email || null,
           revision: Number(formData.revision),
@@ -167,6 +173,7 @@ export const AddDocument = ({
           type: formData.type?.name.toUpperCase(),
           categoryId: Number(categoryId),
           processOwnerId: user?.id,
+          docType: formData.docType?.name.toUpperCase().replace(/ /g, "_"),
         })
       );
 
@@ -182,7 +189,7 @@ export const AddDocument = ({
       }
 
       setFormData({
-        docType: null,
+        docPartNumberType: null,
         documentPartNumber: "",
         name: "",
         classification: { id: 1, name: "Public" },
@@ -193,6 +200,7 @@ export const AddDocument = ({
         processOwner: null,
         type: null,
         categoryId: "",
+        docType: null,
       });
 
       setFile(null);
@@ -222,16 +230,32 @@ export const AddDocument = ({
             sx={{ minWidth: 250, typography: "h6" }}
           />
         </Grid>
+        <Grid item xs={12} md={12}>
+          <GridMultipleAutocomplete
+            multiple={false}
+            onChange={(value) => handleInputChange("docType", value)}
+            value={formData.docType}
+            fullWidth
+            selectorData={{
+              label: "Document Type",
+              accessorId: "docType",
+              options: DOC_TYPE_OPTIONS,
+            }}
+            sx={{ minWidth: 250, typography: "h6" }}
+          />
+        </Grid>
         {!documentToEdit && (
           <Grid item xs={12} md={12}>
             <GridMultipleAutocomplete
               multiple={false}
-              onChange={(value) => handleInputChange("docType", value)}
-              value={formData.docType}
+              onChange={(value) =>
+                handleInputChange("docPartNumberType", value)
+              }
+              value={formData.docPartNumberType}
               fullWidth
               selectorData={{
-                label: "Document Type",
-                accessorId: "docType",
+                label: "Document Part Number Type",
+                accessorId: "docPartNumberType",
                 options: partNumberOptions || [],
               }}
               sx={{ minWidth: 250, typography: "h6" }}

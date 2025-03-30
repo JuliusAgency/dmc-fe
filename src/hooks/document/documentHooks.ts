@@ -156,18 +156,18 @@ export const useUpdateDocument = () => {
 };
 
 export const useGenerateDocumentPartNumber = (
-  docTypeId: number | null,
-  docType: string | null
+  docPartNumberTypeId: number | null,
+  docPartNumberType: string | null
 ) => {
   return useQuery(
-    ["generateDocumentPartNumber", docTypeId],
+    ["generateDocumentPartNumber", docPartNumberTypeId],
     async () => {
-      if (!docTypeId) return null;
+      if (!docPartNumberTypeId) return null;
 
-      const prefix = docType?.slice(0, 3);
-      const suffix = docType?.slice(-2);
+      const prefix = docPartNumberType?.slice(0, 3);
+      const suffix = docPartNumberType?.slice(-2);
       try {
-        const data = await getLastDocumentPartNumber(docTypeId);
+        const data = await getLastDocumentPartNumber(docPartNumberTypeId);
         let nextNumber = 1;
 
         if (data?.lastNumber) {
@@ -185,7 +185,7 @@ export const useGenerateDocumentPartNumber = (
       }
     },
     {
-      enabled: !!docTypeId,
+      enabled: !!docPartNumberTypeId,
       refetchOnWindowFocus: false,
     }
   );

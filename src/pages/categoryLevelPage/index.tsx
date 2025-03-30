@@ -7,13 +7,15 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useChildCategories } from "../../hooks/category/categoryHooks";
+import {
+  useChildCategories,
+  useGetCategoryById,
+} from "../../hooks/category/categoryHooks";
 import FolderIcon from "@mui/icons-material/Folder";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useEffect, useState } from "react";
 import { Document } from "../document";
 import {
-  CATEGORY_PAGE_TITLE,
   CATEGORY_LOADING_TEXT,
   CATEGORY_CARD_STYLES,
   CATEGORY_CARD_CONTENT_STYLES,
@@ -37,6 +39,8 @@ export const CategoryLevelPage = () => {
   }, [location.pathname]);
 
   const { data: categories = [], isLoading } = useChildCategories();
+  const { data: currentCategory, isLoading: loadingCategory } =
+    useGetCategoryById(currentId ?? undefined);
 
   const filteredCategories = categories.filter(
     (cat) => String(cat.parentCategoryId) === String(currentId)
@@ -56,7 +60,7 @@ export const CategoryLevelPage = () => {
         variant="h5"
         sx={{ mb: 3, color: CATEGORY_TITLE_COLOR, fontWeight: "bold" }}
       >
-        {CATEGORY_PAGE_TITLE(currentLevel || 1)}
+        {loadingCategory ? "Loading..." : currentCategory?.name || "Category"}
       </Typography>
 
       {isLoading ? (

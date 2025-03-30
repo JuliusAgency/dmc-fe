@@ -145,9 +145,11 @@ export const getFile = async (fileName: string): Promise<Blob> => {
   return response.data;
 };
 
-export const getLastDocumentPartNumber = async (docTypeId: number) => {
+export const getLastDocumentPartNumber = async (
+  docPartNumberTypeId: number
+) => {
   const response = await API.get(DocumentEndpoints.lastDocumentPartNumber, {
-    params: { docTypeId },
+    params: { docPartNumberTypeId },
   });
   return response.data;
 };
