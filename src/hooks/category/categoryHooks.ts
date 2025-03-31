@@ -37,7 +37,7 @@ export const useChildCategories = () => {
   };
 };
 
-const useGetAllCategories = (): UseQueryResult<Category[], Error> => {
+export const useGetAllCategories = (): UseQueryResult<Category[], Error> => {
   return useQuery({
     queryKey: ["getAllCategories"],
     queryFn: getAllCategories,

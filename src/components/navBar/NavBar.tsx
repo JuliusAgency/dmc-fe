@@ -31,6 +31,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { useLogout } from "../../hooks/auth/authsHooks";
 import { SearchBar } from "../search/SearchBar";
+import { useSelector } from "react-redux";
+import { Category } from "../../api/categoryAPI/types";
 
 export type MenuItem = {
   path: string;
@@ -38,6 +40,7 @@ export type MenuItem = {
   text: string;
   disabled?: boolean;
   childItems?: MenuItem[];
+  categoryId?: number;
 };
 
 export function NavBar({
@@ -56,14 +59,32 @@ export function NavBar({
 
   const { mutate } = useLogout();
 
-  // Mobile drawer state
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const storedUser = localStorage.getItem("user");
+  const user =
+    useSelector((state: any) => state.user.user) ||
+    (storedUser ? JSON.parse(storedUser) : null);
 
-  // User menu state
+  const blockedCategoryIds: number[] =
+    user?.blockedCategories?.map((cat: Category) => {
+      return cat.id;
+    }) || [];
+
+  const filteredMenuItems = menuItems
+    .filter(
+      (item) =>
+        !item.categoryId || !blockedCategoryIds.includes(item.categoryId)
+    )
+    .map((item) => ({
+      ...item,
+      childItems: item.childItems?.filter(
+        (child) =>
+          !child.categoryId || !blockedCategoryIds.includes(child.categoryId)
+      ),
+    }));
+
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const userMenuOpen = Boolean(anchorEl);
-
-  // Hover menu state for child items
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,8 +114,6 @@ export function NavBar({
     setMobileOpen(!mobileOpen);
   };
 
-  // Mobile drawer content
-  // Mobile drawer content
   const drawer = (
     <Box sx={{ width: 250 }} role="presentation">
       <Box sx={{ p: 2 }}>
@@ -103,7 +122,6 @@ export function NavBar({
         </Typography>
       </Box>
       <Divider />
-      {/* Mobile search */}
       <Box sx={{ margin: theme.spacing(1) }}>
         <SearchBar onSearch={onSearch || (() => {})} fullWidth />
       </Box>
@@ -129,9 +147,8 @@ export function NavBar({
           <SearchIcon />
         </IconButton>
       </Box>
-
       <List>
-        {menuItems.map((item) => (
+        {filteredMenuItems.map((item) => (
           <React.Fragment key={item.path}>
             <ListItem disablePadding>
               <ListItemButton
@@ -176,29 +193,16 @@ export function NavBar({
             backgroundColor: "#e3f2fd",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mr: 2,
-            }}
-          >
-            <img
-              src="/images/home.png"
-              alt="Logo"
-              style={{
-                height: "40px",
-              }}
-            />
+          <Box sx={{ display: "flex", alignItems: "center", mr: 2 }}>
+            <img src="/images/home.png" alt="Logo" style={{ height: "40px" }} />
           </Box>
-          {/* Loading indicator */}
+
           {loading && (
             <Box sx={{ display: "flex", mr: 2 }}>
               <CircularProgress size={24} color="primary" />
             </Box>
           )}
 
-          {/* Mobile menu button */}
           {isMobile ? (
             <IconButton
               color="inherit"
@@ -211,26 +215,25 @@ export function NavBar({
             </IconButton>
           ) : null}
 
-          {/* Desktop navigation */}
           {!isMobile && (
             <Box
               sx={{
                 display: "flex",
                 flexGrow: 1,
-                flexWrap: "wrap", // Allow items to wrap to next line
+                flexWrap: "wrap",
                 alignItems: "center",
-                maxWidth: "calc(100% - 50px)", // Reserve space for search and user menu
+                maxWidth: "calc(100% - 50px)",
                 overflow: "visible",
               }}
             >
-              {menuItems.map((item, index) => (
+              {filteredMenuItems.map((item, index) => (
                 <Box
                   key={item.path}
                   sx={{
                     color: theme.palette.primary.main,
                     position: "relative",
-                    mb: 0.5, // Add some margin bottom for wrapped items
-                    mt: 0.5, // Add some margin top for wrapped items
+                    mb: 0.5,
+                    mt: 0.5,
                   }}
                 >
                   <Button
@@ -260,8 +263,8 @@ export function NavBar({
                       "&:hover": {
                         backgroundColor: "rgba(0, 0, 0, 0.04)",
                       },
-                      whiteSpace: "nowrap", // Prevent text from wrapping inside button
-                      minHeight: "36px", // Ensure consistent height
+                      whiteSpace: "nowrap",
+                      minHeight: "36px",
                     }}
                   >
                     {item.text}
@@ -273,9 +276,7 @@ export function NavBar({
                       placement="bottom-start"
                       transition
                       disablePortal
-                      sx={{
-                        zIndex: 1300,
-                      }}
+                      sx={{ zIndex: 1300 }}
                     >
                       {({ TransitionProps }) => (
                         <Grow
@@ -328,12 +329,10 @@ export function NavBar({
             </Box>
           )}
 
-          {/* Search box */}
           <Box sx={{ display: { xs: isMobile ? "none" : "flex", md: "flex" } }}>
             <SearchBar onSearch={onSearch || (() => {})} />
           </Box>
 
-          {/* User menu */}
           <Box sx={{ flexShrink: 0 }}>
             <IconButton
               onClick={handleUserMenuClick}
@@ -351,17 +350,9 @@ export function NavBar({
               anchorEl={anchorEl}
               open={userMenuOpen}
               onClose={handleUserMenuClose}
-              MenuListProps={{
-                "aria-labelledby": "user-button",
-              }}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              MenuListProps={{ "aria-labelledby": "user-button" }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
               <MenuItem sx={{ color: "red" }} onClick={handleLogout}>
                 Logout
@@ -371,14 +362,11 @@ export function NavBar({
         </Toolbar>
       </AppBar>
 
-      {/* Mobile drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true, // Better mobile performance
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": { boxSizing: "border-box", width: 250 },

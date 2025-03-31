@@ -2,6 +2,7 @@ export const USERS_TITLE = "Manage Users";
 export const EMAIL_LABEL = "Email";
 export const PASSWORD_LABEL = "Password";
 export const ROLE_LABEL = "Role";
+export const CATEGORY_PERMISSIONS_LABEL = "Category Permissions";
 export const ROLE_OPTIONS = [
   { value: "USER", label: "User" },
   { value: "ADMIN", label: "Admin" },

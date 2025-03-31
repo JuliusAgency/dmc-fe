@@ -29,7 +29,7 @@ export interface GridMultipleAutocompleteProps {
 
 const StyledChip = styled(Chip)({
   "& .MuiChip-deleteIcon": {
-    marginLeft: "2px", // Adjust this value to move the cancel button
+    marginLeft: "2px",
   },
 });
 

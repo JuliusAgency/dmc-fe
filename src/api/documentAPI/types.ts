@@ -24,6 +24,7 @@ export interface DocumentType {
   nextReview: Date;
   signatures: DocumentSignature[];
   updatedBy: string;
+  status: string;
 }
 
 export enum FileType {

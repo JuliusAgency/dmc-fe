@@ -55,16 +55,18 @@ export const MainLayout = () => {
         path:
           category.childCategories?.length > 0
             ? `/category/${category.childCategories[0].id}`
-            : "/",
+            : `/category/${category.id}`,
         icon: null,
         text: category.name,
         disabled: false,
+        categoryId: category.id,
         childItems:
           category.childCategories?.map((child) => ({
             path: `/category/${child.id}`,
             icon: null,
             text: child.name,
             disabled: false,
+            categoryId: child.id,
           })) || [],
       })) || []
     );
