@@ -50,6 +50,9 @@ export const AddDocument = ({
     useSelector((state: any) => state.user.user) ||
     (storedUser ? JSON.parse(storedUser) : null);
 
+  const isUploadOnlyMode =
+    !!documentToEdit && documentToEdit.status === "MISSING_DOC";
+
   const [formData, setFormData] = useState({
     docPartNumberType: null as Option | null,
     documentPartNumber: "",
@@ -145,11 +148,11 @@ export const AddDocument = ({
     event.preventDefault();
 
     if (
-      !formData.documentPartNumber ||
-      !formData.name ||
-      !formData.classification ||
-      !file ||
-      !formData.type
+      !isUploadOnlyMode &&
+      (!formData.documentPartNumber ||
+        !formData.name ||
+        !formData.classification ||
+        !formData.type)
     ) {
       snackBarError(ERROR_REQUIRED_FIELDS);
       return;
@@ -157,17 +160,24 @@ export const AddDocument = ({
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("file", file);
+      if (file) formDataToSend.append("file", file);
+
+      const status = file ? "DRAFT" : "MISSING_DOC";
       formDataToSend.append(
         "entityData",
         JSON.stringify({
+          id:
+            documentToEdit?.status === "MISSING_DOC" && file
+              ? documentToEdit.id
+              : undefined,
+
           docPartNumberTypeId: formData.docPartNumberType?.id,
           classification: formData.classification.name.toUpperCase(),
           updatedBy: user?.email || null,
           revision: Number(formData.revision),
           name: formData.name,
           documentPartNumber: formData.documentPartNumber,
-          status: "DRAFT",
+          status,
           published: new Date(),
           isFinal: !documentToEdit,
           type: formData.type?.name.toUpperCase(),
@@ -185,7 +195,7 @@ export const AddDocument = ({
         snackBarSuccess(SUCCESS_UPLOAD);
         refetch();
         onClose();
-        onDocumentAdded(response.id);
+        onDocumentAdded(response.id, !!file);
       }
 
       setFormData({
@@ -220,102 +230,107 @@ export const AddDocument = ({
       cancelButtonText={BUTTON_CANCEL}
     >
       <Grid container spacing={3}>
-        <Grid item xs={12} md={12}>
-          <GridInput
-            label="Name"
-            required
-            onChange={(value) => handleInputChange("name", value)}
-            value={formData.name ?? ""}
-            fullWidth
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <GridMultipleAutocomplete
-            multiple={false}
-            onChange={(value) => handleInputChange("docType", value)}
-            value={formData.docType}
-            fullWidth
-            selectorData={{
-              label: "Document Type",
-              accessorId: "docType",
-              options: DOC_TYPE_OPTIONS,
-            }}
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        {!documentToEdit && (
-          <Grid item xs={12} md={12}>
+        {!isUploadOnlyMode && (
+          <>
+            <Grid item xs={12} md={12}>
+              <GridInput
+                label="Name"
+                required
+                onChange={(value) => handleInputChange("name", value)}
+                value={formData.name ?? ""}
+                fullWidth
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <GridMultipleAutocomplete
+                multiple={false}
+                onChange={(value) => handleInputChange("docType", value)}
+                value={formData.docType}
+                fullWidth
+                selectorData={{
+                  label: "Document Type",
+                  accessorId: "docType",
+                  options: DOC_TYPE_OPTIONS,
+                }}
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
+            {!documentToEdit && (
+              <Grid item xs={12} md={12}>
+                <GridMultipleAutocomplete
+                  multiple={false}
+                  onChange={(value) =>
+                    handleInputChange("docPartNumberType", value)
+                  }
+                  value={formData.docPartNumberType}
+                  fullWidth
+                  selectorData={{
+                    label: "Document Part Number Type",
+                    accessorId: "docPartNumberType",
+                    options: partNumberOptions || [],
+                  }}
+                  sx={{ minWidth: 250, typography: "h6" }}
+                />
+              </Grid>
+            )}
+
+            <Grid item xs={12} md={12}>
+              <GridInput
+                label="Document P.N"
+                value={formData.documentPartNumber ?? ""}
+                disabled
+                fullWidth
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <GridMultipleAutocomplete
+                multiple={false}
+                onChange={(value) => handleInputChange("classification", value)}
+                value={formData.classification ?? ""}
+                fullWidth
+                selectorData={{
+                  label: "Classification",
+                  accessorId: "classification",
+                  options: CLASSIFICATION_OPTIONS,
+                }}
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
             <GridMultipleAutocomplete
               multiple={false}
-              onChange={(value) =>
-                handleInputChange("docPartNumberType", value)
-              }
-              value={formData.docPartNumberType}
+              onChange={(value) => handleInputChange("type", value)}
+              value={formData.type ?? null}
               fullWidth
               selectorData={{
-                label: "Document Part Number Type",
-                accessorId: "docPartNumberType",
-                options: partNumberOptions || [],
+                label: "File Type",
+                accessorId: "type",
+                options: FILE_TYPE_OPTIONS,
               }}
               sx={{ minWidth: 250, typography: "h6" }}
             />
-          </Grid>
+            <Grid item xs={12} md={12}>
+              <GridInput
+                label="Revision"
+                value={formData.revision ?? "01"}
+                disabled
+                fullWidth
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <GridInput
+                label="Created By"
+                value={formData.createdBy ?? user?.name ?? ""}
+                disabled
+                fullWidth
+                sx={{ minWidth: 250, typography: "h6" }}
+              />
+            </Grid>
+          </>
         )}
 
-        <Grid item xs={12} md={12}>
-          <GridInput
-            label="Document P.N"
-            value={formData.documentPartNumber ?? ""}
-            disabled
-            fullWidth
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <GridMultipleAutocomplete
-            multiple={false}
-            onChange={(value) => handleInputChange("classification", value)}
-            value={formData.classification ?? ""}
-            fullWidth
-            selectorData={{
-              label: "Classification",
-              accessorId: "classification",
-              options: CLASSIFICATION_OPTIONS,
-            }}
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        <GridMultipleAutocomplete
-          multiple={false}
-          onChange={(value) => handleInputChange("type", value)}
-          value={formData.type ?? null}
-          fullWidth
-          selectorData={{
-            label: "File Type",
-            accessorId: "type",
-            options: FILE_TYPE_OPTIONS,
-          }}
-          sx={{ minWidth: 250, typography: "h6" }}
-        />
-        <Grid item xs={12} md={12}>
-          <GridInput
-            label="Revision"
-            value={formData.revision ?? "01"}
-            disabled
-            fullWidth
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <GridInput
-            label="Created By"
-            value={formData.createdBy ?? user?.name ?? ""}
-            disabled
-            fullWidth
-            sx={{ minWidth: 250, typography: "h6" }}
-          />
-        </Grid>
         <Grid item xs={12} md={12}>
           <input
             type="file"

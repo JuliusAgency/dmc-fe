@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   getReportsForProcessOwner,
+  getAllReports,
   sendReport,
   answerReport,
   deleteReport,
@@ -27,6 +28,12 @@ export const useSendReport = () => {
     onError: () => {
       snackBarError(REPORT_SEND_ERROR);
     },
+  });
+};
+
+export const useAllReports = () => {
+  return useQuery("allReports", getAllReports, {
+    onError: () => snackBarError(REPORT_FETCH_ERROR),
   });
 };
 

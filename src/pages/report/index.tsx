@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, TextField } from "@mui/material";
 import {
-  useGetMyReports,
+  useAllReports,
   useAnswerReport,
   useDeleteReport,
 } from "../../hooks/report/reportHooks";
@@ -18,11 +18,13 @@ import {
 } from "./constants";
 import { useReportColumns } from "./columns";
 import { GenericPopup } from "../../components/genericPopup/genericPopup";
+import { useUser } from "../../hooks/auth/authsHooks";
 
 export const ReportsPage = () => {
-  const { data, isLoading, refetch } = useGetMyReports();
+  const { data, isLoading, refetch } = useAllReports();
   const answerMutation = useAnswerReport();
   const deleteMutation = useDeleteReport();
+  const { user } = useUser();
 
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
   const [answerText, setAnswerText] = useState("");
@@ -58,7 +60,7 @@ export const ReportsPage = () => {
     });
   };
 
-  const COLUMNS = useReportColumns(handleAnswerClick, handleDelete);
+  const COLUMNS = useReportColumns(user?.id, handleAnswerClick, handleDelete);
 
   return (
     <Box p={3}>

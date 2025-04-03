@@ -21,6 +21,7 @@ import { useColumns } from "./useColumns";
 import { getActionColumn } from "./constants";
 
 import { AddDocument } from "./components/addDocument";
+import { NotePopup } from "./components/notePopup";
 import { RevisionGroup } from "./components/revisionGroup";
 import { DocumentHistory } from "./components/documentHistory";
 import { SelectSignersPopup } from "./components/selectSignersPopup";
@@ -39,7 +40,6 @@ export const Document = () => {
 
   const categoryId = pathSegments[pathSegments.length - 1];
 
-  console.log("categoryId", categoryId);
   const { handleDownloadFile } = useFileDownload();
 
   const [pagination, setPagination] = useState<PaginationModel>({
@@ -59,6 +59,10 @@ export const Document = () => {
   const [selectedDoc, setSelectedDoc] = useState<DocumentType | null>(null);
   const [isReportOpen, setReportOpen] = useState(false);
   const [reportDoc, setReportDoc] = useState<DocumentType | null>(null);
+
+  const [isAddNoteOpen, setAddNoteOpen] = useState(false);
+  const [isViewNoteOpen, setViewNoteOpen] = useState(false);
+  const [noteDoc, setNoteDoc] = useState<DocumentType | null>(null);
 
   const categoryQuery = useGetCategoryById(
     categoryId ? Number(categoryId) : undefined
@@ -82,7 +86,7 @@ export const Document = () => {
 
   const approvedQuery = useGetAllDocuments(
     pagination,
-    { ...refetchParams.filters, status: ["APPROVED"] },
+    { ...refetchParams.filters, status: ["APPROVED", "MISSING_DOC"] },
     refetchParams.relations,
     "approvedDocs"
   );
@@ -119,7 +123,14 @@ export const Document = () => {
     refetchAll();
   };
 
-  const handleAdd = (id: number) => {
+  const handleAdd = (id: number, file: boolean) => {
+    const doc = allDocs.find((d) => d.id === id);
+    if (!file) {
+      snackBarInfo("You must upload a file before selecting signers.");
+      refetchAll();
+      return;
+    }
+
     setSignersDocId(id);
     setSignersOpen(true);
     refetchAll();
@@ -133,6 +144,33 @@ export const Document = () => {
   const handleReport = (doc: DocumentType) => {
     setReportDoc(doc);
     setReportOpen(true);
+  };
+
+  const handleAddNote = (doc: DocumentType) => {
+    setNoteDoc(doc);
+    setAddNoteOpen(true);
+  };
+
+  const handleViewNote = (doc: DocumentType) => {
+    setNoteDoc(doc);
+    setViewNoteOpen(true);
+  };
+
+  const handleSaveNote = async (noteText: string) => {
+    if (!noteDoc) return;
+
+    try {
+      await updateDoc.mutateAsync({
+        id: noteDoc.id,
+        field: "note",
+        value: noteText,
+      });
+
+      setAddNoteOpen(false);
+      await refetchAll();
+    } catch (error) {
+      console.error("Failed to save note:", error);
+    }
   };
 
   const handleViewFile = (fileName: string) => {
@@ -179,6 +217,11 @@ export const Document = () => {
     setSelectedDoc(null);
   };
 
+  const handleUploadFile = (doc: DocumentType) => {
+    setDocumentToEdit(doc);
+    setAddOpen(true);
+  };
+
   const refetchAll = async () => {
     await Promise.all([
       approvedQuery.refetch(),
@@ -191,14 +234,16 @@ export const Document = () => {
     if (categoryId) refetchAll();
   }, [categoryId]);
 
-  const columns = useColumns(handleOpenSignatures);
+  const columns = useColumns(handleOpenSignatures, handleUploadFile);
   const actionColumn = getActionColumn(
     handleDownloadFile,
     handleViewFile,
     handleEdit,
     handleDelete,
     handleHistory,
-    handleReport
+    handleReport,
+    handleAddNote,
+    handleViewNote
   );
 
   const approved = approvedQuery.data?.data ?? [];
@@ -316,6 +361,25 @@ export const Document = () => {
         onClose={() => setReportOpen(false)}
         document={reportDoc}
       />
+
+      {isAddNoteOpen && noteDoc && (
+        <NotePopup
+          open={isAddNoteOpen}
+          onClose={() => setAddNoteOpen(false)}
+          title="Add Note"
+          editable
+          onSave={handleSaveNote}
+        />
+      )}
+
+      {isViewNoteOpen && noteDoc && (
+        <NotePopup
+          open={isViewNoteOpen}
+          onClose={() => setViewNoteOpen(false)}
+          title="View Note"
+          initialValue={noteDoc.note || ""}
+        />
+      )}
     </Box>
   );
 };

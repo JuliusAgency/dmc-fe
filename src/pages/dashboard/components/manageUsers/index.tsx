@@ -56,7 +56,7 @@ export const ManageUsers = () => {
         hideFooterPagination
         fileName="users"
         sx={{
-          width: "85%",
+          width: "100%",
           height: "auto",
           border: "none",
           "& .MuiDataGrid-virtualScroller": { overflow: "visible" },

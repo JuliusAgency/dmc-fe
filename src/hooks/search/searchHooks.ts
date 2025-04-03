@@ -4,11 +4,12 @@ import { AxiosResponse } from "axios";
 
 export const useSearch = (
   query: string,
-  categoryId?: number | null
+  categoryId?: number | null,
+  table?: string
 ): UseQueryResult<AxiosResponse<SearchReturnType[]>> => {
   return useQuery({
     queryKey: ["search", query, categoryId],
-    queryFn: () => search(query, categoryId),
+    queryFn: () => search(query, categoryId, table),
     refetchOnWindowFocus: false,
     enabled: !!query,
   });

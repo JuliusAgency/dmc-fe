@@ -1,13 +1,15 @@
-import { Box, IconButton, Button, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import HistoryIcon from "@mui/icons-material/History";
+import ReportIcon from "@mui/icons-material/Report";
+import NoteAddIcon from "@mui/icons-material/NoteAdd";
+import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import { useSelector } from "react-redux";
 import { DocumentType } from "../../api/documentAPI/types.ts";
 import { GridColDef } from "@mui/x-data-grid-pro";
-import ReportIcon from "@mui/icons-material/Report";
 
 const hasClassificationAccess = (
   userLevel: string,
@@ -23,7 +25,9 @@ export const getActionColumn = (
   handleEdit: (document: DocumentType) => void,
   handleDelete: (documentId: number) => void,
   handleShowHistory: (documentPartNumber: string) => void,
-  handleReport: (document: DocumentType) => void
+  handleReport: (document: DocumentType) => void,
+  handleAddNote: (document: DocumentType) => void,
+  handleViewNote: (document: DocumentType) => void
 ): GridColDef => {
   const storedUser = localStorage.getItem("user");
   const user =
@@ -35,7 +39,10 @@ export const getActionColumn = (
     headerName: "Actions",
     headerAlign: "center",
     align: "center",
-    flex: 2,
+    cellClassName: "MuiDataGrid-cell--actions",
+    flex: 0,
+    minWidth: 360,
+    maxWidth: 400,
     sortable: false,
     renderCell: ({ row }) => {
       const hasReports = row.reports?.length > 0;
@@ -61,44 +68,47 @@ export const getActionColumn = (
       return (
         <Box
           display="flex"
-          alignItems="center"
+          flexWrap="wrap"
           justifyContent="center"
-          flexWrap="nowrap"
-          width="100%"
-          maxWidth="100%"
-          overflow="hidden"
+          alignItems="center"
           gap={0.5}
+          sx={{
+            overflow: "visible",
+            whiteSpace: "normal",
+            maxWidth: "100%",
+          }}
         >
-          <Box minWidth={20}>
-            {canViewDownload && (
-              <Tooltip title="View">
-                <IconButton
-                  onClick={() => handleViewFile(row.fileName)}
-                  size="small"
-                >
-                  <VisibilityIcon fontSize="small" sx={{ color: "#42a5f5" }} />
-                </IconButton>
-              </Tooltip>
-            )}
+          {/* View */}
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="View">
+              <IconButton
+                onClick={() => handleViewFile(row.fileName)}
+                size="small"
+                sx={{ visibility: canViewDownload ? "visible" : "hidden" }}
+              >
+                <VisibilityIcon fontSize="small" sx={{ color: "#42a5f5" }} />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          <Box minWidth={20}>
-            {canViewDownload && (
-              <Tooltip title="Download">
-                <IconButton
-                  onClick={() => handleDownloadFile(row.fileName)}
-                  size="small"
-                >
-                  <DownloadForOfflineIcon
-                    fontSize="small"
-                    sx={{ color: "#66bb6a" }}
-                  />
-                </IconButton>
-              </Tooltip>
-            )}
+          {/* Download */}
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="Download">
+              <IconButton
+                onClick={() => handleDownloadFile(row.fileName)}
+                size="small"
+                sx={{ visibility: canViewDownload ? "visible" : "hidden" }}
+              >
+                <DownloadForOfflineIcon
+                  fontSize="small"
+                  sx={{ color: "#66bb6a" }}
+                />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          <Box minWidth={20}>
+          {/* Edit */}
+          <Box sx={{ width: 32, height: 32 }}>
             <Tooltip title="Edit">
               <IconButton onClick={() => handleEdit(row)} size="small">
                 <EditIcon fontSize="small" sx={{ color: "#ffa726" }} />
@@ -106,17 +116,25 @@ export const getActionColumn = (
             </Tooltip>
           </Box>
 
-          <Box minWidth={20}>
-            {(user.role === "ADMIN" || user.role === "SYSTEM_ADMIN") && (
-              <Tooltip title="Delete">
-                <IconButton onClick={() => handleDelete(row.id)} size="small">
-                  <DeleteIcon fontSize="small" sx={{ color: "#ef5350" }} />
-                </IconButton>
-              </Tooltip>
-            )}
+          {/* Delete */}
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="Delete">
+              <IconButton
+                onClick={() => handleDelete(row.id)}
+                size="small"
+                sx={{
+                  visibility:
+                    user.role === "ADMIN" || user.role === "SYSTEM_ADMIN"
+                      ? "visible"
+                      : "hidden",
+                }}
+              >
+                <DeleteIcon fontSize="small" sx={{ color: "#ef5350" }} />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          <Box minWidth={20}>
+          <Box sx={{ width: 32, height: 32 }}>
             <Tooltip title="History">
               <IconButton
                 onClick={() => handleShowHistory(row.documentPartNumber)}
@@ -127,24 +145,53 @@ export const getActionColumn = (
             </Tooltip>
           </Box>
 
-          <Box minWidth={30}>
-            {status === "APPROVED" && (
-              <Tooltip title="Report">
-                <IconButton
-                  onClick={() => handleReport(row)}
-                  size="small"
-                  sx={{
-                    backgroundColor: reportColor,
-                    color: "white",
-                    "&:hover": { backgroundColor: hoverColor },
-                    borderRadius: 1,
-                    p: "4px",
-                  }}
-                >
-                  <ReportIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            )}
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="Report">
+              <IconButton
+                onClick={() => handleReport(row)}
+                size="small"
+                sx={{
+                  visibility: status === "APPROVED" ? "visible" : "hidden",
+                  backgroundColor: reportColor,
+                  color: "white",
+                  "&:hover": { backgroundColor: hoverColor },
+                  borderRadius: 1,
+                  p: "4px",
+                }}
+              >
+                <ReportIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="Add Note">
+              <IconButton
+                onClick={() => handleAddNote(row)}
+                size="small"
+                sx={{
+                  color: "#1976d2",
+                  visibility: status === "APPROVED" ? "visible" : "hidden",
+                }}
+              >
+                <NoteAddIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ width: 32, height: 32 }}>
+            <Tooltip title="View Notes">
+              <IconButton
+                onClick={() => handleViewNote(row)}
+                size="small"
+                sx={{
+                  color: "#6d4c41",
+                  visibility: row.note ? "visible" : "hidden",
+                }}
+              >
+                <StickyNote2Icon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
       );

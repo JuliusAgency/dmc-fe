@@ -26,6 +26,7 @@ export interface DocumentType {
   signatures: DocumentSignature[];
   updatedBy: string;
   status: string;
+  note: string;
 }
 
 export enum FileType {
@@ -56,6 +57,7 @@ export enum SignatureStatus {
   USER = "PENDING",
   ADMIN = "SIGNED",
   SYSTEM_ADMIN = "REJECTED",
+  MISSING_DOC = "MISSING_DOC",
 }
 
 export interface User {

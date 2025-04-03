@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: string;
   blockedCategories: Category[];
+  isActive: boolean;
 }
 
 export interface AuthFormProps {

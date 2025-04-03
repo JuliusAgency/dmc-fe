@@ -114,7 +114,7 @@ export default function ManageHomePage() {
           </Typography>
           <Input
             type="file"
-            inputProps={{ accept: "image/*" }}
+            inputProps={{ accept: "video/*" }}
             onChange={handleFileChange}
             sx={{ mb: 2 }}
           />

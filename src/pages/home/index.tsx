@@ -61,13 +61,17 @@ export const HomePage = () => {
           alignItems="center"
         >
           {imageUrl ? (
-            <Box
-              component="img"
+            <video
               src={imageUrl}
-              alt="Homepage"
-              sx={{
-                width: "60vw",
-                borderRadius: 2,
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: "16px",
+                objectFit: "cover",
               }}
             />
           ) : (

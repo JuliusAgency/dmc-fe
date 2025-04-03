@@ -14,10 +14,11 @@ export enum DocumentStatus {
   IN_PROGRESS = "IN_PROGRESS",
   APPROVED = "APPROVED",
   ARCHIVED = "ARCHIVED",
+  MISSING_DOC = "MISSING_DOC",
 }
 
 const cellStyle = {
-  whiteSpace: "normal", // לא מחייב שורה אחת
+  whiteSpace: "normal",
   overflowWrap: "break-word",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -35,7 +36,8 @@ export const DOC_TYPE_OPTIONS = Object.values(DocumentTypeDisplayNameMap).map(
 );
 
 export const useColumns = (
-  onOpenSignatures?: (doc: DocumentType) => void | undefined
+  onOpenSignatures?: (doc: DocumentType) => void | undefined,
+  onUploadFile?: (doc: DocumentType) => void
 ): GridColDef[] => {
   const { data: users } = useGetUsers();
   const isSystemAdmin = useUser().isSystemAdmin;
@@ -58,6 +60,8 @@ export const useColumns = (
         return "#66bb6a";
       case DocumentStatus.ARCHIVED:
         return "#bdbdbd";
+      case DocumentStatus.MISSING_DOC:
+        return "#ef5350";
       default:
         return "#e0e0e0";
     }
@@ -226,17 +230,29 @@ export const useColumns = (
       align: "center",
       flex: 1,
       minWidth: 100,
-      renderCell: (params) => (
-        <Chip
-          label={params.value}
-          sx={{
-            backgroundColor: getStatusColor(params.value),
-            color: "white",
-            fontSize: "0.7rem",
-            height: 24,
-          }}
-        />
-      ),
+      renderCell: (params) => {
+        const doc: DocumentType = params.row;
+        const isMissingFile = !doc.fileName;
+
+        return (
+          <Chip
+            label={doc.status}
+            onClick={() => {
+              if (isMissingFile) {
+                onUploadFile?.(doc);
+              }
+            }}
+            sx={{
+              backgroundColor: getStatusColor(doc.status as DocumentStatus),
+              color: "white",
+              fontSize: "0.7rem",
+              height: 24,
+              cursor: isMissingFile ? "pointer" : "default",
+              textDecoration: isMissingFile ? "underline" : "none",
+            }}
+          />
+        );
+      },
     },
     {
       field: "lastUpdate",

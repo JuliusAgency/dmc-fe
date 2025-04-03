@@ -1,3 +1,4 @@
+import { isAction } from "redux";
 import { API } from "../API.ts";
 import { userEndpoints } from "./constants.ts";
 
@@ -20,6 +21,7 @@ export const updateUser = async (data: {
   role?: string;
   classification?: string;
   newPassword?: string;
+  isActive?: boolean;
 }) => {
   const idOrEmail = data.userId ?? data.email;
   return API.put(`/user/${idOrEmail}`, data);

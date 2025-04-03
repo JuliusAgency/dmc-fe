@@ -45,7 +45,7 @@ export const RevisionGroup = ({ documentPartNumber }: Props) => {
         border: "none",
         backgroundColor: "transparent",
         paddingLeft: "1.5%",
-        width: "90%",
+        width: "83%",
         maxWidth: "100%",
       }}
     />

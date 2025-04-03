@@ -26,6 +26,11 @@ export const getReportsForProcessOwner = async () => {
   return data;
 };
 
+export const getAllReports = async () => {
+  const { data } = await API.get(ReportEndpoints.getAllReports);
+  return data;
+};
+
 export const answerReport = async ({
   reportId,
   response,

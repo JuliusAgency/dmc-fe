@@ -20,3 +20,5 @@ export const CLASSIFICATION_OPTIONS = [
   { value: "CONFIDENTIAL", label: "Confidential" },
   { value: "SECRET", label: "Secret" },
 ];
+
+export const USERS_DELETE_LABEL = "Delete User";

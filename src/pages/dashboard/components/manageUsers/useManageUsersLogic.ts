@@ -8,6 +8,7 @@ import {
 import { useGetAllCategories } from "../../../../hooks/category/categoryHooks";
 import { useManageUsersColumns } from "./columns";
 import { User } from "../../../../api/authAPI/types";
+import { isAction } from "redux";
 
 export const useManageUsersLogic = () => {
   const [openCreatePopup, setOpenCreatePopup] = useState(false);
@@ -59,6 +60,7 @@ export const useManageUsersLogic = () => {
         classification?: string;
         newPassword?: string;
         blockedCategoryIds?: number[];
+        isActive?: boolean;
       }
     ) => {
       updateUser({ userId, ...data });
@@ -110,12 +112,18 @@ export const useManageUsersLogic = () => {
     setOpenPermissionsPopup(false);
   };
 
+  const handleToggleStatus = (userId: number, currentStatus: boolean) => {
+    console.log(currentStatus);
+    handleUpdate(userId, { isActive: !currentStatus });
+  };
+
   const COLUMNS = useManageUsersColumns(
     handleRoleChange,
     handleClassificationChange,
     handleOpenResetPopup,
     handleOpenPermissionsPopup,
-    handleDeleteUser
+    handleDeleteUser,
+    handleToggleStatus
   );
 
   return {

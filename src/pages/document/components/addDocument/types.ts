@@ -12,7 +12,7 @@ export interface Props {
   onClose: () => void;
   refetch: () => Promise<void>;
   documentToEdit?: DocumentType | undefined;
-  onDocumentAdded: (documentId: number) => void;
+  onDocumentAdded: (documentId: number, file: boolean) => void | null;
 }
 
 export interface DocumentFormData extends DocumentType {

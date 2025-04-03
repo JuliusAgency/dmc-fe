@@ -167,6 +167,14 @@ export const GenericTable = ({
           "& .MuiDataGrid-virtualScrollerContent": {
             width: "100% !important",
           },
+          "& .MuiDataGrid-cell--actions": {
+            minWidth: "360px",
+            justifyContent: "center",
+            alignItems: "center",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "4px",
+          },
         }}
         slots={{
           toolbar: () => (

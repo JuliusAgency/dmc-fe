@@ -16,9 +16,9 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SearchReturnType } from "../../api/searchAPI/search";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSearch } from "../../hooks/search/searchHooks";
+import { SearchReturnType } from "../../api/searchAPI/search";
 import { getNameFromSearchResult, getUrlFromSearchResult } from "./utils";
 
 interface SearchBarProps {
@@ -33,25 +33,31 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   fullWidth = false,
 }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const anchorRef = useRef<HTMLDivElement>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isResultsOpen, setIsResultsOpen] = useState(false);
-  const anchorRef = useRef<HTMLDivElement>(null);
 
   const pathSegments = location.pathname
     .replace("/category/", "")
     .split("/")
     .filter(Boolean);
-
-  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+  const rawCategoryId = pathSegments[pathSegments.length - 1];
+  const categoryId = isNaN(Number(rawCategoryId))
+    ? null
+    : Number(rawCategoryId);
 
   const {
     data: searchResultsData,
     isLoading,
     isError,
-  } = useSearch(debouncedQuery, Number(categoryId));
+  } = useSearch(debouncedQuery, categoryId, "document");
+  console.log(categoryId);
 
-  const searchResults = searchResultsData?.data;
+  const searchResults = searchResultsData?.data ?? [];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -62,7 +68,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         setDebouncedQuery("");
         setIsResultsOpen(false);
       }
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -81,20 +87,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (searchQuery.trim()) {
-      onSearch(searchQuery.trim(), Number(categoryId));
+      onSearch(searchQuery.trim(), categoryId);
       setIsResultsOpen(false);
     }
   };
 
-  const navigate = useNavigate();
-
   const handleResultClick = (result: SearchReturnType) => {
     setIsResultsOpen(false);
     const url = getUrlFromSearchResult(result);
+    console.log("url", url);
     if (url) {
       navigate(url);
     }
   };
+
+  console.log(searchQuery);
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
@@ -106,21 +113,17 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           component="form"
           onSubmit={handleSearchSubmit}
           sx={{
+            display: "flex",
             position: "relative",
             borderRadius: 2,
-            border: `1px solid black`,
+            border: "1px solid black",
             backgroundColor: alpha(theme.palette.common.white, 0.15),
             "&:hover": {
               backgroundColor: alpha(theme.palette.common.white, 0.25),
             },
+            width: fullWidth ? "100%" : "auto",
             marginRight: 2,
             marginLeft: 0,
-            width: fullWidth ? "100%" : "auto",
-            [theme.breakpoints.up("sm")]: {
-              marginLeft: theme.spacing(1),
-              width: fullWidth ? "100%" : "auto",
-            },
-            display: "flex",
           }}
         >
           <IconButton type="submit" sx={{ p: "10px" }} aria-label="search">
@@ -129,14 +132,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <InputBase
             sx={{
               color: "inherit",
-              "& .MuiInputBase-input": {
-                padding: theme.spacing(1, 1, 1, 0),
-                paddingLeft: 0,
-                width: "100%",
-                [theme.breakpoints.up("md")]: {
-                  width: fullWidth ? "100%" : "20ch",
-                },
-              },
+              flex: 1,
+              padding: theme.spacing(1),
+              minWidth: fullWidth ? "100%" : "20ch",
             }}
             placeholder={placeholder}
             inputProps={{ "aria-label": "search" }}
@@ -161,22 +159,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <Grow {...TransitionProps} style={{ transformOrigin: "top left" }}>
               <Paper
                 elevation={3}
-                sx={{ mt: 1, maxHeight: "300px", overflow: "auto" }}
+                sx={{ mt: 1, maxHeight: 300, overflow: "auto" }}
               >
-                {isLoading ? (
-                  <Box sx={{ p: 2, display: "flex", justifyContent: "center" }}>
-                    <CircularProgress size={24} />
-                  </Box>
-                ) : isError ? (
+                {isError ? (
                   <Box sx={{ p: 2 }}>
                     <Typography color="error">Error loading results</Typography>
                   </Box>
-                ) : searchResults && searchResults.length > 0 ? (
+                ) : searchResults.length > 0 ? (
                   <List dense>
                     {searchResults.map((result, index) => {
+                      const id = (result as any)?.value?.id ?? index;
                       return (
                         <ListItem
-                          key={`${result.table}-${index}`}
+                          key={`result-${id}-${index}`}
                           onClick={() => handleResultClick(result)}
                           divider
                           button
@@ -187,17 +182,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                                 {getNameFromSearchResult(result)}
                               </Typography>
                             }
-                            secondary={result.table}
                           />
                         </ListItem>
                       );
                     })}
                   </List>
-                ) : debouncedQuery ? (
+                ) : (
                   <Box sx={{ p: 2 }}>
                     <Typography variant="body2">No results found</Typography>
                   </Box>
-                ) : null}
+                )}
               </Paper>
             </Grow>
           )}
