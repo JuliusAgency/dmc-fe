@@ -38,6 +38,7 @@ export const RevisionGroup = ({ documentPartNumber }: Props) => {
       disableColumnMenu
       disableColumnFilter
       disableColumnSelector
+      fileName="rivision"
       sx={{
         "& .MuiDataGrid-columnHeaders": { display: "none" },
         "& .MuiDataGrid-footerContainer": { display: "none" },

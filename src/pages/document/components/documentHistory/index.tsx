@@ -114,6 +114,7 @@ export const DocumentHistory = ({
           }}
           rowCount={documentsQuery?.data?.total ?? 0}
           rows={historyRows}
+          fileName="documents history"
         />
 
         {selectedDocument && (

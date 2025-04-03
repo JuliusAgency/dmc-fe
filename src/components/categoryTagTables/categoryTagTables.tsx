@@ -64,6 +64,7 @@ export const CategoryTable = ({
         hideFooterPagination
         onPaginationModelChange={() => {}}
         sx={{ height: "auto", mt: 2 }}
+        fileName="categories"
       />
       {selectedCategory && (
         <SubCategoryModal
@@ -155,6 +156,7 @@ export const TagTable = ({
       pageSize={10}
       hideFooterPagination={true}
       onPaginationModelChange={() => {}}
+      fileName="tags"
       sx={{ height: "auto", mt: 2 }}
     />
   );

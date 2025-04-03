@@ -251,6 +251,7 @@ export const Document = () => {
         processRowUpdate={handleRowUpdate}
         detailPanelExpandedRowIds={expandedRowIds}
         setDetailPanelExpandedRowIds={setExpandedRowIds}
+        fileName={`DOC-${categoryQuery.data?.name || ""}`}
         onTryExpandRow={(rowId) => {
           const doc = allDocs.find((d) => d.id === rowId.id);
           if (!doc) return false;

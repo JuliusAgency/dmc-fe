@@ -9,7 +9,7 @@ import { MainLayout } from "./components/layouts/MainLayout.tsx";
 import AuthForm from "./pages/auth/index.tsx";
 import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
-import { PendingSignatures } from "./pages/signature/index.tsx";
+import { SignatureDashboard } from "./pages/signature/index.tsx";
 import { HomePage } from "./pages/home";
 import { ResetPasswordPage } from "./pages/auth/components/resetPassword";
 import { ReportsPage } from "./pages/report";
@@ -41,7 +41,7 @@ const MainRoutes = () => {
       <Route element={<MainLayout />}>
         <Route path="/home" element={<HomePage />} />
         <Route path="/documents" element={<Document key="documents" />} />
-        <Route path="/pending-signature" element={<PendingSignatures />} />
+        <Route path="/signatures" element={<SignatureDashboard />} />
         <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/audit-trail" element={<AuditTrailPage />} />

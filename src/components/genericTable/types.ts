@@ -25,4 +25,5 @@ export interface GenericTableProps {
   detailPanelExpandedRowIds?: GridRowId[];
   setDetailPanelExpandedRowIds?: (ids: GridRowId[]) => void;
   onTryExpandRow?: (params: { id: number }) => boolean | Promise<boolean>;
+  fileName?: string;
 }

@@ -84,6 +84,7 @@ export function PartNumberTable() {
         onPaginationModelChange={() => {}}
         sx={{ height: "auto", mt: 2 }}
         hideFooterPagination={true}
+        fileName="part-number"
       />
     </>
   );

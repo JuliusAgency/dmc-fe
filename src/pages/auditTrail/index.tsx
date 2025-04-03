@@ -72,6 +72,7 @@ export const AuditTrailPage = () => {
           pageSize={pagination.pageSize}
           onPaginationModelChange={setPagination}
           getDetailPanelHeight={() => 200}
+          fileName={PAGE_TITLE}
           sx={{
             width: "98%",
             height: "100%",

@@ -73,6 +73,7 @@ export const ReportsPage = () => {
         pageSize={10}
         rowCount={data?.length || 0}
         onPaginationModelChange={() => {}}
+        fileName="reports"
       />
 
       <GenericPopup

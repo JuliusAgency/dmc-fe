@@ -35,9 +35,9 @@ export const MainLayout = () => {
           ]
         : []),
       {
-        path: "/pending-signature",
+        path: "/signatures",
         icon: <DescriptionIcon />,
-        text: "Pending signature",
+        text: "Signatures",
         disabled: false,
       },
       {

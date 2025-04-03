@@ -10,6 +10,8 @@ export const SignatureEndpoints = {
     `/document-signatures/history/${revisionGroup}`,
   getPendingSignatures: (userId: number) =>
     `/document-signatures/user/${userId}/pending`,
+  getSentSignatures: (userId: number) =>
+    `/document-signatures/user/${userId}/sent`,
 };
 
 export const SignatureGroupEndpoints = {

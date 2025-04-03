@@ -54,6 +54,7 @@ export const ManageUsers = () => {
         pageSize={10}
         onPaginationModelChange={() => {}}
         hideFooterPagination
+        fileName="users"
         sx={{
           width: "85%",
           height: "auto",

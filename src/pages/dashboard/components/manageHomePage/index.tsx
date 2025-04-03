@@ -104,6 +104,7 @@ export default function ManageHomePage() {
             hideFooterPagination={true}
             onPaginationModelChange={() => {}}
             sx={{ height: "auto", mt: 2 }}
+            fileName="announcements"
           />
         </Grid>
 

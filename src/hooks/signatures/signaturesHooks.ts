@@ -10,6 +10,7 @@ import {
   signDocument,
   rejectSignature,
   getPendingSignatures,
+  getSentSignatures,
 } from "../../api/signaturesAPI/signatures";
 import { Signature } from "../../api/signaturesAPI/types";
 import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
@@ -112,3 +113,11 @@ export const useGetPendingSignatures = (
     refetchOnWindowFocus: false,
   });
 };
+
+export const useGetSentSignatures = (userId: number) =>
+  useQuery({
+    queryKey: ["sentSignatures", userId],
+    queryFn: () => getSentSignatures(userId),
+    enabled: !!userId,
+    refetchOnWindowFocus: false,
+  });

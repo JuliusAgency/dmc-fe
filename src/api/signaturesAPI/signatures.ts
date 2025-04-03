@@ -20,8 +20,14 @@ export const signDocument = async (documentId: number, userId: number) => {
   return API.post(SignatureEndpoints.signDocument(documentId, userId));
 };
 
-export const rejectSignature = async (documentId: number, userId: number, rejectReason: string) => {
-  return API.post(SignatureEndpoints.rejectSignature(documentId, userId), { rejectReason });
+export const rejectSignature = async (
+  documentId: number,
+  userId: number,
+  rejectReason: string
+) => {
+  return API.post(SignatureEndpoints.rejectSignature(documentId, userId), {
+    rejectReason,
+  });
 };
 
 export const getPendingSignatures = async (
@@ -30,5 +36,12 @@ export const getPendingSignatures = async (
   const { data } = await API.get(
     SignatureEndpoints.getPendingSignatures(userId)
   );
+  return data;
+};
+
+export const getSentSignatures = async (
+  userId: number
+): Promise<Signature[]> => {
+  const { data } = await API.get(SignatureEndpoints.getSentSignatures(userId));
   return data;
 };
