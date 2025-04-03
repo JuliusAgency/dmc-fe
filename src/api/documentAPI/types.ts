@@ -22,6 +22,7 @@ export interface DocumentType {
   tags: DocumentTag[] | Tag[];
   docType: DocumentTypeEnum;
   nextReview: Date;
+  createdAt: Date;
   signatures: DocumentSignature[];
   updatedBy: string;
   status: string;

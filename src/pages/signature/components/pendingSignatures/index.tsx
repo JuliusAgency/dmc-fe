@@ -1,15 +1,9 @@
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Typography,
   Grid,
   CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   TextField,
 } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -24,10 +18,21 @@ import {
   BUTTON_SIGN,
   BUTTON_REJECT,
   BUTTON_DOWNLOAD,
+  SIGN_DIALOG_TITLE,
+  SIGN_DIALOG_LABEL,
+  SIGN_DIALOG_CANCEL,
+  SIGN_DIALOG_CONFIRM,
+  REJECT_DIALOG_TITLE,
+  REJECT_DIALOG_LABEL,
+  REJECT_DIALOG_CANCEL,
+  REJECT_DIALOG_CONFIRM,
 } from "./constants.ts";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
-import { useGetFile } from "../../../../hooks/document/documentHooks.ts";
-import { useEffect, useState } from "react";
+import { useFileDownload } from "../../../../hooks/utils/useFileDownload";
+import { formatDate } from "../../../../utils/formatDate.ts";
+import { useState } from "react";
+import { GenericPopup } from "../../../../components/genericPopup/genericPopup";
+import { GenericCard } from "../../../../components/genericCard/genericCard";
 
 export const PendingSignatures = () => {
   const storedUser = localStorage.getItem("user");
@@ -41,61 +46,56 @@ export const PendingSignatures = () => {
     refetch,
   } = useGetPendingSignatures(user?.id);
 
+  const { handleDownloadFile } = useFileDownload();
   const signMutation = useSignDocument();
   const rejectMutation = useRejectSignature();
 
   const [fileNameToDownload, setFileNameToDownload] = useState<string | null>(
     null
   );
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
-  const [pendingRejectDocumentId, setPendingRejectDocumentId] = useState<
-    number | null
-  >(null);
 
-  const fileQuery = useGetFile(fileNameToDownload ?? "");
+  const [popupState, setPopupState] = useState<{
+    open: boolean;
+    mode: "sign" | "reject" | null;
+    documentId: number | null;
+    reason: string;
+  }>({
+    open: false,
+    mode: null,
+    documentId: null,
+    reason: "",
+  });
 
-  useEffect(() => {
-    if (fileQuery.data && fileNameToDownload) {
-      const url = window.URL.createObjectURL(new Blob([fileQuery.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileNameToDownload);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setFileNameToDownload(null);
-    }
-  }, [fileQuery.data, fileNameToDownload]);
-
-  const handleSign = async (documentId: number) => {
-    await signMutation.mutateAsync({ documentId, userId: user?.id });
-    refetch();
+  const openPopup = (mode: "sign" | "reject", documentId: number) => {
+    setPopupState({ open: true, mode, documentId, reason: "" });
   };
 
-  const handleRejectClick = (documentId: number) => {
-    setPendingRejectDocumentId(documentId);
-    setRejectDialogOpen(true);
+  const closePopup = () => {
+    setPopupState({ open: false, mode: null, documentId: null, reason: "" });
   };
 
-  const handleRejectConfirm = async () => {
-    if (pendingRejectDocumentId && rejectReason.trim()) {
-      await rejectMutation.mutateAsync({
-        documentId: pendingRejectDocumentId,
+  const confirmPopup = async () => {
+    const { documentId, mode, reason } = popupState;
+    if (!documentId || !mode) return;
+
+    if (mode === "sign") {
+      await signMutation.mutateAsync({
+        documentId,
         userId: user?.id,
-        rejectReason: rejectReason.trim(),
+        signReason: reason.trim(),
       });
-      setRejectDialogOpen(false);
-      setRejectReason("");
-      setPendingRejectDocumentId(null);
-      refetch();
     }
-  };
 
-  const handleRejectCancel = () => {
-    setRejectDialogOpen(false);
-    setRejectReason("");
-    setPendingRejectDocumentId(null);
+    if (mode === "reject" && reason.trim()) {
+      await rejectMutation.mutateAsync({
+        documentId,
+        userId: user?.id,
+        rejectReason: reason.trim(),
+      });
+    }
+
+    closePopup();
+    refetch();
   };
 
   const handleDownload = (fileName: string) => {
@@ -116,89 +116,86 @@ export const PendingSignatures = () => {
         <Typography>{NO_PENDING_SIGNATURES}</Typography>
       ) : (
         <Grid container spacing={2}>
-          {pendingSignatures.map((signature) => (
-            <Grid item xs={12} md={6} lg={2.1} key={signature.id}>
-              <Card sx={{ p: 2, boxShadow: 3 }}>
-                <CardContent>
-                  <Typography variant="h6">
-                    {/* @ts-ignore */}
-                    {signature.document.name}
-                  </Typography>
-                  <Typography variant="body2">
-                    {/* @ts-ignore */}
-                    Revision: {signature.document.revision} | Created on:{" "}
-                    {new Date(
-                      // @ts-ignore
-                      signature.document.createdAt
-                    ).toLocaleDateString()}
-                  </Typography>
-                  <Box mt={2} display="flex" justifyContent="space-between">
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() => handleSign(signature.documentId)}
-                      // @ts-ignore
-                      disabled={signMutation.isLoading}
-                    >
-                      {BUTTON_SIGN}
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleRejectClick(signature.documentId)}
-                      // @ts-ignore
-                      disabled={rejectMutation.isLoading}
-                    >
-                      {BUTTON_REJECT}
-                    </Button>
-                  </Box>
-                  <Box mt={2}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={() =>
-                        // @ts-ignore
-                        handleDownload(signature.document.fileName)
-                      }
-                      startIcon={<DownloadForOfflineIcon />}
-                    >
-                      {BUTTON_DOWNLOAD}
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+          {pendingSignatures.map((signature) => {
+            const document = signature.document;
+            const infoItems = [
+              { label: "Revision", value: document.revision },
+              {
+                label: "Created",
+                value: formatDate(String(document.createdAt)),
+              },
+            ];
+
+            const actions = [
+              {
+                label: BUTTON_SIGN,
+                onClick: () => openPopup("sign", signature.documentId),
+                color: "success" as const,
+                variant: "contained" as const,
+                disabled: signMutation.isPending,
+              },
+              {
+                label: BUTTON_REJECT,
+                onClick: () => openPopup("reject", signature.documentId),
+                color: "error" as const,
+                variant: "outlined" as const,
+                disabled: rejectMutation.isPending,
+              },
+              {
+                label: BUTTON_DOWNLOAD,
+                onClick: () => handleDownload(document.fileName),
+                color: "primary" as const,
+                variant: "outlined" as const,
+                icon: <DownloadForOfflineIcon />,
+              },
+            ];
+
+            return (
+              <Grid item xs={12} md={6} lg={4} key={signature.id}>
+                <GenericCard
+                  title={document.name}
+                  infoItems={infoItems}
+                  actions={actions}
+                  sx={{ minWidth: 300 }}
+                />
+              </Grid>
+            );
+          })}
         </Grid>
       )}
-      <Dialog fullWidth open={rejectDialogOpen} onClose={handleRejectCancel}>
-        <DialogTitle>Reject Document</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Reject Reason"
-            type="text"
-            fullWidth
-            multiline
-            rows={4}
-            value={rejectReason}
-            onChange={(e) => setRejectReason(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleRejectCancel} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleRejectConfirm}
-            color="error"
-            disabled={!rejectReason.trim()}
-          >
-            Reject
-          </Button>
-        </DialogActions>
-      </Dialog>
+
+      <GenericPopup
+        open={popupState.open}
+        onClose={closePopup}
+        onConfirm={confirmPopup}
+        title={
+          popupState.mode === "sign" ? SIGN_DIALOG_TITLE : REJECT_DIALOG_TITLE
+        }
+        confirmButtonText={
+          popupState.mode === "sign"
+            ? SIGN_DIALOG_CONFIRM
+            : REJECT_DIALOG_CONFIRM
+        }
+        cancelButtonText={
+          popupState.mode === "sign" ? SIGN_DIALOG_CANCEL : REJECT_DIALOG_CANCEL
+        }
+        disabledConfirm={
+          popupState.mode === "reject" && !popupState.reason.trim()
+        }
+      >
+        <TextField
+          fullWidth
+          multiline
+          rows={popupState.mode === "reject" ? 4 : 3}
+          value={popupState.reason}
+          onChange={(e) =>
+            setPopupState((prev) => ({ ...prev, reason: e.target.value }))
+          }
+          placeholder={
+            popupState.mode === "sign" ? SIGN_DIALOG_LABEL : REJECT_DIALOG_LABEL
+          }
+        />
+      </GenericPopup>
     </Box>
   );
 };

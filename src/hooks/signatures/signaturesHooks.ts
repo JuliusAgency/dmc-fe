@@ -63,10 +63,12 @@ export const useSignDocument = () => {
     mutationFn: ({
       documentId,
       userId,
+      signReason,
     }: {
       documentId: number;
       userId: number;
-    }) => signDocument(documentId, userId),
+      signReason: string;
+    }) => signDocument(documentId, userId, signReason),
     onSuccess: (_, { documentId }) => {
       snackBarSuccess(SIGNATURES_SIGN_SUCCESS);
       queryClient.invalidateQueries({

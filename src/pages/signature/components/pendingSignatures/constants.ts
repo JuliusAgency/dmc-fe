@@ -4,6 +4,12 @@ export const NO_PENDING_SIGNATURES =
 export const BUTTON_SIGN = "Sign";
 export const BUTTON_REJECT = "Reject";
 export const BUTTON_DOWNLOAD = "Download";
+
+export const SIGN_DIALOG_TITLE = "Sign Document";
+export const SIGN_DIALOG_LABEL = "Approval Reason (optional)";
+export const SIGN_DIALOG_CANCEL = "Cancel";
+export const SIGN_DIALOG_CONFIRM = "Sign";
+
 export const REJECT_DIALOG_TITLE = "Reject Document";
 export const REJECT_DIALOG_LABEL = "Reject Reason";
 export const REJECT_DIALOG_CANCEL = "Cancel";

@@ -1,16 +1,19 @@
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Grid,
-  CircularProgress,
-  Divider,
-  Chip,
-} from "@mui/material";
+import { Box, Typography, Grid, CircularProgress, Chip } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useGetSentSignatures } from "../../../../hooks/signatures/signaturesHooks";
-import { SENT_SIGNATURES_TITLE, NO_SENT_SIGNATURES } from "./constants";
+import {
+  SENT_SIGNATURES_TITLE,
+  NO_SENT_SIGNATURES,
+  INFO_LABEL_REVISION,
+  INFO_LABEL_PART_NUMBER,
+  INFO_LABEL_CREATED_AT,
+  INFO_LABEL_STATUS,
+  INFO_LABEL_SIGNATURES,
+  REJECT_REASON_LABEL,
+} from "./constants";
+import { SentSignatureType } from "./types";
+import { GenericCard } from "../../../../components/genericCard/genericCard";
+import { formatDate } from "../../../../utils/formatDate.ts";
 
 export const SentSignatureStatus = () => {
   const storedUser = localStorage.getItem("user");
@@ -29,71 +32,90 @@ export const SentSignatureStatus = () => {
       </Typography>
 
       {isLoading ? (
-        <Box display="flex" justifyContent="center" mt={3}>
-          <CircularProgress />
-        </Box>
+        <CenteredLoader />
       ) : sentSignatures.length === 0 ? (
         <Typography>{NO_SENT_SIGNATURES}</Typography>
       ) : (
         <Grid container spacing={2}>
           {sentSignatures.map((doc) => (
             <Grid item xs={12} md={6} lg={4} key={doc.documentId}>
-              <Card sx={{ p: 2, boxShadow: 3 }}>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    {doc.name}
-                  </Typography>
-
-                  <Typography variant="body2" gutterBottom>
-                    Revision: {doc.revision} <br />
-                    Part Number: {doc.documentPartNumber} <br />
-                    Created At: {new Date(
-                      doc.createdAt
-                    ).toLocaleDateString()}{" "}
-                    <br />
-                    Status: <strong>{doc.status}</strong>
-                  </Typography>
-
-                  <Divider sx={{ my: 1 }} />
-
-                  <Typography variant="body2">
-                    <strong>Signatures:</strong> {doc.signedCount} /{" "}
-                    {doc.totalSignatures} signed
-                  </Typography>
-
-                  {doc.signers?.map((signer) => (
-                    <Box key={signer.email} sx={{ mt: 1, pl: 1 }}>
-                      <Chip
-                        label={`${signer.fullName || signer.email} – ${
-                          signer.status
-                        }`}
-                        color={
-                          signer.status === "SIGNED"
-                            ? "success"
-                            : signer.status === "REJECTED"
-                            ? "error"
-                            : "default"
-                        }
-                        size="small"
-                        variant="outlined"
-                      />
-                      {signer.rejectReason && (
-                        <Typography
-                          variant="caption"
-                          color="error"
-                          sx={{ display: "block", pl: 2 }}
-                        >
-                          Reason: {signer.rejectReason}
-                        </Typography>
-                      )}
-                    </Box>
-                  ))}
-                </CardContent>
-              </Card>
+              <SignatureCard data={doc} />
             </Grid>
           ))}
         </Grid>
       )}
     </Box>
+  );
+};
+
+const CenteredLoader = () => (
+  <Box display="flex" justifyContent="center" mt={3}>
+    <CircularProgress />
+  </Box>
+);
+
+const SignatureCard = ({ data }: { data: SentSignatureType }) => {
+  const {
+    documentId,
+    name,
+    revision,
+    createdAt,
+    documentPartNumber,
+    totalSignatures,
+    signedCount,
+    status,
+    signers,
+  } = data;
+
+  const infoItems = [
+    { label: INFO_LABEL_REVISION, value: revision },
+    { label: INFO_LABEL_PART_NUMBER, value: documentPartNumber },
+    {
+      label: INFO_LABEL_CREATED_AT,
+      value: formatDate(String(createdAt)),
+    },
+    { label: INFO_LABEL_STATUS, value: status },
+    {
+      label: INFO_LABEL_SIGNATURES,
+      value: `${signedCount} / ${totalSignatures} signed`,
+    },
+  ];
+
+  const bottomContent = (
+    <>
+      {signers.map(({ fullName, email, status, rejectReason }) => (
+        <Box key={email} sx={{ mt: 1, pl: 1 }}>
+          <Chip
+            label={`${fullName || email} – ${status}`}
+            color={
+              status === "SIGNED"
+                ? "success"
+                : status === "REJECTED"
+                ? "error"
+                : "default"
+            }
+            size="small"
+            variant="outlined"
+          />
+          {rejectReason && (
+            <Typography
+              variant="caption"
+              color="error"
+              sx={{ display: "block", pl: 2 }}
+            >
+              {REJECT_REASON_LABEL}: {rejectReason}
+            </Typography>
+          )}
+        </Box>
+      ))}
+    </>
+  );
+
+  return (
+    <GenericCard
+      title={name}
+      infoItems={infoItems}
+      bottomContent={bottomContent}
+    />
   );
 };

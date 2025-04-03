@@ -1,6 +1,7 @@
 import { API } from "../API.ts";
 import { Signature } from "./types.ts";
 import { SignatureEndpoints } from "./consts.ts";
+import { SentSignatureType } from "../../pages/signature/components/sentSignatureStatus/types.ts";
 
 export const getSignaturesForDocument = async (
   documentId: number
@@ -16,8 +17,14 @@ export const addSignersToDocument = async (
   return API.post(SignatureEndpoints.addSigners(documentId), { userIds });
 };
 
-export const signDocument = async (documentId: number, userId: number) => {
-  return API.post(SignatureEndpoints.signDocument(documentId, userId));
+export const signDocument = async (
+  documentId: number,
+  userId: number,
+  signReason: string
+) => {
+  return API.post(SignatureEndpoints.signDocument(documentId, userId), {
+    signReason,
+  });
 };
 
 export const rejectSignature = async (
@@ -41,7 +48,7 @@ export const getPendingSignatures = async (
 
 export const getSentSignatures = async (
   userId: number
-): Promise<Signature[]> => {
+): Promise<SentSignatureType[]> => {
   const { data } = await API.get(SignatureEndpoints.getSentSignatures(userId));
   return data;
 };

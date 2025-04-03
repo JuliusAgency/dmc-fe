@@ -12,7 +12,7 @@ export const SignatureDashboard = () => {
 
   return (
     <Container sx={{ direction: "ltr", textAlign: "left" }}>
-      <Typography variant="h5" sx={{ mb: 3 }}>
+      <Typography variant="h5" sx={{ mb: 2, textAlign: "center" }}>
         {DASHBOARD_TITLE}
       </Typography>
 
