@@ -3,5 +3,5 @@ export interface SendMailDto {
   subject: string;
   text: string;
   html?: string;
-  from: string;
+  from?: string;
 }

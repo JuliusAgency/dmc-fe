@@ -76,15 +76,15 @@ export const getAllDocuments = async (
       },
     ],
     [
-      "query",
+      "revision",
       {
-        description: "query",
+        description: "revision",
         action: () => {
-          const query = filters["query"];
-          if (query) {
+          const revision = filters["revision"];
+          if (revision) {
             transformedFilters = {
               ...transformedFilters,
-              query,
+              revision: Number(revision),
             };
           }
         },

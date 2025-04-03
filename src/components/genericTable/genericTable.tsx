@@ -92,47 +92,69 @@ export const GenericTable = ({
         }
         sx={{
           height: "100%",
-          mb: 2,
           width: "100%",
+          mb: 2,
+          overflow: "hidden",
           "& .MuiDataGrid-root": {
             border: "none",
             fontSize: "0.75rem",
           },
+
           "& .MuiDataGrid-cell": {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
             padding: "2px 4px",
+            minWidth: 0,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            fontSize: "0.7rem",
           },
+
+          "& .MuiDataGrid-columnHeader": {
+            padding: "2px 4px",
+            minWidth: 0,
+          },
+
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: alpha(theme.palette.primary.main, 0.08),
             color: theme.palette.primary.main,
             fontWeight: "bold",
             fontSize: "0.75rem",
           },
-          "& .MuiDataGrid-columnHeader": {
-            padding: "2px 4px",
-          },
+
           "& .MuiDataGrid-columnHeaderTitle": {
             fontWeight: "bold",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           },
           "& .MuiDataGrid-row:nth-of-type(even)": {
             backgroundColor: alpha(theme.palette.background.default, 0.4),
           },
+
           "& .MuiDataGrid-row:hover": {
             backgroundColor: alpha(theme.palette.primary.light, 0.1),
           },
+
           "& .actionColumn": {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
           },
+
           "& .MuiDataGrid-footerContainer": {
             borderTop: `1px solid ${theme.palette.divider}`,
           },
+
           "& .MuiTablePagination-root": {
             fontSize: "0.75rem",
+          },
+
+          "& .MuiDataGrid-virtualScrollerContent": {
+            width: "100% !important",
           },
         }}
         slots={{

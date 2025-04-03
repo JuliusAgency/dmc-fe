@@ -1,4 +1,12 @@
-import { Chip, FormControl, Select, MenuItem } from "@mui/material";
+import {
+  Chip,
+  FormControl,
+  Select,
+  MenuItem,
+  Tooltip,
+  IconButton,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   CLASSIFICATION_LABEL,
   EMAIL_LABEL,
@@ -15,7 +23,8 @@ export const useManageUsersColumns = (
   handleRoleChange: (userId: number, role: string) => void,
   handleClassificationChange: (ruserId: number, classification: string) => void,
   handleOpenResetDialog: (userId: number) => void,
-  handleOpenPermissionsDialog: (user: User) => void
+  handleOpenPermissionsDialog: (user: User) => void,
+  handleDeleteUser: (userId: number) => void
 ): GridColDef[] => [
   { field: "email", headerName: EMAIL_LABEL, flex: 1 },
   {
@@ -71,7 +80,7 @@ export const useManageUsersColumns = (
   {
     field: "actions",
     headerName: "actions",
-    flex: 1.2,
+    flex: 1.5,
     renderCell: (params) => (
       <>
         <Chip
@@ -81,12 +90,12 @@ export const useManageUsersColumns = (
             mr: 1,
             cursor: "pointer",
             fontSize: "0.75rem",
-            backgroundColor: "#ef5350",
+            backgroundColor: "#ffa726",
             color: "#fff",
           }}
         />
         <Chip
-          label="Permissions"
+          label="Category Permissions"
           onClick={() => handleOpenPermissionsDialog(params.row)}
           sx={{
             cursor: "pointer",
@@ -98,6 +107,13 @@ export const useManageUsersColumns = (
             },
           }}
         />
+        <IconButton
+          onClick={() => handleDeleteUser(params.row.id)}
+          size="small"
+          sx={{ color: "#ef5350" }}
+        >
+          <DeleteIcon />
+        </IconButton>
       </>
     ),
   },

@@ -3,6 +3,7 @@ import { formatDate } from "../../utils/formatDate";
 import { Classification, FileType } from "../../api/documentAPI/types";
 import { GridEditSingleSelectCell } from "@mui/x-data-grid-pro";
 import { useGetUsers } from "../../hooks/user/userHooks";
+import { useUser } from "../../hooks/auth/authsHooks";
 import { useMemo } from "react";
 import { Chip, Button, Typography } from "@mui/material";
 import { DocumentType } from "../../api/documentAPI/types";
@@ -16,7 +17,8 @@ export enum DocumentStatus {
 }
 
 const cellStyle = {
-  whiteSpace: "nowrap",
+  whiteSpace: "normal", // לא מחייב שורה אחת
+  overflowWrap: "break-word",
   overflow: "hidden",
   textOverflow: "ellipsis",
   fontSize: "0.75rem",
@@ -33,9 +35,10 @@ export const DOC_TYPE_OPTIONS = Object.values(DocumentTypeDisplayNameMap).map(
 );
 
 export const useColumns = (
-  onOpenSignatures: (doc: DocumentType) => void
+  onOpenSignatures?: (doc: DocumentType) => void | undefined
 ): GridColDef[] => {
   const { data: users } = useGetUsers();
+  const isSystemAdmin = useUser().isSystemAdmin;
 
   const userOptions = useMemo(() => {
     if (!users || users.length === 0) return [];
@@ -83,7 +86,7 @@ export const useColumns = (
       align: "center",
       flex: 1.2,
       minWidth: 100,
-      editable: true,
+      editable: isSystemAdmin,
       renderCell: (params) => (
         <Typography sx={cellStyle}>{params.value}</Typography>
       ),
@@ -106,7 +109,7 @@ export const useColumns = (
       align: "center",
       flex: 1,
       minWidth: 110,
-      editable: true,
+      editable: isSystemAdmin,
       type: "singleSelect",
       valueOptions: Object.values(Classification),
       renderEditCell: (params: GridRenderEditCellParams) => (
@@ -131,7 +134,7 @@ export const useColumns = (
       align: "center",
       flex: 1,
       minWidth: 120,
-      editable: true,
+      editable: isSystemAdmin,
       type: "singleSelect",
       valueOptions: Object.keys(DocumentTypeDisplayNameMap),
       renderEditCell: (params: GridRenderEditCellParams) => (
@@ -151,8 +154,8 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1.5,
-      minWidth: 150,
-      editable: true,
+      minWidth: 170,
+      editable: isSystemAdmin,
       type: "singleSelect",
       valueOptions: userOptions.map((u) => ({
         value: u.id,
@@ -173,7 +176,7 @@ export const useColumns = (
       align: "center",
       flex: 0.7,
       minWidth: 70,
-      editable: true,
+      editable: isSystemAdmin,
     },
     {
       field: "published",
@@ -181,7 +184,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 100,
+      minWidth: 150,
       valueGetter: (params) => formatDate(params),
     },
     {
@@ -190,12 +193,12 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 120,
+      minWidth: 90,
       renderCell: (params) => (
         <Button
           variant="text"
           size="small"
-          onClick={() => onOpenSignatures(params.row)}
+          onClick={() => onOpenSignatures?.(params.row)}
           sx={{ fontSize: "0.7rem", textTransform: "none" }}
         >
           {params.value}
@@ -208,8 +211,8 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 100,
-      editable: true,
+      minWidth: 50,
+      editable: isSystemAdmin,
       type: "singleSelect",
       valueOptions: Object.values(FileType),
       renderEditCell: (params: GridRenderEditCellParams) => (
@@ -241,7 +244,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 100,
+      minWidth: 150,
       valueGetter: (params) => formatDate(params),
     },
     {
@@ -250,7 +253,7 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 100,
+      minWidth: 150,
     },
     {
       field: "nextReview",
@@ -258,8 +261,8 @@ export const useColumns = (
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 120,
-      editable: true,
+      minWidth: 150,
+      editable: isSystemAdmin,
       type: "date",
       valueGetter: (params) => formatDate(params),
       valueFormatter: (params) => formatDate(params),

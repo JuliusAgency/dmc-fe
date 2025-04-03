@@ -8,7 +8,7 @@ export const LABELS = {
 };
 
 export const BUTTONS = {
-  cancel: "Cancel",
+  cancel: "No signatures needed",
   submit: "Submit",
 };
 

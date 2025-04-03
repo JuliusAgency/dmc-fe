@@ -1,5 +1,4 @@
-import { GridColDef } from "@mui/x-data-grid";
-import { Box, Button } from "@mui/material";
+import { Box, IconButton, Button, Tooltip } from "@mui/material";
 import DownloadForOfflineIcon from "@mui/icons-material/DownloadForOffline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
@@ -7,6 +6,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import HistoryIcon from "@mui/icons-material/History";
 import { useSelector } from "react-redux";
 import { DocumentType } from "../../api/documentAPI/types.ts";
+import { GridColDef } from "@mui/x-data-grid-pro";
+import ReportIcon from "@mui/icons-material/Report";
 
 const hasClassificationAccess = (
   userLevel: string,
@@ -33,8 +34,9 @@ export const getActionColumn = (
     field: "action",
     headerName: "Actions",
     headerAlign: "center",
-    width: 300,
     align: "center",
+    flex: 2,
+    sortable: false,
     renderCell: ({ row }) => {
       const hasReports = row.reports?.length > 0;
       const allAnswered = row.reports?.every((r: any) => !!r.response);
@@ -57,75 +59,91 @@ export const getActionColumn = (
       else if (hasReports && !allAnswered) hoverColor = "#fb8c00";
 
       return (
-        <Box display="flex" gap={1} justifyContent="center" width="100%">
-          <Box minWidth={32}>
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          flexWrap="nowrap"
+          width="100%"
+          maxWidth="100%"
+          overflow="hidden"
+          gap={0.5}
+        >
+          <Box minWidth={20}>
             {canViewDownload && (
-              <Button
-                onClick={() => handleViewFile(row.fileName)}
-                sx={{ padding: 0, minWidth: 0 }}
-              >
-                <VisibilityIcon sx={{ color: "#42a5f5" }} />
-              </Button>
+              <Tooltip title="View">
+                <IconButton
+                  onClick={() => handleViewFile(row.fileName)}
+                  size="small"
+                >
+                  <VisibilityIcon fontSize="small" sx={{ color: "#42a5f5" }} />
+                </IconButton>
+              </Tooltip>
             )}
           </Box>
 
-          <Box minWidth={32}>
+          <Box minWidth={20}>
             {canViewDownload && (
-              <Button
-                onClick={() => handleDownloadFile(row.fileName)}
-                sx={{ padding: 0, minWidth: 0 }}
-              >
-                <DownloadForOfflineIcon sx={{ color: "#66bb6a" }} />
-              </Button>
+              <Tooltip title="Download">
+                <IconButton
+                  onClick={() => handleDownloadFile(row.fileName)}
+                  size="small"
+                >
+                  <DownloadForOfflineIcon
+                    fontSize="small"
+                    sx={{ color: "#66bb6a" }}
+                  />
+                </IconButton>
+              </Tooltip>
             )}
           </Box>
 
-          <Box minWidth={32}>
-            <Button
-              onClick={() => handleEdit(row)}
-              sx={{ padding: 0, minWidth: 0 }}
-            >
-              <EditIcon sx={{ color: "#ffa726" }} />
-            </Button>
+          <Box minWidth={20}>
+            <Tooltip title="Edit">
+              <IconButton onClick={() => handleEdit(row)} size="small">
+                <EditIcon fontSize="small" sx={{ color: "#ffa726" }} />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          <Box minWidth={32}>
+          <Box minWidth={20}>
             {(user.role === "ADMIN" || user.role === "SYSTEM_ADMIN") && (
-              <Button
-                onClick={() => handleDelete(row.id)}
-                sx={{ padding: 0, minWidth: 0 }}
-              >
-                <DeleteIcon sx={{ color: "#ef5350" }} />
-              </Button>
+              <Tooltip title="Delete">
+                <IconButton onClick={() => handleDelete(row.id)} size="small">
+                  <DeleteIcon fontSize="small" sx={{ color: "#ef5350" }} />
+                </IconButton>
+              </Tooltip>
             )}
           </Box>
 
-          <Box minWidth={32}>
-            <Button
-              onClick={() => handleShowHistory(row.documentPartNumber)}
-              sx={{ padding: 0, minWidth: 0 }}
-            >
-              <HistoryIcon sx={{ color: "#ab47bc" }} />
-            </Button>
+          <Box minWidth={20}>
+            <Tooltip title="History">
+              <IconButton
+                onClick={() => handleShowHistory(row.documentPartNumber)}
+                size="small"
+              >
+                <HistoryIcon fontSize="small" sx={{ color: "#ab47bc" }} />
+              </IconButton>
+            </Tooltip>
           </Box>
 
-          <Box minWidth={80}>
+          <Box minWidth={30}>
             {status === "APPROVED" && (
-              <Button
-                onClick={() => handleReport(row)}
-                variant="contained"
-                sx={{
-                  minWidth: "80px",
-                  textTransform: "none",
-                  backgroundColor: reportColor,
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: hoverColor,
-                  },
-                }}
-              >
-                Report
-              </Button>
+              <Tooltip title="Report">
+                <IconButton
+                  onClick={() => handleReport(row)}
+                  size="small"
+                  sx={{
+                    backgroundColor: reportColor,
+                    color: "white",
+                    "&:hover": { backgroundColor: hoverColor },
+                    borderRadius: 1,
+                    p: "4px",
+                  }}
+                >
+                  <ReportIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             )}
           </Box>
         </Box>

@@ -13,6 +13,8 @@ import {
 } from "../../hooks/category/categoryHooks";
 import FolderIcon from "@mui/icons-material/Folder";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 import { useEffect, useState } from "react";
 import { Document } from "../document";
 import {
@@ -56,12 +58,18 @@ export const CategoryLevelPage = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography
-        variant="h5"
-        sx={{ mb: 3, color: CATEGORY_TITLE_COLOR, fontWeight: "bold" }}
-      >
-        {loadingCategory ? "Loading..." : currentCategory?.name || "Category"}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+        <ArrowBackIcon
+          onClick={() => navigate(-1)}
+          sx={{ cursor: "pointer", mr: 1, color: CATEGORY_TITLE_COLOR }}
+        />
+        <Typography
+          variant="h5"
+          sx={{ color: CATEGORY_TITLE_COLOR, fontWeight: "bold" }}
+        >
+          {loadingCategory ? "Loading..." : currentCategory?.name || "Category"}
+        </Typography>
+      </Box>
 
       {isLoading ? (
         <Typography>{CATEGORY_LOADING_TEXT}</Typography>

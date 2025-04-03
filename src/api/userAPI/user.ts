@@ -24,3 +24,7 @@ export const updateUser = async (data: {
   const idOrEmail = data.userId ?? data.email;
   return API.put(`/user/${idOrEmail}`, data);
 };
+
+export const deleteUser = async (userId: number): Promise<void> => {
+  await API.delete(`/user/${userId}`);
+};

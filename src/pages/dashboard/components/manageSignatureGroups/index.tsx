@@ -1,19 +1,7 @@
-import {
-  Container,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  List,
-  ListItem,
-  ListItemText,
-  Checkbox,
-  IconButton,
-} from "@mui/material";
+import { Container, Typography, Button, Box } from "@mui/material";
+import { useState } from "react";
+import { SignatureGroupCard } from "./components/signatureGroupCard";
+import { SignatureGroupPopup } from "./components/signatureGroupPopup";
 import {
   useGetAllSignatureGroups,
   useCreateSignatureGroup,
@@ -21,29 +9,13 @@ import {
   useDeleteSignatureGroup,
 } from "../../../../hooks/signatures/signatureGroupsHook";
 import { useGetUsers } from "../../../../hooks/user/userHooks";
-import { useState } from "react";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import { GenericPopup } from "../../../../components/genericPopup/genericPopup";
-import {
-  SIGNATURE_GROUPS_TITLE,
-  CREATE_GROUP_TITLE,
-  GROUP_NAME_LABEL,
-  GROUP_USERS_LABEL,
-  SAVE_BUTTON,
-  CANCEL_BUTTON,
-  ADD_GROUP_BUTTON,
-  USERS_COLUMN_LABEL,
-  NAME_COLUMN_LABEL,
-  EDIT_GROUP_TITLE,
-} from "./constants";
+import { SIGNATURE_GROUPS_TITLE, ADD_GROUP_BUTTON } from "./constants";
+import { SignatureGroup } from "./types";
 
 export const ManageSignatureGroups = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [editingGroupId, setEditingGroupId] = useState<number | null>(null);
-  const [groupName, setGroupName] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [editingGroup, setEditingGroup] = useState<SignatureGroup | null>(null);
 
   const { data: groups = [], isLoading } = useGetAllSignatureGroups();
   const { data: users = [] } = useGetUsers();
@@ -52,40 +24,25 @@ export const ManageSignatureGroups = () => {
   const updateGroup = useUpdateSignatureGroup();
   const deleteGroup = useDeleteSignatureGroup();
 
-  const openCreateDialog = () => {
-    setDialogOpen(true);
-    setEditMode(false);
-    setEditingGroupId(null);
-    setGroupName("");
-    setSelectedUsers([]);
+  const handleOpenPopup = (group?: SignatureGroup) => {
+    setPopupOpen(true);
+    setEditMode(!!group);
+    setEditingGroup(group ?? null);
   };
 
-  const openEditDialog = (group: any) => {
-    setDialogOpen(true);
-    setEditMode(true);
-    setEditingGroupId(group.id);
-    setGroupName(group.name);
-    setSelectedUsers(group.users.map((u: any) => u.id));
+  const handleClosePopup = () => {
+    setPopupOpen(false);
+    setEditingGroup(null);
   };
 
-  const handleSave = () => {
-    const payload = { name: groupName, userIds: selectedUsers };
-
-    if (editMode && editingGroupId !== null) {
-      updateGroup.mutate({ id: editingGroupId, group: payload });
+  const handleSave = (name: string, userIds: number[]) => {
+    const payload = { name, userIds };
+    if (editMode && editingGroup) {
+      updateGroup.mutate({ id: editingGroup.id, group: payload });
     } else {
       createGroup.mutate(payload);
     }
-
-    setDialogOpen(false);
-  };
-
-  const handleToggleUser = (userId: number) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
-    );
+    handleClosePopup();
   };
 
   return (
@@ -95,78 +52,29 @@ export const ManageSignatureGroups = () => {
       </Typography>
 
       <Box sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={openCreateDialog}>
+        <Button variant="contained" onClick={() => handleOpenPopup()}>
           {ADD_GROUP_BUTTON}
         </Button>
       </Box>
 
       {!isLoading &&
         groups.map((group) => (
-          <Box
+          <SignatureGroupCard
             key={group.id}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              border: "1px solid #ccc",
-              borderRadius: 2,
-              padding: 2,
-              mb: 1,
-            }}
-          >
-            <Box>
-              <Typography fontWeight="bold">
-                {NAME_COLUMN_LABEL}: {group.name}
-              </Typography>
-              <Typography variant="body2">
-                {USERS_COLUMN_LABEL}:{" "}
-                {group.users.map((u) => u.email).join(", ") || "—"}
-              </Typography>
-            </Box>
-            <Box>
-              <IconButton onClick={() => openEditDialog(group)}>
-                <EditIcon sx={{ color: "orange" }} />
-              </IconButton>
-              <IconButton onClick={() => deleteGroup.mutate(group.id)}>
-                <DeleteIcon sx={{ color: "red" }} />
-              </IconButton>
-            </Box>
-          </Box>
+            group={group}
+            onEdit={handleOpenPopup}
+            onDelete={(id) => deleteGroup.mutate(id)}
+          />
         ))}
 
-      <GenericPopup
-        open={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        title={editMode ? EDIT_GROUP_TITLE : CREATE_GROUP_TITLE}
-        onConfirm={handleSave}
-        confirmButtonText={SAVE_BUTTON}
-        cancelButtonText={CANCEL_BUTTON}
-      >
-        <TextField
-          label={GROUP_NAME_LABEL}
-          fullWidth
-          value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-        <Typography sx={{ mb: 1 }}>{GROUP_USERS_LABEL}</Typography>
-        <List>
-          {users.map((user: any) => (
-            <ListItem
-              key={user.id}
-              secondaryAction={
-                <Checkbox
-                  edge="end"
-                  checked={selectedUsers.includes(user.id)}
-                  onChange={() => handleToggleUser(user.id)}
-                />
-              }
-            >
-              <ListItemText primary={user.email} />
-            </ListItem>
-          ))}
-        </List>
-      </GenericPopup>
+      <SignatureGroupPopup
+        open={popupOpen}
+        onClose={handleClosePopup}
+        onSave={handleSave}
+        users={users}
+        editMode={editMode}
+        group={editingGroup}
+      />
     </Container>
   );
 };

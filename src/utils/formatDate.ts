@@ -1,5 +1,5 @@
-import daysjs from "dayjs";
+import dayjs from "dayjs";
 
 export const formatDate = (date: string) => {
-  return daysjs(date).isValid() ? daysjs(date).format("DD/MM/YYYY") : "";
-}
+  return dayjs(date).isValid() ? dayjs(date).format("DD/MM/YYYY HH:mm") : "";
+};

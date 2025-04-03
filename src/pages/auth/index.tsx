@@ -53,6 +53,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       email: "",
       password: "",
       rememberMe: false,
+      blockedCategoryIds: [],
     },
     validationSchema: Yup.object({
       email: Yup.string()

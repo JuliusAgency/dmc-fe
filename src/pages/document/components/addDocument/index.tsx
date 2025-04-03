@@ -78,7 +78,7 @@ export const AddDocument = ({
     .split("/")
     .filter(Boolean);
 
-  const categoryId = pathSegments.length >= 6 ? pathSegments[5] : null;
+  const categoryId = pathSegments[pathSegments.length - 1];
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditingRef = useRef(!!documentToEdit);
@@ -149,7 +149,7 @@ export const AddDocument = ({
       !formData.name ||
       !formData.classification ||
       !file ||
-      formData.type
+      !formData.type
     ) {
       snackBarError(ERROR_REQUIRED_FIELDS);
       return;

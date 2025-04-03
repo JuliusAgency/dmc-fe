@@ -1,12 +1,17 @@
 import { useAuditTrails } from "../../hooks/auditTrail/auditTrailHook";
 import { COLUMNS } from "./columns";
-import { AuditTrail } from "./types";
 import { GenericTable } from "../../components/genericTable/genericTable";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ERROR_MESSAGE, PAGE_TITLE } from "./constants";
+import { PaginationModel } from "../../consts/types";
+import { useState } from "react";
 
 export const AuditTrailPage = () => {
   const { data: auditTrails = [], isLoading, error } = useAuditTrails();
+  const [pagination, setPagination] = useState<PaginationModel>({
+    page: 0,
+    pageSize: 15,
+  });
 
   if (isLoading) {
     return (
@@ -54,9 +59,10 @@ export const AuditTrailPage = () => {
           rows={auditTrails}
           columns={COLUMNS}
           loading={isLoading}
-          pageSize={10}
           rowCount={auditTrails.length}
-          onPaginationModelChange={() => {}}
+          pageSize={pagination.pageSize}
+          onPaginationModelChange={setPagination}
+          getDetailPanelHeight={() => 200}
           sx={{
             width: "98%",
             height: "100%",

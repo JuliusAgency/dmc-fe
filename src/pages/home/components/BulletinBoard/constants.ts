@@ -5,3 +5,7 @@ export const BULLETIN_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   month: "short",
   day: "numeric",
 };
+
+export const BULLETIN_PENDING_SIGNATURES_TEXT =
+  "⚠️ You have documents pending your signature!";
+export const BULLETIN_PENDING_SIGNATURES_BUTTON = "Sign now";

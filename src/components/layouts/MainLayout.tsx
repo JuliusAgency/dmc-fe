@@ -9,8 +9,8 @@ import { useParentCategories } from "../../hooks/category/categoryHooks";
 import { NavBar } from "../navBar";
 import { MenuItem } from "../navBar/NavBar";
 import HistoryIcon from "@mui/icons-material/History";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 
-// Layout component for authenticated routes with NavBar
 export const MainLayout = () => {
   const { isSystemAdmin } = useUser();
   const { data: categoriesData, isLoading } = useParentCategories();
@@ -42,7 +42,7 @@ export const MainLayout = () => {
       },
       {
         path: "/reports",
-        icon: <DescriptionIcon />,
+        icon: <AssessmentIcon />,
         text: "Reports",
         disabled: false,
       },

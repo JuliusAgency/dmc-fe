@@ -89,6 +89,7 @@ export const DocumentHistory = ({
       onClose={onClose}
       title={DOCUMENT_HISTORY_TITLE}
       cancelButtonText={BUTTON_CLOSE}
+      fullScreen={true}
     >
       <Box
         sx={{

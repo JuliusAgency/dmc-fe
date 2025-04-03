@@ -4,4 +4,6 @@ export const TOAST_MESSAGES = {
   createUserError: "Failed to create user",
   updateUserSuccess: "User updated successfully.",
   updateUserError: "Failed to update user.",
+  deleteUserSuccess: "User deleted successfully",
+  deleteUserError: "Failed to delete user",
 };

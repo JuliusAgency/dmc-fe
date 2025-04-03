@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 import { REVISION_GROUP_DOCUMENTS } from "./consts.ts";
 
 export const RevisionGroup = ({ documentPartNumber }: Props) => {
-  const COLUMNS = useColumns();
   const { id: categoryId } = useParams();
   const [pagination, setPagination] = useState<PaginationModel>({
     pageSize: 5,
@@ -25,6 +24,8 @@ export const RevisionGroup = ({ documentPartNumber }: Props) => {
     ["tags", "tags.tag", "category", "processOwner"],
     REVISION_GROUP_DOCUMENTS(documentPartNumber)
   );
+
+  const COLUMNS = useColumns();
 
   return (
     <GenericTable

@@ -226,104 +226,49 @@ export function NavBar({
                 overflow: "visible",
               }}
             >
-              {filteredMenuItems.map((item, index) => (
+              {filteredMenuItems.map((item) => (
                 <Box
                   key={item.path}
+                  onClick={() => handleNavigation(item.path)}
                   sx={{
-                    color: theme.palette.primary.main,
-                    position: "relative",
-                    mb: 0.5,
-                    mt: 0.5,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    mx: 2,
                   }}
                 >
-                  <Button
-                    startIcon={item.icon}
-                    onClick={() => handleNavigation(item.path)}
-                    disabled={item.disabled}
-                    color="inherit"
-                    onMouseEnter={(event) => {
-                      if (item.childItems && item.childItems.length > 0) {
-                        setOpenMenuIndex(index);
-                        setMenuAnchorEl(event.currentTarget);
-                      }
-                    }}
-                    endIcon={
-                      item.childItems && item.childItems.length > 0 ? (
-                        <ArrowDropDownIcon />
-                      ) : null
-                    }
+                  {item.icon && (
+                    <Box
+                      sx={{
+                        backgroundColor: "white",
+                        padding: 1.1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        mb: 0.5,
+                        mt: 1,
+                      }}
+                    >
+                      {React.cloneElement(item.icon as React.ReactElement, {
+                        //@ts-ignore
+                        sx: { fontSize: 34, color: theme.palette.primary.main },
+                      })}
+                    </Box>
+                  )}
+                  <Typography
                     sx={{
-                      mx: 1,
-                      borderRadius: 1,
-                      textTransform: "none",
+                      mt: item.icon ? 0 : 7,
+                      fontSize: item.icon ? "0.75rem" : "1rem",
                       fontWeight:
                         location.pathname === item.path ? "bold" : "normal",
-                      borderBottom:
-                        location.pathname === item.path ? "2px solid" : "none",
-                      "&:hover": {
-                        backgroundColor: "rgba(0, 0, 0, 0.04)",
-                      },
-                      whiteSpace: "nowrap",
-                      minHeight: "36px",
+                      color: theme.palette.primary.main,
+                      textAlign: "center",
                     }}
                   >
                     {item.text}
-                  </Button>
-                  {item.childItems && item.childItems.length > 0 && (
-                    <Popper
-                      open={openMenuIndex === index}
-                      anchorEl={menuAnchorEl}
-                      placement="bottom-start"
-                      transition
-                      disablePortal
-                      sx={{ zIndex: 1300 }}
-                    >
-                      {({ TransitionProps }) => (
-                        <Grow
-                          {...TransitionProps}
-                          style={{ transformOrigin: "top left" }}
-                        >
-                          <Paper
-                            elevation={3}
-                            sx={{
-                              mt: 0.5,
-                              minWidth: 180,
-                              backgroundColor: theme.palette.grey[200],
-                              borderBottom: `2px solid ${theme.palette.grey[400]}`,
-                            }}
-                          >
-                            <ClickAwayListener
-                              onClickAway={() => setOpenMenuIndex(null)}
-                            >
-                              <List dense sx={{ py: 0.5 }}>
-                                {item.childItems?.map((child) => (
-                                  <ListItem key={child.path} disablePadding>
-                                    <ListItemButton
-                                      onClick={() =>
-                                        handleNavigation(child.path)
-                                      }
-                                      dense
-                                    >
-                                      <Typography
-                                        sx={{
-                                          fontSize: "14px",
-                                          fontWeight: "bold",
-                                          color: theme.palette.primary.main,
-                                          padding: "7px",
-                                        }}
-                                      >
-                                        {child.text}
-                                      </Typography>
-                                    </ListItemButton>
-                                  </ListItem>
-                                ))}
-                              </List>
-                            </ClickAwayListener>
-                          </Paper>
-                        </Grow>
-                      )}
-                    </Popper>
-                  )}
+                  </Typography>
                 </Box>
               ))}
             </Box>

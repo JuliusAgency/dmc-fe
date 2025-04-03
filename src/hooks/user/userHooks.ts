@@ -1,5 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUsers, createUser, updateUser } from "../../api/userAPI/user";
+import {
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+} from "../../api/userAPI/user";
 import { User } from "../../api/authAPI/types";
 import { snackBarError, snackBarSuccess } from "../../components/toast/Toast";
 import { TOAST_MESSAGES } from "./constants";
@@ -60,6 +65,21 @@ export const useUpdateUser = () => {
     },
     onError: () => {
       snackBarError(TOAST_MESSAGES.updateUserError);
+    },
+  });
+};
+
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId: number) => deleteUser(userId),
+    onSuccess: () => {
+      snackBarSuccess(TOAST_MESSAGES.deleteUserSuccess);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: () => {
+      snackBarError(TOAST_MESSAGES.deleteUserError);
     },
   });
 };

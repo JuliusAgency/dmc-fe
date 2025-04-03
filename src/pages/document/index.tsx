@@ -37,9 +37,9 @@ export const Document = () => {
     .split("/")
     .filter(Boolean);
 
-  const categoryId =
-    pathSegments.length <= 6 ? pathSegments[pathSegments.length - 1] : null;
+  const categoryId = pathSegments[pathSegments.length - 1];
 
+  console.log("categoryId", categoryId);
   const { handleDownloadFile } = useFileDownload();
 
   const [pagination, setPagination] = useState<PaginationModel>({
@@ -89,7 +89,7 @@ export const Document = () => {
 
   const inProgressQuery = useGetAllDocuments(
     pagination,
-    { ...refetchParams.filters, status: ["IN_PROGRESS"], revision: 1 },
+    { ...refetchParams.filters, status: ["IN_PROGRESS"] },
     refetchParams.relations,
     "inProgressDocs"
   );
@@ -202,7 +202,9 @@ export const Document = () => {
   );
 
   const approved = approvedQuery.data?.data ?? [];
-  const inProgress = inProgressQuery.data?.data ?? [];
+  const inProgress =
+    inProgressQuery.data?.data.filter((doc) => Number(doc.revision) === 1) ??
+    [];
   const drafts = draftQuery.data?.data ?? [];
 
   const allDocs = [...approved, ...inProgress, ...drafts];
@@ -253,7 +255,7 @@ export const Document = () => {
           const doc = allDocs.find((d) => d.id === rowId.id);
           if (!doc) return false;
 
-          const hasInProgress = allDocs.some(
+          const hasInProgress = inProgressQuery.data?.data.some(
             (d) =>
               d.documentPartNumber === doc.documentPartNumber &&
               d.status === "IN_PROGRESS"
