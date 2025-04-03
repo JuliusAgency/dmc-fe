@@ -12,7 +12,7 @@ export const sendReport = async ({
   reporterName: string;
   message: string;
 }) => {
-  const { data } = await API.post(ReportEndpoints.SEND_REPORT, {
+  const { data } = await API.post(ReportEndpoints.sendReport, {
     documentId,
     revision,
     reporterName,
@@ -22,7 +22,7 @@ export const sendReport = async ({
 };
 
 export const getReportsForProcessOwner = async () => {
-  const { data } = await API.get(ReportEndpoints.GET_MY_REPORTS);
+  const { data } = await API.get(ReportEndpoints.getMyReport);
   return data;
 };
 
@@ -33,8 +33,13 @@ export const answerReport = async ({
   reportId: number;
   response: string;
 }) => {
-  const { data } = await API.patch(ReportEndpoints.ANSWER_REPORT(reportId), {
+  const { data } = await API.patch(ReportEndpoints.answerReport(reportId), {
     response,
   });
+  return data;
+};
+
+export const deleteReport = async (reportId: number) => {
+  const { data } = await API.delete(ReportEndpoints.deleteReport(reportId));
   return data;
 };

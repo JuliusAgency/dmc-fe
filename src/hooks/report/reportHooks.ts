@@ -3,6 +3,7 @@ import {
   getReportsForProcessOwner,
   sendReport,
   answerReport,
+  deleteReport,
 } from "../../api/reportAPI/report";
 import { snackBarError, snackBarSuccess } from "../../components/toast/Toast";
 import {
@@ -11,6 +12,8 @@ import {
   REPORT_SEND_ERROR,
   REPORT_ANSWER_SUCCESS,
   REPORT_ANSWER_ERROR,
+  REPORT_DELETE_SUCCESS,
+  REPORT_DELETE_ERROR,
 } from "./constants";
 
 export const useSendReport = () => {
@@ -43,6 +46,20 @@ export const useAnswerReport = () => {
     },
     onError: () => {
       snackBarError(REPORT_ANSWER_ERROR);
+    },
+  });
+};
+
+export const useDeleteReport = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation(deleteReport, {
+    onSuccess: () => {
+      snackBarSuccess(REPORT_DELETE_SUCCESS);
+      queryClient.invalidateQueries("myReports");
+    },
+    onError: () => {
+      snackBarError(REPORT_DELETE_ERROR);
     },
   });
 };

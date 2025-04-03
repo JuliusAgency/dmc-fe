@@ -1,5 +1,8 @@
-import { useAuditTrails } from "../../hooks/auditTrail/auditTrailHook";
-import { COLUMNS } from "./columns";
+import {
+  useAuditTrails,
+  useDeleteAuditTrail,
+} from "../../hooks/auditTrail/auditTrailHook";
+import { getAuditTrailColumns } from "./columns";
 import { GenericTable } from "../../components/genericTable/genericTable";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { ERROR_MESSAGE, PAGE_TITLE } from "./constants";
@@ -8,10 +11,16 @@ import { useState } from "react";
 
 export const AuditTrailPage = () => {
   const { data: auditTrails = [], isLoading, error } = useAuditTrails();
+  const deleteMutation = useDeleteAuditTrail();
+
   const [pagination, setPagination] = useState<PaginationModel>({
     page: 0,
     pageSize: 15,
   });
+
+  const handleDelete = (id: number) => {
+    deleteMutation.mutate(id);
+  };
 
   if (isLoading) {
     return (
@@ -57,7 +66,7 @@ export const AuditTrailPage = () => {
       <Box sx={{ flex: 1 }}>
         <GenericTable
           rows={auditTrails}
-          columns={COLUMNS}
+          columns={getAuditTrailColumns(handleDelete)}
           loading={isLoading}
           rowCount={auditTrails.length}
           pageSize={pagination.pageSize}

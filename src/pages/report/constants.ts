@@ -7,3 +7,4 @@ export const REPORTS_RESPOND_SUBMIT = "Submit Response";
 export const REPORTS_TABLE_ACTION = "Respond";
 export const REPORT_ANSWER_SUCCESS = "Response submitted successfully";
 export const REPORT_ANSWER_ERROR = "Failed to submit response";
+export const REPORTS_DELETE_LABEL = "Delete Report";

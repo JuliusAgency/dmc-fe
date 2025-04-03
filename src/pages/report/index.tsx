@@ -3,6 +3,7 @@ import { Box, Typography, TextField } from "@mui/material";
 import {
   useGetMyReports,
   useAnswerReport,
+  useDeleteReport,
 } from "../../hooks/report/reportHooks";
 import { GenericTable } from "../../components/genericTable/genericTable";
 import { snackBarSuccess, snackBarError } from "../../components/toast/Toast";
@@ -21,6 +22,7 @@ import { GenericPopup } from "../../components/genericPopup/genericPopup";
 export const ReportsPage = () => {
   const { data, isLoading, refetch } = useGetMyReports();
   const answerMutation = useAnswerReport();
+  const deleteMutation = useDeleteReport();
 
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
   const [answerText, setAnswerText] = useState("");
@@ -48,7 +50,15 @@ export const ReportsPage = () => {
     );
   };
 
-  const COLUMNS = useReportColumns(handleAnswerClick);
+  const handleDelete = (reportId: number) => {
+    deleteMutation.mutate(reportId, {
+      onSuccess: () => {
+        refetch();
+      },
+    });
+  };
+
+  const COLUMNS = useReportColumns(handleAnswerClick, handleDelete);
 
   return (
     <Box p={3}>

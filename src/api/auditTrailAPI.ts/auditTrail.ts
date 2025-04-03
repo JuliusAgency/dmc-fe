@@ -25,3 +25,8 @@ export const logAuditAction = async ({
   });
   return data;
 };
+
+export const deleteAuditTrail = async (id: number) => {
+  const { data } = await API.delete(AuditTrailEndpoints.deleteAuditTrail(id));
+  return data;
+};

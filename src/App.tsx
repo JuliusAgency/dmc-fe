@@ -9,7 +9,7 @@ import { MainLayout } from "./components/layouts/MainLayout.tsx";
 import AuthForm from "./pages/auth/index.tsx";
 import AdminDashboard from "./pages/dashboard/adminDashboard";
 import { Document } from "./pages/document";
-import { PendingSignatures } from "./pages/pendingSignatures";
+import { PendingSignatures } from "./pages/signature/index.tsx";
 import { HomePage } from "./pages/home";
 import { ResetPasswordPage } from "./pages/auth/components/resetPassword";
 import { ReportsPage } from "./pages/report";

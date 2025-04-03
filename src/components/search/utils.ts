@@ -1,5 +1,5 @@
 import { SearchReturnType } from "../../api/searchAPI/search";
-import { Document } from "../../pages/pendingSignatures/types";
+import { Document } from "../../pages/signature/types";
 
 export function getNameFromSearchResult(result: SearchReturnType) {
   if (result.table === "Document") {

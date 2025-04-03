@@ -5,11 +5,15 @@ import {
   AUDIT_ACTION_LABELS,
 } from "../../api/auditTrailAPI.ts/types";
 import { formatDate } from "../../utils/formatDate";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-export const COLUMNS: GridColDef<AuditTrail>[] = [
+export const getAuditTrailColumns = (
+  onDelete: (id: number) => void
+): GridColDef<AuditTrail>[] => [
   {
     field: "timestamp",
-    headerName: " date",
+    headerName: "Date",
     flex: 1,
     headerAlign: "center",
     align: "center",
@@ -48,5 +52,20 @@ export const COLUMNS: GridColDef<AuditTrail>[] = [
     flex: 2,
     headerAlign: "center",
     align: "center",
+  },
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 100,
+    sortable: false,
+    filterable: false,
+    disableColumnMenu: true,
+    align: "center",
+    headerAlign: "center",
+    renderCell: (params: any) => (
+      <IconButton onClick={() => onDelete(params?.id)} color="error">
+        <DeleteIcon fontSize="small" sx={{ color: "#ef5350" }} />
+      </IconButton>
+    ),
   },
 ];
