@@ -4,11 +4,13 @@ import {
   DialogContent,
   DialogActions,
   Button,
+  CircularProgress,
 } from "@mui/material";
 
 interface GenericPopupProps {
   open: boolean;
   fullScreen?: boolean;
+  loading?: boolean;
   disabledConfirm?: boolean;
   onClose: () => void;
   title: string;
@@ -22,6 +24,7 @@ interface GenericPopupProps {
 export const GenericPopup = ({
   open,
   fullScreen = false,
+  loading = false,
   onClose,
   title,
   children,
@@ -42,14 +45,18 @@ export const GenericPopup = ({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button onClick={onCancel ?? onClose}>{cancelButtonText}</Button>
+        <Button onClick={onCancel ?? onClose} disabled={loading}>
+          {cancelButtonText}
+        </Button>
+
         {onConfirm && (
           <Button
             variant="contained"
-            disabled={disabledConfirm}
+            disabled={disabledConfirm || loading}
             onClick={onConfirm}
+            startIcon={loading && <CircularProgress size={16} />}
           >
-            {confirmButtonText}
+            {loading ? "Please wait..." : confirmButtonText}
           </Button>
         )}
       </DialogActions>

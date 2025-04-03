@@ -31,6 +31,8 @@ export const ReportIssuePopup = ({
   const sendMailMutation = useSendMail();
   const sendReportMutation = useSendReport();
 
+  const isLoading = sendMailMutation.isPending || sendReportMutation.isLoading;
+
   const handleSubmitReport = async () => {
     if (!document?.processOwner?.email) {
       snackBarError(REPORT_NO_EMAIL);
@@ -69,6 +71,7 @@ export const ReportIssuePopup = ({
       confirmButtonText={REPORT_SEND_BUTTON}
       cancelButtonText={REPORT_CANCEL_BUTTON}
       disabledConfirm={!message.trim()}
+      loading={isLoading}
     >
       <TextField
         fullWidth
