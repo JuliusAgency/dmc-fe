@@ -9,3 +9,7 @@ export const BULLETIN_DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 export const BULLETIN_PENDING_SIGNATURES_TEXT =
   "⚠️ You have documents pending your signature!";
 export const BULLETIN_PENDING_SIGNATURES_BUTTON = "Sign now";
+
+export const BULLETIN_PENDING_REPORTS_TEXT =
+  "⚠️ There are reports waiting for your response.";
+export const BULLETIN_PENDING_REPORTS_BUTTON = "View Reports";

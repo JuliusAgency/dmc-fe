@@ -13,10 +13,14 @@ import {
   BULLETIN_DATE_FORMAT_OPTIONS,
   BULLETIN_PENDING_SIGNATURES_TEXT,
   BULLETIN_PENDING_SIGNATURES_BUTTON,
+  BULLETIN_PENDING_REPORTS_TEXT,
+  BULLETIN_PENDING_REPORTS_BUTTON,
 } from "./constants";
 import { useGetPendingSignatures } from "../../../../hooks/signatures/signaturesHooks";
+import { useGetMyReports } from "../../../../hooks/report/reportHooks";
 import { useUser } from "../../../../hooks/auth/authsHooks";
 import { useNavigate } from "react-router-dom";
+import { WarningBox } from "../../../../components/warningBox/warningBox";
 
 export const BulletinBoard = () => {
   const { user } = useUser();
@@ -24,9 +28,14 @@ export const BulletinBoard = () => {
 
   const { data: announcements = [], isLoading } = useGetHomeAnnouncements();
   const { data: pendingSignatures = [] } = useGetPendingSignatures(user?.id);
+  const { data: reports = [] } = useGetMyReports();
 
-  const handleGoToDocuments = () => {
+  const handleGoToSignatures = () => {
     navigate("/pending-signature");
+  };
+
+  const handleGoToReports = () => {
+    navigate("/reports");
   };
 
   return (
@@ -47,36 +56,19 @@ export const BulletinBoard = () => {
       </Typography>
 
       {pendingSignatures.length > 0 && (
-        <Box
-          sx={{
-            backgroundColor: "#fdecea",
-            border: "1px solid #f44336",
-            borderRadius: 1,
-            p: 1.5,
-            mb: 2,
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "bold", color: "#c62828", mb: 1 }}
-          >
-            {BULLETIN_PENDING_SIGNATURES_TEXT}
-          </Typography>
-          <Button
-            variant="outlined"
-            fullWidth
-            size="small"
-            onClick={handleGoToDocuments}
-            sx={{
-              color: "#c62828",
-              borderColor: "#c62828",
-              textTransform: "none",
-              fontWeight: 500,
-            }}
-          >
-            {BULLETIN_PENDING_SIGNATURES_BUTTON}
-          </Button>
-        </Box>
+        <WarningBox
+          text={BULLETIN_PENDING_SIGNATURES_TEXT}
+          buttonText={BULLETIN_PENDING_SIGNATURES_BUTTON}
+          onClick={handleGoToSignatures}
+        />
+      )}
+
+      {reports.length > 0 && (
+        <WarningBox
+          text={BULLETIN_PENDING_REPORTS_TEXT}
+          buttonText={BULLETIN_PENDING_REPORTS_BUTTON}
+          onClick={handleGoToReports}
+        />
       )}
 
       <Divider sx={{ mb: 1, borderColor: "#90caf9" }} />
